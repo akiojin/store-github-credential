@@ -14,6 +14,7 @@ async function StoreGitHubCredential(username, password)
 
 	const options = {
 		input: () => {
+			console.log('@@@@@@@@@@@@@');
 			return Buffer.from(
 				`protocol=https
 				host=github.com

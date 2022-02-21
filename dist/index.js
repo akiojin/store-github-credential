@@ -9768,27 +9768,31 @@ function ImportLoginKeychain()
 	exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
 }
 
-function StoreGitHubCredential(username, password)
+async function StoreGitHubCredential(username, password)
 {
-	const gcm = exec.exec(
-		'git credential-manager-core store',
-		(err, stdout, stderr) => {
-			if (err) {
+	const options = {
+		input: () => {
+			return `protocol=https
+			host=github.com
+			username=${username}
+			password=${password}`
+		},
+		listeners: {
+			stdout: (data) => {
+				console.log(data);
+			},
+			stderr: (err) => {
 				core.setFailed(err);
-			} else {
-				console.log(stdout);
 			}
 		}
-	);
+	};
 
-	gcm.stdin.write('protocol=https');
-	gcm.stdin.write('host=github.com');
-	gcm.stdin.write(`username=${username}`);
-	gcm.stdin.write(`password=${password}`);
-	gcm.stdin.end();
+	await exec.exec('git credential-manager-core store', options);
 }
 
-console.log(`platform=${process.platform}`);
+if (process.platform != 'darwin') {
+	core.setFailed('Platform not supported.');
+}
 
 try {
 	ImportLoginKeychain();

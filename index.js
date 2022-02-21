@@ -15,6 +15,7 @@ async function StoreGitHubCredential(username, password)
 
 	const options = {
 		input: () => {
+			return Buffer.from('protocol=https');
 			return Buffer.from(
 				`protocol=https
 				host=github.com
@@ -33,7 +34,7 @@ async function StoreGitHubCredential(username, password)
 
 	await exec.exec('git', ['credential-manager-core', 'store'], options);
 
-	if (stderr != '') {
+	if (error != '') {
 		core.setFailed(error);
 	} else {
 		console.log(output);

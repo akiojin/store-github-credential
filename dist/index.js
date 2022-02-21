@@ -9787,7 +9787,7 @@ async function StoreGitHubCredential(username, password)
 		}
 	};
 
-	await exec.exec('git credential-manager-core store', options);
+	await exec.exec('git', ['credential-manager-core', 'store'], options);
 }
 
 if (process.platform != 'darwin') {

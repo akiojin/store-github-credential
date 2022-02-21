@@ -6,16 +6,10 @@ try {
   const username = core.getInput('username');
   const password = core.getInput('password');
 
-  const credential = `
-  git credential-manager-core store << EOS
-  protocol=https
-  host=github.com
-  username=%s
-  password=%s
-  EOS
-  `
+  process.env.GIT_CREDENTIAL_USERNAME = core.getInput('username');
+  process.env.GIT_CREDENTIAL_PASSWORD = core.getInput('password');
 
-  process.execFile('security', ['list-keychains', '-d user', '-s ~/Library/Keychains/login.keychain-db'], (error, stdout, stderr) => {
+  process.exec('./Store-GitHub-Credential.sh', (error, stdout, stderr) => {
     if (error) {
       console.log('ERROR', error);
       core.setFailed(error);

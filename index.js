@@ -11,6 +11,9 @@ try {
       console.log('ERROR', error);
       core.setFailed(error);
     } else {
+      console.log('username: ', username);
+      console.log('password: ', password);
+
       console.log('STDOUT', stdout);
       console.log('STDERR', stderr);
     }

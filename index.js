@@ -4,7 +4,8 @@ const exec = require('@actions/exec');
 
 function ImportLoginKeychain()
 {
-  exec.exec('security list-keychain -d user -s ~/Library/Keychains/login.keychain-db');
+  // ログインキーチェインをリストに表示されるように
+  exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
 }
 
 async function StoreGitHubCredential(username, password)

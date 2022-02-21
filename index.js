@@ -2,15 +2,25 @@ const core = require('@actions/core')
 const github = require('@actions/github')
 const exec = require('@actions/exec');
 
-async function StoreGitHubCredential()
+function ImportLoginKeychain()
 {
-  await exec.exec('./Store-GitHub-Credential.sh');
+  exec.exec('security list-keychain -d user -s ~/Library/Keychains/login.keychain-db');
+}
+
+async function StoreGitHubCredential(username, password)
+{
+  await exec.exec(`
+  git credential-manager-core store << EOS
+  protocol=https
+  host=github.com
+  username=${username}
+  password=${password}
+  EOS
+  `);
 }
 
 try {
-  core.exportVariable('GIT_CREDENTIAL_USERNAME', core.getInput('username'));
-  core.exportVariable('GIT_CREDENTIAL_PASSWORD', core.getInput('password'));
-
+  ImportLoginKeychain();
   StoreGitHubCredential();
 } catch (ex) {
   core.setFailed(ex.message);

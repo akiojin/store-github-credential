@@ -6,8 +6,8 @@ try {
   const username = core.getInput('username');
   const password = core.getInput('password');
 
-  process.env.GIT_CREDENTIAL_USERNAME = core.getInput('username');
-  process.env.GIT_CREDENTIAL_PASSWORD = core.getInput('password');
+  proc.execSync('export GIT_CREDENTIAL_USERNAME=' + core.getInput('username'));
+  proc.execSync('export GIT_CREDENTIAL_PASSWORD=' + core.getInput('password'));
 
   proc.exec('./Store-GitHub-Credential.sh', (error, stdout, stderr) => {
     if (error) {

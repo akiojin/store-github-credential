@@ -9799,18 +9799,21 @@ async function StoreGitHubCredential(username, password)
 	}
 }
 
-if (process.platform != 'darwin') {
-	core.setFailed('Platform not supported.');
+async function Execute()
+{
+	if (process.platform != 'darwin') {
+		core.setFailed('Platform not supported.');
+	}
+	
+	try {
+		await ImportLoginKeychain();
+		await StoreGitHubCredential(core.getInput('username'), core.getInput('password'));
+	} catch (ex) {
+		core.setFailed(ex.message);
+	}
 }
 
-try {
-	ImportLoginKeychain();
-	StoreGitHubCredential(core.getInput('username'), core.getInput('password'));
-} catch (ex) {
-	core.setFailed(ex.message);
-}
-
-
+Execute();
 })();
 
 module.exports = __webpack_exports__;

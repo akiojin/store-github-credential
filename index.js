@@ -1,11 +1,10 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
 const exec = require('@actions/exec');
-const { stderr } = require('process');
 
-function ImportLoginKeychain()
+async function ImportLoginKeychain()
 {
-	exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
+	await exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
 }
 
 async function StoreGitHubCredential(username, password)

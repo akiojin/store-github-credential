@@ -9646,14 +9646,6 @@ module.exports = require("path");
 
 /***/ }),
 
-/***/ 7282:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("process");
-
-/***/ }),
-
 /***/ 5477:
 /***/ ((module) => {
 
@@ -9770,11 +9762,10 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(5127)
 const github = __nccwpck_require__(3134)
 const exec = __nccwpck_require__(2049);
-const { stderr } = __nccwpck_require__(7282);
 
-function ImportLoginKeychain()
+async function ImportLoginKeychain()
 {
-	exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
+	await exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
 }
 
 async function StoreGitHubCredential(username, password)

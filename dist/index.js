@@ -8478,16 +8478,16 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(5127)
 const github = __nccwpck_require__(3134)
-const process = __nccwpck_require__(2081);
+const proc = __nccwpck_require__(2081);
 
 try {
   const username = core.getInput('username');
   const password = core.getInput('password');
 
-  process.env.GIT_CREDENTIAL_USERNAME = core.getInput('username');
-  process.env.GIT_CREDENTIAL_PASSWORD = core.getInput('password');
+  proc.execSync('export GIT_CREDENTIAL_USERNAME=' + core.getInput('username'));
+  proc.execSync('export GIT_CREDENTIAL_PASSWORD=' + core.getInput('password'));
 
-  process.exec('./Store-GitHub-Credential.sh', (error, stdout, stderr) => {
+  proc.exec('./Store-GitHub-Credential.sh', (error, stdout, stderr) => {
     if (error) {
       console.log('ERROR', error);
       core.setFailed(error);

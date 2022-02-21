@@ -15,12 +15,10 @@ async function StoreGitHubCredential(username, password)
 
 	const options = {
 		input: () => {
-			return Buffer.from('protocol=https');
-			return Buffer.from(
-				`protocol=https
+			return `protocol=https
 				host=github.com
 				username=${username}
-				password=${password}`);
+				password=${password}`;
 		},
 		listeners: {
 			stdout: (data) => {

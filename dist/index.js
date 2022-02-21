@@ -9765,27 +9765,26 @@ const exec = __nccwpck_require__(2049);
 
 function ImportLoginKeychain()
 {
-  // ログインキーチェインをリストに表示されるように
-  exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
+	exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
 }
 
 async function StoreGitHubCredential(username, password)
 {
-  await exec.exec(`
-  git credential-manager-core store << EOS
-  protocol=https
-  host=github.com
-  username=${username}
-  password=${password}
-  EOS
-  `);
+	await exec.exec(`
+	git credential-manager-core store << EOS
+	protocol=https
+	host=github.com
+	username=${username}
+	password=${password}
+	EOS
+	`);
 }
 
 try {
-  ImportLoginKeychain();
-//  StoreGitHubCredential();
+	ImportLoginKeychain();
+//	StoreGitHubCredential();
 } catch (ex) {
-  core.setFailed(ex.message);
+	core.setFailed(ex.message);
 }
 
 

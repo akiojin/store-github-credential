@@ -9,9 +9,6 @@ function ImportLoginKeychain()
 
 async function StoreGitHubCredential(username, password)
 {
-	console.log(`username=${username}`);
-	console.log(`password=${password}`);
-
 	const options = {
 		input: () => {
 			return Buffer.from(
@@ -22,10 +19,10 @@ async function StoreGitHubCredential(username, password)
 		},
 		listeners: {
 			stdout: (data) => {
-				console.log(data);
+				console.log(data.toString());
 			},
 			stderr: (err) => {
-				core.setFailed(err);
+				core.setFailed(err.toString());
 			}
 		}
 	};

@@ -9646,6 +9646,14 @@ module.exports = require("path");
 
 /***/ }),
 
+/***/ 7282:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("process");
+
+/***/ }),
+
 /***/ 5477:
 /***/ ((module) => {
 
@@ -9762,6 +9770,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(5127)
 const github = __nccwpck_require__(3134)
 const exec = __nccwpck_require__(2049);
+const { stderr } = __nccwpck_require__(7282);
 
 function ImportLoginKeychain()
 {
@@ -9770,6 +9779,9 @@ function ImportLoginKeychain()
 
 async function StoreGitHubCredential(username, password)
 {
+	output = '';
+	error = '';
+
 	const options = {
 		input: () => {
 			return Buffer.from(
@@ -9780,15 +9792,21 @@ async function StoreGitHubCredential(username, password)
 		},
 		listeners: {
 			stdout: (data) => {
-				console.log(data.toString());
+				output += data.toString();
 			},
 			stderr: (err) => {
-				core.setFailed(err.toString());
+				error += err.toString();
 			}
 		}
 	};
 
 	await exec.exec('git', ['credential-manager-core', 'store'], options);
+
+	if (stderr != '') {
+		core.setFailed(error);
+	} else {
+		console.log(output);
+	}
 }
 
 if (process.platform != 'darwin') {

@@ -1,6 +1,7 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
 const exec = require('@actions/exec');
+const { stderr } = require('process');
 
 function ImportLoginKeychain()
 {
@@ -9,6 +10,9 @@ function ImportLoginKeychain()
 
 async function StoreGitHubCredential(username, password)
 {
+	output = '';
+	error = '';
+
 	const options = {
 		input: () => {
 			return Buffer.from(
@@ -19,15 +23,21 @@ async function StoreGitHubCredential(username, password)
 		},
 		listeners: {
 			stdout: (data) => {
-				console.log(data.toString());
+				output += data.toString();
 			},
 			stderr: (err) => {
-				core.setFailed(err.toString());
+				error += err.toString();
 			}
 		}
 	};
 
 	await exec.exec('git', ['credential-manager-core', 'store'], options);
+
+	if (stderr != '') {
+		core.setFailed(error);
+	} else {
+		console.log(output);
+	}
 }
 
 if (process.platform != 'darwin') {

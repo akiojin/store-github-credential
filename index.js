@@ -9,6 +9,9 @@ function ImportLoginKeychain()
 
 async function StoreGitHubCredential(username, password)
 {
+	console.log(`username=${username}`);
+	console.log(`password=${password}`);
+
 	const options = {
 		input: () => {
 			return `protocol=https

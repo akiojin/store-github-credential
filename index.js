@@ -6,7 +6,16 @@ try {
   const username = core.getInput('username');
   const password = core.getInput('password');
 
-  process.execFile('security', ['list-keychain', '-d user', '-s ~/Library/Keychains/login.keychain-db'], (error, stdout, stderr) => {
+  const credential = `
+  git credential-manager-core store << EOS
+  protocol=https
+  host=github.com
+  username=%s
+  password=%s
+  EOS
+  `
+
+  process.execFile('security', ['list-keychains', '-d user', '-s ~/Library/Keychains/login.keychain-db'], (error, stdout, stderr) => {
     if (error) {
       console.log('ERROR', error);
       core.setFailed(error);
@@ -17,7 +26,7 @@ try {
       console.log('STDOUT', stdout);
       console.log('STDERR', stderr);
     }
-  })
+  });
 } catch (ex) {
   core.setFailed(ex.message);
 }

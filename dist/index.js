@@ -9775,10 +9775,11 @@ async function StoreGitHubCredential(username, password)
 
 	const options = {
 		input: () => {
-			return `protocol=https
-			host=github.com
-			username=${username}
-			password=${password}`
+			return Buffer.from(
+				`protocol=https
+				host=github.com
+				username=${username}
+				password=${password}`);
 		},
 		listeners: {
 			stdout: (data) => {

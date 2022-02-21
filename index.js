@@ -19,10 +19,12 @@ function StoreGitHubCredential(username, password)
 			}
 		});
 
-	gcm.stdin.write('protocol=https');
-	gcm.stdin.write('host=github.com');
-	gcm.stdin.write(`username=${username}`);
-	gcm.stdin.write(`password=${password}`);
+	gcm.stdin.write(`
+		protocol=https
+		host=github.com
+		username=${username}
+		password=${password}`);
+
 	gcm.stdin.end();
 }
 

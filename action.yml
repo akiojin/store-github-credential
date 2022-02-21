@@ -1,0 +1,15 @@
+name: 'Store GitHub credential'
+description: ''
+inputs:
+  username:
+    description: 'GitHub username'
+    required: true
+    default: ''
+  password:
+    description: 'Password or Personal Access Token (PAT)'
+    required: true
+    default: ''
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+

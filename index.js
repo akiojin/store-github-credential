@@ -38,7 +38,7 @@ if (process.platform != 'darwin') {
 
 try {
 	ImportLoginKeychain();
-	StoreGitHubCredential();
+	StoreGitHubCredential(core.getInput('username'), core.getInput('password'));
 } catch (ex) {
 	core.setFailed(ex.message);
 }

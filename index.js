@@ -1,26 +1,17 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
-const proc = require('child_process');
+const exec = require('@actions/exec');
+
+async function StoreGitHubCredential()
+{
+  await exec.exec('./Store-GitHub-Credential.sh');
+}
 
 try {
-  const username = core.getInput('username');
-  const password = core.getInput('password');
+  core.exportVariable('GIT_CREDENTIAL_USERNAME', core.getInput('username'));
+  core.exportVariable('GIT_CREDENTIAL_PASSWORD', core.getInput('password'));
 
-  proc.execSync('export GIT_CREDENTIAL_USERNAME=' + core.getInput('username'));
-  proc.execSync('export GIT_CREDENTIAL_PASSWORD=' + core.getInput('password'));
-
-  proc.exec('./Store-GitHub-Credential.sh', (error, stdout, stderr) => {
-    if (error) {
-      console.log('ERROR', error);
-      core.setFailed(error);
-    } else {
-      console.log('username: ', username);
-      console.log('password: ', password);
-
-      console.log('STDOUT', stdout);
-      console.log('STDERR', stderr);
-    }
-  });
+  StoreGitHubCredential();
 } catch (ex) {
   core.setFailed(ex.message);
 }

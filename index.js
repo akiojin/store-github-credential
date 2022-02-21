@@ -21,7 +21,7 @@ async function StoreGitHubCredential(username, password)
 
 try {
   ImportLoginKeychain();
-  StoreGitHubCredential();
+//  StoreGitHubCredential();
 } catch (ex) {
   core.setFailed(ex.message);
 }

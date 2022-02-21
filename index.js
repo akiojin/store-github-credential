@@ -1,10 +1,10 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
-const exec = require('child_process');
+const exec = require('@actions/exec');
 
 function ImportLoginKeychain()
 {
-	exec.execSync('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
+	exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
 }
 
 function StoreGitHubCredential(username, password)
@@ -21,17 +21,13 @@ function StoreGitHubCredential(username, password)
 	);
 
 	gcm.stdin.write('protocol=https');
-	gcm.stdin.end();
-}
 	gcm.stdin.write('host=github.com');
-	gcm.stdin.end();
-}
 	gcm.stdin.write(`username=${username}`);
-	gcm.stdin.end();
-}
 	gcm.stdin.write(`password=${password}`);
 	gcm.stdin.end();
 }
+
+console.log(`platform=${process.platform}`);
 
 try {
 	ImportLoginKeychain();

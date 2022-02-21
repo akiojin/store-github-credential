@@ -1,22 +1,29 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
-const exec = require('@actions/exec');
+const exec = require('child_process');
 
 function ImportLoginKeychain()
 {
-	exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
+	exec.execSync('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
 }
 
-async function StoreGitHubCredential(username, password)
+function StoreGitHubCredential(username, password)
 {
-	await exec.exec(`
-	git credential-manager-core store << EOS
-	protocol=https
-	host=github.com
-	username=${username}
-	password=${password}
-	EOS
-	`);
+	const gcm = exec.exec(
+		'git credential-manager-core store',
+		(err, stdout, stderr) => {
+			if (err) {
+				core.setFailed(err);
+			} else {
+				console.log(stdout);
+			}
+		});
+
+	gcm.stdin.write('protocol=https');
+	gcm.stdin.write('host=github.com');
+	gcm.stdin.write(`username=${username}`);
+	gcm.stdin.write(`password=${password}`);
+	gcm.stdin.end();
 }
 
 try {

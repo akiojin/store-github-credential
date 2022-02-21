@@ -8485,6 +8485,12 @@ function ImportLoginKeychain()
 	exec.execSync('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
 }
 
+function OutputStdin(gcm, command)
+{
+	gcm.stdin.write(command);
+	gcm.stdin.end();
+}
+
 function StoreGitHubCredential(username, password)
 {
 	const gcm = exec.exec(
@@ -8497,12 +8503,10 @@ function StoreGitHubCredential(username, password)
 			}
 		});
 
-	gcm.stdin.write('protocol=https');
-	gcm.stdin.write('host=github.com');
-	gcm.stdin.write(`username=${username}`);
-	gcm.stdin.write(`password=${password}`);
-
-	gcm.stdin.end();
+	OutputStdin('protocol=https');
+	OutputStdin('host=github.com');
+	OutputStdin(`username=${username}`);
+	OutputStdin(`password=${password}`);
 }
 
 try {

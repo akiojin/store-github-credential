@@ -3722,7 +3722,7 @@ async function GetTemporaryShellScript(text)
 	var dst = `${src}.sh`;
 
 	await fsPromises.rename(src, dst);
-	await fsPromises.chmod(dst, fs.constants.R_OK | fs.constants.X_OK);
+	await fsPromises.chmod(dst, fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK);
 
 	return dst;
 };
@@ -3738,7 +3738,6 @@ async function StoreGitCredential(username, password)
 	EOS`;
 	
 	const path = await GetTemporaryShellScript(credential);
-	await exec.exec(`cat ${path}`);
 	await exec.exec(path);
 }
 

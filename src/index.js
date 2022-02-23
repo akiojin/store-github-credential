@@ -35,7 +35,7 @@ async function EnableLoginUserKeychain()
 
 async function StoreGitCredential(username, password)
 {
-	var credential = `git credential-manager-core << EOS
+	var credential = `git credential-manager-core store << EOS
 protocol=http
 host=github.com
 username=${username}

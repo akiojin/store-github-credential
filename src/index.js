@@ -47,7 +47,7 @@ export async function GetTemporaryFile(text)
 export async function GetTemporaryShellScript(text)
 {
 	var src = await GetTemporaryFile(text);
-	var dst = `${path}.sh`;
+	var dst = `${src}.sh`;
 
 	await fsPromises.rename(src, dst);
 	await fsPromises.chmod(dst, fs.constants.R_OK | fs.constants.X_OK);

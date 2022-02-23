@@ -3707,19 +3707,25 @@ async function EnableLoginUserKeychain()
 	await EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 }
 
-async function GetTemporaryFile(text)
+async function GetTemporaryFile(text, options)
 {
-	var path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
+	const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
 
-	await fsPromises.writeFile(path, text);
+	await fsPromises.writeFile(path, text, options);
 
 	return path;
 };
 
 async function GetTemporaryShellScript(text)
 {
-	var src = await GetTemporaryFile(text);
-	var dst = `${src}.sh`;
+	const options = {
+		encoding: "utf8",
+		flag: "w",
+		mode: 0o777
+	};
+
+	const src = await GetTemporaryFile(text, options);
+	const dst = `${src}.sh`;
 
 	await fsPromises.rename(src, dst);
 	await fsPromises.chmod(dst, fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK);

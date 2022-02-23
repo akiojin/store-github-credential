@@ -9763,60 +9763,70 @@ const core = __nccwpck_require__(5127)
 const github = __nccwpck_require__(3134)
 const exec = __nccwpck_require__(2049);
 
-async function ImportLoginKeychain()
+async function EnableKeychains(domain, path)
 {
-	await exec.exec('security list-keychains -d user -s ~/Library/Keychains/login.keychain-db');
+	var args = [ "list-keychains", "-d", domain, "-s", path ];
+	await exec.exec('security', args);
+}
+
+async function EnableUserKeychains(path)
+{
+	await EnableKeychains("user", path);
+}
+
+async function EnableSystemKeychains(path)
+{
+	await EnableKeychains("system", path);
+}
+
+async function EnableCommonKeychains(path)
+{
+	await EnableKeychains("common", path);
+}
+
+async function EnableDynamicKeychains(path)
+{
+	await EnableKeychains("dynamic", path);
+}
+
+async function EnableLoginUserKeychain()
+{
+	await EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 }
 
 async function StoreGitHubCredential(username, password)
 {
-	output = '';
-	error = '';
+	var credential = `git credential-manager-core << EOS
+	protocol=http
+	host=github.com
+	${username}
+	${password}
+	EOS
+	`;
 
-	const options = {
-		input: () => {
-			return Buffer.from('protocol=https');
-			return Buffer.from(
-				`protocol=https
-				host=github.com
-				username=${username}
-				password=${password}`
-			);
-		},
-		listeners: {
-			stdout: (data) => {
-				output += data.toString();
-			},
-			stderr: (err) => {
-				error += err.toString();
-			}
-		}
-	};
+	core.exportVariable('GIT_CREDENTIAL', credential);
 
-	await exec.exec('git', ['credential-manager-core', 'store'], options);
+	const temp = `${process.env.RUNNER_TEMP}/store-git-credential.sh`;
+	await exec.exec(`/bin/bash -c "echo \\\"$GIT_CREDENTIAL\\\" | tee ${temp}"`);
 
-	if (error != '') {
-		core.setFailed(error);
-	} else {
-		console.log(output);
-	}
+	await exec.exec(temp);
 }
 
-async function Execute()
+async function Run()
 {
 	if (process.platform != 'darwin') {
 		core.setFailed('Platform not supported.');
 	}
 	
 	try {
-		await ImportLoginKeychain();
+		await EnableLoginUserKeychain();
 		await StoreGitHubCredential(core.getInput('username'), core.getInput('password'));
 	} catch (ex) {
 		core.setFailed(ex.message);
 	}
 }
 
-Execute();
+Run();
 })();
 
 module.exports = __webpack_exports__;

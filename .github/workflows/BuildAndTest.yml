@@ -1,0 +1,30 @@
+name: Build & Test
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  Build_and_Test:
+    runs-on: macos-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Store Git Credential
+        uses: ./
+        with:
+          username: akiojin
+          password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}

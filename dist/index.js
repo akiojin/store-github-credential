@@ -3508,6 +3508,14 @@ module.exports = require("fs");
 
 /***/ }),
 
+/***/ 292:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("fs/promises");
+
+/***/ }),
+
 /***/ 685:
 /***/ ((module) => {
 
@@ -3662,8 +3670,10 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */   "GetTemporaryShellScript": () => (/* binding */ GetTemporaryShellScript),
 /* harmony export */   "StoreGitCredential": () => (/* binding */ StoreGitCredential)
 /* harmony export */ });
-const core = __nccwpck_require__(127)
+const core = __nccwpck_require__(127);
 const exec = __nccwpck_require__(49);
+const fs = __nccwpck_require__(147);
+const fsPromises = __nccwpck_require__(292);
 const { v4: uuidv4 } = __nccwpck_require__(267);
 
 async function EnableKeychains(domain, path)

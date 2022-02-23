@@ -1,5 +1,7 @@
-const core = require('@actions/core')
+const core = require('@actions/core');
 const exec = require('@actions/exec');
+const fs = require('fs');
+const fsPromises = require('fs/promises');
 const { v4: uuidv4 } = require('uuid');
 
 export async function EnableKeychains(domain, path)

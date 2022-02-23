@@ -47,6 +47,7 @@ EOS`;
 	const temp = `${process.env.RUNNER_TEMP}/store-git-credential.sh`;
 	await exec.exec(`/bin/bash -c "echo \\\"$GIT_CREDENTIAL\\\" | tee ${temp}"`);
 	await exec.exec(`chmod +x ${temp}`);
+	await exec.exec(`cat ${temp}`);
 	await exec.exec(temp);
 }
 

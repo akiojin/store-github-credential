@@ -1,53 +1,70 @@
 const core = require('@actions/core')
-const github = require('@actions/github')
 const exec = require('@actions/exec');
 
-async function EnableKeychains(domain, path)
+export async function EnableKeychains(domain, path)
 {
 	var args = [ "list-keychains", "-d", domain, "-s", path ];
 	await exec.exec('security', args);
 }
 
-async function EnableUserKeychains(path)
+export async function EnableUserKeychains(path)
 {
 	await EnableKeychains("user", path);
 }
 
-async function EnableSystemKeychains(path)
+export async function EnableSystemKeychains(path)
 {
 	await EnableKeychains("system", path);
 }
 
-async function EnableCommonKeychains(path)
+export async function EnableCommonKeychains(path)
 {
 	await EnableKeychains("common", path);
 }
 
-async function EnableDynamicKeychains(path)
+export async function EnableDynamicKeychains(path)
 {
 	await EnableKeychains("dynamic", path);
 }
 
-async function EnableLoginUserKeychain()
+export async function EnableLoginUserKeychain()
 {
 	await EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 }
 
-async function StoreGitCredential(username, password)
+export async function GetTemporaryFile(text)
 {
-	var credential = `git credential-manager-core store << EOS
-protocol=http
-host=github.com
-username=${username}
-password=${password}
-EOS`;
+	var path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
 
-	core.exportVariable('GIT_CREDENTIAL', credential);
+	await fsPromises.writeFile(path, text);
 
-	const temp = `${process.env.RUNNER_TEMP}/store-git-credential.sh`;
-	await exec.exec(`/bin/bash -c "echo \\\"$GIT_CREDENTIAL\\\" | tee ${temp}"`);
-	await exec.exec(`chmod +x ${temp}`);
-	await exec.exec(temp);
+	return path;
+};
+
+export async function GetTemporaryShellScript(text)
+{
+	var src = await GetTemporaryFile(text);
+	var dst = `${path}.sh`;
+
+	await fsPromises.rename(src, dst);
+	await fsPromises.chmod(dst, fs.constants.R_OK | fs.constants.X_OK);
+
+	return dst;
+};
+
+export async function StoreGitCredential(username, password)
+{
+	const credential = `
+	git credential-manager-core store << EOS
+	protocol=http
+	host=github.com
+	username=${username}
+	password=${password}
+	EOS`;
+	
+	const path = await GetTemporaryShellScript(credential);
+	await exec.exec(`cat ${path}`);
+	await exec.exec(path);
 }
 
 async function Run()

@@ -1,5 +1,6 @@
 const core = require('@actions/core')
 const exec = require('@actions/exec');
+const { v4: uuidv4 } = require('uuid');
 
 export async function EnableKeychains(domain, path)
 {

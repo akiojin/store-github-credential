@@ -9794,21 +9794,20 @@ async function EnableLoginUserKeychain()
 	await EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 }
 
-async function StoreGitHubCredential(username, password)
+async function StoreGitCredential(username, password)
 {
 	var credential = `git credential-manager-core << EOS
-	protocol=http
-	host=github.com
-	${username}
-	${password}
-	EOS
-	`;
+protocol=http
+host=github.com
+username=${username}
+password=${password}
+EOS`;
 
 	core.exportVariable('GIT_CREDENTIAL', credential);
 
 	const temp = `${process.env.RUNNER_TEMP}/store-git-credential.sh`;
 	await exec.exec(`/bin/bash -c "echo \\\"$GIT_CREDENTIAL\\\" | tee ${temp}"`);
-
+	await exec.exec(`chmod +x ${temp}`);
 	await exec.exec(temp);
 }
 
@@ -9820,7 +9819,7 @@ async function Run()
 	
 	try {
 		await EnableLoginUserKeychain();
-		await StoreGitHubCredential(core.getInput('username'), core.getInput('password'));
+		await StoreGitCredential(core.getInput('username'), core.getInput('password'));
 	} catch (ex) {
 		core.setFailed(ex.message);
 	}

@@ -5553,8 +5553,7 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	core.exportVariable('CREDENTIAL', `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}`);
-	await execa(`echo \"$CREDENTIAL\" | git credential-manager-core store`);
+	await execa(`echo \"protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\" | git credential-manager-core store`);
 };
 
 var GetGitCredential = async function() {

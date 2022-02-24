@@ -5399,8 +5399,13 @@ var GetTemporaryShellScript = async function(text) {
 
 var StoreGitCredential = async function(username, password) {
 	const credential = `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}`;
-	await exec.exec(`echo -e "${credential}" | git credential-manager-core store`);
-}
+	await exec.exec(`echo "${credential}" | git credential-manager-core store`);
+};
+
+var GetGitCredential = async function() {
+	const credential = `protocol=https\nhost=github.com`;
+	await exec.exec(`echo "${credential}" | git credential-manager-core get`);
+};
 
 async function Run()
 {
@@ -5411,6 +5416,7 @@ async function Run()
 	try {
 		await EnableLoginUserKeychain();
 		await StoreGitCredential(core.getInput('username'), core.getInput('password'));
+		await GetGitCredential();
 	} catch (ex) {
 		core.setFailed(ex.message);
 	}

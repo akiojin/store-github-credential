@@ -79,7 +79,7 @@ var StoreGitCredential = async function(username, password) {
 		}
 	};
 
-	await Execute('export', options);
+//	await Execute('export', options);
 	await Execute(`echo "$CREDENTIAL" | git credential-manager-core store`, options);
 };
 

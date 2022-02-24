@@ -5557,10 +5557,18 @@ var StoreGitCredential = async function(username, password) {
 	
 	const bin = Buffer.from(base64, 'base64');
 
+	const credential = `git credential-manager-core store << EOS
+	protocol=https
+	host=github.com
+	username=$GIT_CREDENTIAL_USERNAME
+	password=$GIT_CREDENTIAL_PASSWORD
+	EOS
+	`;
+
 	core.exportVariable('GIT_CREDENTIAL_USERNAME', username);
 	core.exportVariable('GIT_CREDENTIAL_PASSWORD', password);
 
-	await execa(bin.toString());
+	await execa(credential);
 //	const path = await GetTemporaryShellScript(bin.toString());
 //	await exec.exec(path);
 //	await exec.exec(bin.toString());

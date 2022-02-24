@@ -62,18 +62,28 @@ var GetTemporaryShellScript = async function(text) {
 	return dst;
 };
 
+var Execute = async function(command, options) {
+	core.info(command);
+	await execa.execaCommand(command, options);
+};
+
+var Execute = async function(command) {
+	core.info(command);
+	await execa.execaCommand(command);
+};
+
 var StoreGitCredential = async function(username, password) {
 	const options = {
 		env: {
-			'CREDENTIAL': `protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`
+			CREDENTIAL: `protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`
 		}
 	};
 
-	await execa.execaCommand(`echo "$CREDENTIAL" | git credential-manager-core store`, options);
+	await Execute(`echo "$CREDENTIAL" | git credential-manager-core store`, options);
 };
 
 var GetGitCredential = async function() {
-	await execa.execaCommand(`echo "protocol=https\\nhost=github.com" | git credential-manager-core get`);
+	await Execute(`echo "protocol=https\\nhost=github.com" | git credential-manager-core get`);
 };
 
 async function Run()

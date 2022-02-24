@@ -7,7 +7,7 @@ import * as execa from 'execa'
 
 var EnableKeychains = async function(domain, path) {
 	var args = [ "list-keychains", "-d", domain, "-s", path ];
-	await exec.exec('security', args);
+	await execa.execa('security', args);
 }
 
 var EnableUserKeychains = async function(path) {
@@ -64,11 +64,11 @@ var GetTemporaryShellScript = async function(text) {
 
 var StoreGitCredential = async function(username, password) {
 	core.exportVariable('CREDENTIAL', `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}`);
-	await exec.exec(`echo \"$CREDENTIAL\" | git credential-manager-core store`);
+	await execa.execa(`echo \"$CREDENTIAL\" | git credential-manager-core store`);
 };
 
 var GetGitCredential = async function() {
-	await exec.exec(`echo \"protocol=https\nhost=github.com\" | git credential-manager-core get`);
+	await execa.execa(`echo \"protocol=https\nhost=github.com\" | git credential-manager-core get`);
 };
 
 async function Run()

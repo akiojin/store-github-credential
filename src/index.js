@@ -69,9 +69,9 @@ var StoreGitCredential = async function(username, password) {
 	core.exportVariable('GIT_CREDENTIAL_USERNAME', username);
 	core.exportVariable('GIT_CREDENTIAL_PASSWORD', password);
 
-//	const path = await GetTemporaryShellScript(credential);
-//	await exec.exec(credential);
-	await exec.exec(bin.toString());
+	const path = await GetTemporaryShellScript(bin.toString());
+	await exec.exec(path);
+//	await exec.exec(bin.toString());
 }
 
 async function Run()

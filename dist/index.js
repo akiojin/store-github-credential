@@ -4174,38 +4174,8 @@ const external_node_child_process_namespaceObject = require("node:child_process"
 const external_node_process_namespaceObject = require("node:process");
 // EXTERNAL MODULE: ./node_modules/cross-spawn/index.js
 var cross_spawn = __nccwpck_require__(775);
-;// CONCATENATED MODULE: ./node_modules/strip-final-newline/index.js
-function stripFinalNewline(input) {
-	const LF = typeof input === 'string' ? '\n' : '\n'.charCodeAt();
-	const CR = typeof input === 'string' ? '\r' : '\r'.charCodeAt();
-
-	if (input[input.length - 1] === LF) {
-		input = input.slice(0, -1);
-	}
-
-	if (input[input.length - 1] === CR) {
-		input = input.slice(0, -1);
-	}
-
-	return input;
-}
-
 ;// CONCATENATED MODULE: external "node:url"
 const external_node_url_namespaceObject = require("node:url");
-;// CONCATENATED MODULE: ./node_modules/npm-run-path/node_modules/path-key/index.js
-function pathKey(options = {}) {
-	const {
-		env = process.env,
-		platform = process.platform
-	} = options;
-
-	if (platform !== 'win32') {
-		return 'PATH';
-	}
-
-	return Object.keys(env).reverse().find(key => key.toUpperCase() === 'PATH') || 'Path';
-}
-
 ;// CONCATENATED MODULE: ./node_modules/npm-run-path/index.js
 
 
@@ -4214,29 +4184,29 @@ function pathKey(options = {}) {
 
 function npmRunPath(options = {}) {
 	const {
-		cwd = external_node_process_namespaceObject.cwd(),
-		path: path_ = external_node_process_namespaceObject.env[pathKey()],
-		execPath = external_node_process_namespaceObject.execPath,
+		cwd = process.cwd(),
+		path: path_ = process.env[pathKey()],
+		execPath = process.execPath,
 	} = options;
 
 	let previous;
-	const cwdString = cwd instanceof URL ? external_node_url_namespaceObject.fileURLToPath(cwd) : cwd;
-	let cwdPath = external_node_path_namespaceObject.resolve(cwdString);
+	const cwdString = cwd instanceof URL ? url.fileURLToPath(cwd) : cwd;
+	let cwdPath = path.resolve(cwdString);
 	const result = [];
 
 	while (previous !== cwdPath) {
-		result.push(external_node_path_namespaceObject.join(cwdPath, 'node_modules/.bin'));
+		result.push(path.join(cwdPath, 'node_modules/.bin'));
 		previous = cwdPath;
-		cwdPath = external_node_path_namespaceObject.resolve(cwdPath, '..');
+		cwdPath = path.resolve(cwdPath, '..');
 	}
 
 	// Ensure the running `node` binary is used.
-	result.push(external_node_path_namespaceObject.resolve(cwdString, execPath, '..'));
+	result.push(path.resolve(cwdString, execPath, '..'));
 
-	return [...result, path_].join(external_node_path_namespaceObject.delimiter);
+	return [...result, path_].join(path.delimiter);
 }
 
-function npmRunPathEnv({env = external_node_process_namespaceObject.env, ...options} = {}) {
+function npm_run_path_npmRunPathEnv({env = process.env, ...options} = {}) {
 	env = {...env};
 
 	const path = pathKey({env});
@@ -4324,7 +4294,7 @@ function mimicFunction(to, from, {ignoreNonConfigurable = false} = {}) {
 
 const calledFunctions = new WeakMap();
 
-const onetime = (function_, options = {}) => {
+const onetime_onetime = (function_, options = {}) => {
 	if (typeof function_ !== 'function') {
 		throw new TypeError('Expected a function');
 	}
@@ -4352,7 +4322,7 @@ const onetime = (function_, options = {}) => {
 	return onetime;
 };
 
-onetime.callCount = function_ => {
+onetime_onetime.callCount = function_ => {
 	if (!calledFunctions.has(function_)) {
 		throw new Error(`The given function \`${function_.name}\` is not wrapped by the \`onetime\` package`);
 	}
@@ -4360,7 +4330,7 @@ onetime.callCount = function_ => {
 	return calledFunctions.get(function_);
 };
 
-/* harmony default export */ const node_modules_onetime = (onetime);
+/* harmony default export */ const node_modules_onetime = ((/* unused pure expression or super */ null && (onetime_onetime)));
 
 // EXTERNAL MODULE: external "os"
 var external_os_ = __nccwpck_require__(37);
@@ -4717,7 +4687,7 @@ return{
 
 };
 
-const signalsByName=getSignalsByName();
+const main_signalsByName=getSignalsByName();
 
 
 
@@ -4853,57 +4823,6 @@ const error_makeError = ({
 	return error;
 };
 
-;// CONCATENATED MODULE: ./node_modules/execa/lib/stdio.js
-const aliases = ['stdin', 'stdout', 'stderr'];
-
-const hasAlias = options => aliases.some(alias => options[alias] !== undefined);
-
-const normalizeStdio = options => {
-	if (!options) {
-		return;
-	}
-
-	const {stdio} = options;
-
-	if (stdio === undefined) {
-		return aliases.map(alias => options[alias]);
-	}
-
-	if (hasAlias(options)) {
-		throw new Error(`It's not possible to provide \`stdio\` in combination with one of ${aliases.map(alias => `\`${alias}\``).join(', ')}`);
-	}
-
-	if (typeof stdio === 'string') {
-		return stdio;
-	}
-
-	if (!Array.isArray(stdio)) {
-		throw new TypeError(`Expected \`stdio\` to be of type \`string\` or \`Array\`, got \`${typeof stdio}\``);
-	}
-
-	const length = Math.max(stdio.length, aliases.length);
-	return Array.from({length}, (value, index) => stdio[index]);
-};
-
-// `ipc` is pushed unless it is already present
-const stdio_normalizeStdioNode = options => {
-	const stdio = normalizeStdio(options);
-
-	if (stdio === 'ipc') {
-		return 'ipc';
-	}
-
-	if (stdio === undefined || typeof stdio === 'string') {
-		return [stdio, stdio, stdio, 'ipc'];
-	}
-
-	if (stdio.includes('ipc')) {
-		return stdio;
-	}
-
-	return [...stdio, 'ipc'];
-};
-
 ;// CONCATENATED MODULE: external "node:os"
 const external_node_os_namespaceObject = require("node:os");
 // EXTERNAL MODULE: ./node_modules/signal-exit/index.js
@@ -4912,10 +4831,10 @@ var signal_exit = __nccwpck_require__(56);
 
 
 
-const DEFAULT_FORCE_KILL_TIMEOUT = 1000 * 5;
+const DEFAULT_FORCE_KILL_TIMEOUT = (/* unused pure expression or super */ null && (1000 * 5));
 
 // Monkey-patches `childProcess.kill()` to add `forceKillAfterTimeout` behavior
-const spawnedKill = (kill, signal = 'SIGTERM', options = {}) => {
+const kill_spawnedKill = (kill, signal = 'SIGTERM', options = {}) => {
 	const killResult = kill(signal);
 	setKillTimeout(kill, signal, options, killResult);
 	return killResult;
@@ -4942,7 +4861,7 @@ const setKillTimeout = (kill, signal, options, killResult) => {
 
 const shouldForceKill = (signal, {forceKillAfterTimeout}, killResult) => isSigterm(signal) && forceKillAfterTimeout !== false && killResult;
 
-const isSigterm = signal => signal === external_node_os_namespaceObject.constants.signals.SIGTERM
+const isSigterm = signal => signal === os.constants.signals.SIGTERM
 		|| (typeof signal === 'string' && signal.toUpperCase() === 'SIGTERM');
 
 const getForceKillAfterTimeout = ({forceKillAfterTimeout = true}) => {
@@ -4958,7 +4877,7 @@ const getForceKillAfterTimeout = ({forceKillAfterTimeout = true}) => {
 };
 
 // `childProcess.cancel()`
-const spawnedCancel = (spawned, context) => {
+const kill_spawnedCancel = (spawned, context) => {
 	const killResult = spawned.kill();
 
 	if (killResult) {
@@ -4972,7 +4891,7 @@ const timeoutKill = (spawned, signal, reject) => {
 };
 
 // `timeout` option handling
-const setupTimeout = (spawned, {timeout, killSignal = 'SIGTERM'}, spawnedPromise) => {
+const kill_setupTimeout = (spawned, {timeout, killSignal = 'SIGTERM'}, spawnedPromise) => {
 	if (timeout === 0 || timeout === undefined) {
 		return spawnedPromise;
 	}
@@ -4991,19 +4910,19 @@ const setupTimeout = (spawned, {timeout, killSignal = 'SIGTERM'}, spawnedPromise
 	return Promise.race([timeoutPromise, safeSpawnedPromise]);
 };
 
-const validateTimeout = ({timeout}) => {
+const kill_validateTimeout = ({timeout}) => {
 	if (timeout !== undefined && (!Number.isFinite(timeout) || timeout < 0)) {
 		throw new TypeError(`Expected the \`timeout\` option to be a non-negative integer, got \`${timeout}\` (${typeof timeout})`);
 	}
 };
 
 // `cleanup` option handling
-const setExitHandler = async (spawned, {cleanup, detached}, timedPromise) => {
+const kill_setExitHandler = async (spawned, {cleanup, detached}, timedPromise) => {
 	if (!cleanup || detached) {
 		return timedPromise;
 	}
 
-	const removeExitHandler = signal_exit(() => {
+	const removeExitHandler = onExit(() => {
 		spawned.kill();
 	});
 
@@ -5011,37 +4930,6 @@ const setExitHandler = async (spawned, {cleanup, detached}, timedPromise) => {
 		removeExitHandler();
 	});
 };
-
-;// CONCATENATED MODULE: ./node_modules/is-stream/index.js
-function is_stream_isStream(stream) {
-	return stream !== null
-		&& typeof stream === 'object'
-		&& typeof stream.pipe === 'function';
-}
-
-function isWritableStream(stream) {
-	return is_stream_isStream(stream)
-		&& stream.writable !== false
-		&& typeof stream._write === 'function'
-		&& typeof stream._writableState === 'object';
-}
-
-function isReadableStream(stream) {
-	return is_stream_isStream(stream)
-		&& stream.readable !== false
-		&& typeof stream._read === 'function'
-		&& typeof stream._readableState === 'object';
-}
-
-function isDuplexStream(stream) {
-	return isWritableStream(stream)
-		&& isReadableStream(stream);
-}
-
-function isTransformStream(stream) {
-	return isDuplexStream(stream)
-		&& typeof stream._transform === 'function';
-}
 
 // EXTERNAL MODULE: ./node_modules/get-stream/index.js
 var get_stream = __nccwpck_require__(152);
@@ -5053,14 +4941,14 @@ var merge_stream = __nccwpck_require__(513);
 
 
 // `input` option
-const handleInput = (spawned, input) => {
+const stream_handleInput = (spawned, input) => {
 	// Checking for stdin is workaround for https://github.com/nodejs/node/issues/26852
 	// @todo remove `|| spawned.stdin === undefined` once we drop support for Node.js <=12.2.0
 	if (input === undefined || spawned.stdin === undefined) {
 		return;
 	}
 
-	if (is_stream_isStream(input)) {
+	if (isStream(input)) {
 		input.pipe(spawned.stdin);
 	} else {
 		spawned.stdin.end(input);
@@ -5068,12 +4956,12 @@ const handleInput = (spawned, input) => {
 };
 
 // `all` interleaves `stdout` and `stderr`
-const makeAllStream = (spawned, {all}) => {
+const stream_makeAllStream = (spawned, {all}) => {
 	if (!all || (!spawned.stdout && !spawned.stderr)) {
 		return;
 	}
 
-	const mixed = merge_stream();
+	const mixed = mergeStream();
 
 	if (spawned.stdout) {
 		mixed.add(spawned.stdout);
@@ -5107,14 +4995,14 @@ const getStreamPromise = (stream, {encoding, buffer, maxBuffer}) => {
 	}
 
 	if (encoding) {
-		return get_stream(stream, {encoding, maxBuffer});
+		return getStream(stream, {encoding, maxBuffer});
 	}
 
-	return get_stream.buffer(stream, {maxBuffer});
+	return getStream.buffer(stream, {maxBuffer});
 };
 
 // Retrieve result of child process: exit code, signal, error, streams (stdout/stderr/all)
-const getSpawnedResult = async ({stdout, stderr, all}, {encoding, buffer, maxBuffer}, processDone) => {
+const stream_getSpawnedResult = async ({stdout, stderr, all}, {encoding, buffer, maxBuffer}, processDone) => {
 	const stdoutPromise = getStreamPromise(stdout, {encoding, buffer, maxBuffer});
 	const stderrPromise = getStreamPromise(stderr, {encoding, buffer, maxBuffer});
 	const allPromise = getStreamPromise(all, {encoding, buffer, maxBuffer: maxBuffer * 2});
@@ -5145,7 +5033,7 @@ const descriptors = ['then', 'catch', 'finally'].map(property => [
 ]);
 
 // The return value is a mixin of `childProcess` and `Promise`
-const mergePromise = (spawned, promise) => {
+const promise_mergePromise = (spawned, promise) => {
 	for (const [property, descriptor] of descriptors) {
 		// Starting the main `promise` is deferred to avoid consuming streams
 		const value = typeof promise === 'function'
@@ -5159,7 +5047,7 @@ const mergePromise = (spawned, promise) => {
 };
 
 // Use promises instead of `child_process` events
-const getSpawnedPromise = spawned => new Promise((resolve, reject) => {
+const promise_getSpawnedPromise = spawned => new Promise((resolve, reject) => {
 	spawned.on('exit', (exitCode, signal) => {
 		resolve({exitCode, signal});
 	});
@@ -5174,49 +5062,6 @@ const getSpawnedPromise = spawned => new Promise((resolve, reject) => {
 		});
 	}
 });
-
-;// CONCATENATED MODULE: ./node_modules/execa/lib/command.js
-const normalizeArgs = (file, args = []) => {
-	if (!Array.isArray(args)) {
-		return [file];
-	}
-
-	return [file, ...args];
-};
-
-const NO_ESCAPE_REGEXP = /^[\w.-]+$/;
-const DOUBLE_QUOTES_REGEXP = /"/g;
-
-const escapeArg = arg => {
-	if (typeof arg !== 'string' || NO_ESCAPE_REGEXP.test(arg)) {
-		return arg;
-	}
-
-	return `"${arg.replace(DOUBLE_QUOTES_REGEXP, '\\"')}"`;
-};
-
-const command_joinCommand = (file, args) => normalizeArgs(file, args).join(' ');
-
-const command_getEscapedCommand = (file, args) => normalizeArgs(file, args).map(arg => escapeArg(arg)).join(' ');
-
-const SPACES_REGEXP = / +/g;
-
-// Handle `execaCommand()`
-const command_parseCommand = command => {
-	const tokens = [];
-	for (const token of command.trim().split(SPACES_REGEXP)) {
-		// Allow spaces to be escaped by a backslash if not meant as a delimiter
-		const previousToken = tokens[tokens.length - 1];
-		if (previousToken && previousToken.endsWith('\\')) {
-			// Merge previous token with current one
-			tokens[tokens.length - 1] = `${previousToken.slice(0, -1)} ${token}`;
-		} else {
-			tokens.push(token);
-		}
-	}
-
-	return tokens;
-};
 
 ;// CONCATENATED MODULE: ./node_modules/execa/index.js
 
@@ -5234,10 +5079,10 @@ const command_parseCommand = command => {
 
 
 
-const DEFAULT_MAX_BUFFER = 1000 * 1000 * 100;
+const DEFAULT_MAX_BUFFER = (/* unused pure expression or super */ null && (1000 * 1000 * 100));
 
 const getEnv = ({env: envOption, extendEnv, preferLocal, localDir, execPath}) => {
-	const env = extendEnv ? {...external_node_process_namespaceObject.env, ...envOption} : envOption;
+	const env = extendEnv ? {...process.env, ...envOption} : envOption;
 
 	if (preferLocal) {
 		return npmRunPathEnv({env, cwd: localDir, execPath});
@@ -5247,7 +5092,7 @@ const getEnv = ({env: envOption, extendEnv, preferLocal, localDir, execPath}) =>
 };
 
 const handleArguments = (file, args, options = {}) => {
-	const parsed = cross_spawn._parse(file, args, options);
+	const parsed = crossSpawn._parse(file, args, options);
 	file = parsed.command;
 	args = parsed.args;
 	options = parsed.options;
@@ -5258,8 +5103,8 @@ const handleArguments = (file, args, options = {}) => {
 		stripFinalNewline: true,
 		extendEnv: true,
 		preferLocal: false,
-		localDir: options.cwd || external_node_process_namespaceObject.cwd(),
-		execPath: external_node_process_namespaceObject.execPath,
+		localDir: options.cwd || process.cwd(),
+		execPath: process.execPath,
 		encoding: 'utf8',
 		reject: true,
 		cleanup: true,
@@ -5272,7 +5117,7 @@ const handleArguments = (file, args, options = {}) => {
 
 	options.stdio = normalizeStdio(options);
 
-	if (external_node_process_namespaceObject.platform === 'win32' && external_node_path_namespaceObject.basename(file, '.exe') === 'cmd') {
+	if (process.platform === 'win32' && path.basename(file, '.exe') === 'cmd') {
 		// #116
 		args.unshift('/q');
 	}
@@ -5281,7 +5126,7 @@ const handleArguments = (file, args, options = {}) => {
 };
 
 const handleOutput = (options, value, error) => {
-	if (typeof value !== 'string' && !external_node_buffer_namespaceObject.Buffer.isBuffer(value)) {
+	if (typeof value !== 'string' && !Buffer.isBuffer(value)) {
 		// When `execaSync()` errors, we normalize it to '' to mimic `execa()`
 		return error === undefined ? undefined : '';
 	}
@@ -5295,18 +5140,18 @@ const handleOutput = (options, value, error) => {
 
 function execa(file, args, options) {
 	const parsed = handleArguments(file, args, options);
-	const command = command_joinCommand(file, args);
-	const escapedCommand = command_getEscapedCommand(file, args);
+	const command = joinCommand(file, args);
+	const escapedCommand = getEscapedCommand(file, args);
 
 	validateTimeout(parsed.options);
 
 	let spawned;
 	try {
-		spawned = external_node_child_process_namespaceObject.spawn(parsed.file, parsed.args, parsed.options);
+		spawned = childProcess.spawn(parsed.file, parsed.args, parsed.options);
 	} catch (error) {
 		// Ensure the returned error is always both a promise and a child process
-		const dummySpawned = new external_node_child_process_namespaceObject.ChildProcess();
-		const errorPromise = Promise.reject(error_makeError({
+		const dummySpawned = new childProcess.ChildProcess();
+		const errorPromise = Promise.reject(makeError({
 			error,
 			stdout: '',
 			stderr: '',
@@ -5337,7 +5182,7 @@ function execa(file, args, options) {
 		const all = handleOutput(parsed.options, allResult);
 
 		if (error || exitCode !== 0 || signal !== null) {
-			const returnedError = error_makeError({
+			const returnedError = makeError({
 				error,
 				exitCode,
 				signal,
@@ -5373,7 +5218,7 @@ function execa(file, args, options) {
 		};
 	};
 
-	const handlePromiseOnce = node_modules_onetime(handlePromise);
+	const handlePromiseOnce = onetime(handlePromise);
 
 	handleInput(spawned, parsed.options.input);
 
@@ -5446,7 +5291,7 @@ function execaSync(file, args, options) {
 }
 
 function execaCommand(command, options) {
-	const [file, ...args] = command_parseCommand(command);
+	const [file, ...args] = parseCommand(command);
 	return execa(file, args, options);
 }
 
@@ -5554,7 +5399,7 @@ var GetTemporaryShellScript = async function(text) {
 
 var StoreGitCredential = async function(username, password) {
 	const credential = `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}`;
-	await execaCommand(`echo -e "${credential}" | git credential-manager-core store`);
+	await exec.exec(`echo -e "${credential}" | git credential-manager-core store`);
 }
 
 async function Run()

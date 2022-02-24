@@ -64,7 +64,7 @@ var GetTemporaryShellScript = async function(text) {
 
 var StoreGitCredential = async function(username, password) {
 	const credential = `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}`;
-	await execa.execaCommand(`echo -e "${credential}" | git credential-manager-core store`);
+	await exec.exec(`echo -e "${credential}" | git credential-manager-core store`);
 }
 
 async function Run()

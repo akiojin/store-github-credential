@@ -64,12 +64,11 @@ var GetTemporaryShellScript = async function(text) {
 
 var StoreGitCredential = async function(username, password) {
 	core.exportVariable('CREDENTIAL', `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}`);
-	await exec.exec(`echo "$CREDENTIAL" | git credential-manager-core store`);
+	await exec.exec(`echo \"$CREDENTIAL\" | git credential-manager-core store`);
 };
 
 var GetGitCredential = async function() {
-	core.exportVariable('CREDENTIAL', `protocol=https\nhost=github.com`);
-	await exec.exec(`echo "$CREDENTIAL" | git credential-manager-core get`);
+	await exec.exec(`echo \"protocol=https\nhost=github.com\" | git credential-manager-core get`);
 };
 
 async function Run()

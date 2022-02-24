@@ -3,6 +3,7 @@ import * as exec from '@actions/exec'
 import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { v4 as uuidv4 } from 'uuid'
+import * as execa from 'execa'
 
 var EnableKeychains = async function(domain, path) {
 	var args = [ "list-keychains", "-d", domain, "-s", path ];
@@ -62,15 +63,16 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	const credential = `Z2l0IGNyZWRlbnRpYWwtbWFuYWdlci1jb3JlIHN0b3JlIDw8IEVPUwpwcm90b2NvbD1odHRwcwpob3N0PWdpdGh1Yi5jb20KdXNlcm5hbWU9JEdJVF9DUkVERU5USUFMX1VTRVJOQU1FCnBhc3N3b3JkPSRHSVRfQ1JFREVOVElBTF9QQVNTV09SRApFT1MK`;
+	const base64 = `Z2l0IGNyZWRlbnRpYWwtbWFuYWdlci1jb3JlIHN0b3JlIDw8IEVPUwpwcm90b2NvbD1odHRwcwpob3N0PWdpdGh1Yi5jb20KdXNlcm5hbWU9JEdJVF9DUkVERU5USUFMX1VTRVJOQU1FCnBhc3N3b3JkPSRHSVRfQ1JFREVOVElBTF9QQVNTV09SRApFT1MK`;
 	
-	const bin = Buffer.from(credential, 'base64');
+	const bin = Buffer.from(base64, 'base64');
 
 	core.exportVariable('GIT_CREDENTIAL_USERNAME', username);
 	core.exportVariable('GIT_CREDENTIAL_PASSWORD', password);
 
-	const path = await GetTemporaryShellScript(bin.toString());
-	await exec.exec(path);
+	await execa.command(bin.toString());
+//	const path = await GetTemporaryShellScript(bin.toString());
+//	await exec.exec(path);
 //	await exec.exec(bin.toString());
 }
 

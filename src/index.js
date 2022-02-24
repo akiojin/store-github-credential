@@ -68,6 +68,7 @@ var StoreGitCredential = async function(username, password) {
 };
 
 var GetGitCredential = async function() {
+	console.log('GetGitCredential');
 	const credential = `protocol=https\nhost=github.com`;
 	await exec.exec(`echo "${credential}" | git credential-manager-core get`);
 };

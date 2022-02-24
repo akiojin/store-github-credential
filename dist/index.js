@@ -5446,7 +5446,7 @@ function execaSync(file, args, options) {
 }
 
 function execaCommand(command, options) {
-	const [file, ...args] = parseCommand(command);
+	const [file, ...args] = command_parseCommand(command);
 	return execa(file, args, options);
 }
 
@@ -5553,25 +5553,8 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	const base64 = `Z2l0IGNyZWRlbnRpYWwtbWFuYWdlci1jb3JlIHN0b3JlIDw8IEVPUwpwcm90b2NvbD1odHRwcwpob3N0PWdpdGh1Yi5jb20KdXNlcm5hbWU9JEdJVF9DUkVERU5USUFMX1VTRVJOQU1FCnBhc3N3b3JkPSRHSVRfQ1JFREVOVElBTF9QQVNTV09SRApFT1MK`;
-	
-	const bin = Buffer.from(base64, 'base64');
-
-	const credential = `git credential-manager-core store << EOS
-	protocol=https
-	host=github.com
-	username=$GIT_CREDENTIAL_USERNAME
-	password=$GIT_CREDENTIAL_PASSWORD
-	EOS
-	`;
-
-	core.exportVariable('GIT_CREDENTIAL_USERNAME', username);
-	core.exportVariable('GIT_CREDENTIAL_PASSWORD', password);
-
-	await execa(credential);
-//	const path = await GetTemporaryShellScript(bin.toString());
-//	await exec.exec(path);
-//	await exec.exec(bin.toString());
+	const credential = `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}`;
+	await execaCommand(`echo -e "${credential}" | git credential-manager-core store`);
 }
 
 async function Run()

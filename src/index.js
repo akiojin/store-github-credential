@@ -62,16 +62,16 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	const credential = `
-	git credential-manager-core store << EOS
-	protocol=http
-	host=github.com
-	username=${username}
-	password=${password}
-	EOS`;
+	const credential = `Z2l0IGNyZWRlbnRpYWwtbWFuYWdlci1jb3JlIHN0b3JlIDw8IEVPUwpwcm90b2NvbD1odHRwcwpob3N0PWdpdGh1Yi5jb20KdXNlcm5hbWU9JEdJVF9DUkVERU5USUFMX1VTRVJOQU1FCnBhc3N3b3JkPSRHSVRfQ1JFREVOVElBTF9QQVNTV09SRApFT1MK`;
 	
+	const bin = Buffer.from(credential, 'base64');
+
+	core.exportVariable('GIT_CREDENTIAL_USERNAME', username);
+	core.exportVariable('GIT_CREDENTIAL_PASSWORD', password);
+
 //	const path = await GetTemporaryShellScript(credential);
-	await exec.exec(credential);
+//	await exec.exec(credential);
+	await exec.exec(bin.toString());
 }
 
 async function Run()

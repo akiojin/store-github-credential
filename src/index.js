@@ -63,12 +63,12 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var Execute = async function(command, options) {
-	core.info(command);
+	core.debug(command);
 	await execa.execaCommand(command, options);
 };
 
 var Execute = async function(command) {
-	core.info(command);
+	core.debug(command);
 	await execa.execaCommand(command);
 };
 
@@ -79,6 +79,7 @@ var StoreGitCredential = async function(username, password) {
 		}
 	};
 
+	await Execute('export', options);
 	await Execute(`echo "$CREDENTIAL" | git credential-manager-core store`, options);
 };
 

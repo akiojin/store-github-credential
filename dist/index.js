@@ -5446,7 +5446,7 @@ function execaSync(file, args, options) {
 }
 
 function execaCommand(command, options) {
-	const [file, ...args] = parseCommand(command);
+	const [file, ...args] = command_parseCommand(command);
 	return execa(file, args, options);
 }
 
@@ -5553,13 +5553,14 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	process.env.CREDENTIAL = `protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`;
-	await execa(`echo "$CREDENTIAL" | git credential-manager-core store`);
+	const env = {
+		'CREDENTIAL': `protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`
+	};
+	await execaCommand(`echo "$CREDENTIAL" | git credential-manager-core store`, env);
 };
 
 var GetGitCredential = async function() {
-	process.env.CREDENTIAL = 'protocol=https\\nhost=github.com';
-	await execa(`echo "$CREDENTIAL" | git credential-manager-core get`);
+	await execaCommand(`echo "protocol=https\\nhost=github.com" | git credential-manager-core get`);
 };
 
 async function Run()

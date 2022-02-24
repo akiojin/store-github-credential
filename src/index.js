@@ -1,51 +1,51 @@
-const core = require('@actions/core');
-const exec = require('@actions/exec');
-const fs = require('fs');
-const fsPromises = require('fs/promises');
-const { v4: uuidv4 } = require('uuid');
+import * as core from '@actions/core'
+import * as exec from '@actions/exec'
+import * as fs from 'fs'
+import * as fsPromises from 'fs/promises'
+import { v4 as uuidv4 } from 'uuid'
 
-export async function EnableKeychains(domain, path)
-{
+var EnableKeychains = async function(domain, path) {
 	var args = [ "list-keychains", "-d", domain, "-s", path ];
 	await exec.exec('security', args);
 }
 
-export async function EnableUserKeychains(path)
-{
+var EnableUserKeychains = async function(path) {
 	await EnableKeychains("user", path);
 }
 
-export async function EnableSystemKeychains(path)
-{
+var EnableSystemKeychains = async function(path) {
 	await EnableKeychains("system", path);
 }
 
-export async function EnableCommonKeychains(path)
-{
+var EnableCommonKeychains = async function(path) {
 	await EnableKeychains("common", path);
 }
 
-export async function EnableDynamicKeychains(path)
-{
+var EnableDynamicKeychains = async function(path) {
 	await EnableKeychains("dynamic", path);
 }
 
-export async function EnableLoginUserKeychain()
-{
+var EnableLoginUserKeychain = async function() {
 	await EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 }
 
-export async function GetTemporaryFile(text, options)
-{
-	const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
+var GenerateTemporaryFilename = function() {
+	return `${process.env.RUNNER_TEMP}/${uuidv4()}`;
+};
 
-	await fsPromises.writeFile(path, text, options);
-
+var GetTemporaryFile = async function(text) {
+	const path = GenerateTemporaryFilename();
+	await fsPromises.writeFile(path, text);
 	return path;
 };
 
-export async function GetTemporaryShellScript(text)
-{
+var GetTemporaryFile = async function (text, options) {
+	const path = GenerateTemporaryFilename();
+	await fsPromises.writeFile(path, text, options);
+	return path;
+};
+
+var GetTemporaryShellScript = async function(text) {
 	const options = {
 		encoding: "utf8",
 		flag: "w",
@@ -61,8 +61,7 @@ export async function GetTemporaryShellScript(text)
 	return dst;
 };
 
-export async function StoreGitCredential(username, password)
-{
+var StoreGitCredential = async function(username, password) {
 	const credential = `
 	git credential-manager-core store << EOS
 	protocol=http
@@ -77,7 +76,7 @@ export async function StoreGitCredential(username, password)
 
 async function Run()
 {
-	if (process.platform != 'darwin') {
+	if (process.platform !== 'darwin') {
 		core.setFailed('Platform not supported.');
 	}
 	

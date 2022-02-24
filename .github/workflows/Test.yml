@@ -1,4 +1,4 @@
-name: Build & Test
+name: Test
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build_and_Test:
+  Test:
     runs-on: macos-latest
     timeout-minutes: 5
 

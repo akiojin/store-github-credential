@@ -70,8 +70,8 @@ var StoreGitCredential = async function(username, password) {
 	password=${password}
 	EOS`;
 	
-	const path = await GetTemporaryShellScript(credential);
-	await exec.exec(path);
+//	const path = await GetTemporaryShellScript(credential);
+	await exec.exec(credential);
 }
 
 async function Run()

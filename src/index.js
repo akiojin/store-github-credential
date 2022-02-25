@@ -32,7 +32,9 @@ var EnableLoginUserKeychain = async function() {
 }
 
 var GenerateTemporaryFilename = function() {
-	return `${process.env.RUNNER_TEMP}/${uuidv4()}`;
+	const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
+	core.notice(`path:${path}`);
+	return path;
 };
 
 var GetTemporaryFile = async function(text) {
@@ -47,21 +49,17 @@ var GetTemporaryShellScript = async function(text) {
 
 	await fsPromises.rename(src, dst);
 	await exec.exec(`chmod +x ${dst}`)
-	await exec.exec(`cat ${dst}`);
-	console.log('');
 
 	return dst;
 };
 
 var Execute = async function(command) {
 	await exec.exec(command);
+	console.log('');
 };
 
 var StoreGitCredential = async function(username, password) {
-	const path = await GetTemporaryShellScript(`protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`);
-	await Execute(`ls -la ${process.env.RUNNER_TEMP}`);
-	await Execute(`echo "${path}"`);
-	await Execute(`cat ${path}`);
+	const path = await GetTemporaryShellScript(`echo "protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}" | git credential-manager-core store`);
 	await Execute(path);
 };
 

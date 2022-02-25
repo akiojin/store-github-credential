@@ -53,7 +53,6 @@ var GetTemporaryShellScript = async function(text) {
 
 var Execute = async function(command) {
 	core.notice(command);
-	console.log(command);
 	await exec.exec(command);
 };
 
@@ -61,6 +60,7 @@ var StoreGitCredential = async function(username, password) {
 	const path = await GetTemporaryShellScript(`protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`);
 	await Execute(`ls -la ${process.env.RUNNER_TEMP}`);
 	await Execute(`echo "${path}"`);
+	await Execute(`cat ${path}`);
 	await Execute(path);
 };
 

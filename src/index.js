@@ -75,7 +75,7 @@ var Execute = async function(command) {
 
 var StoreGitCredential = async function(username, password) {
 	const path = await GetTemporaryShellScript(`protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`);
-	await exec.exec('ls -la $RUNNER_TEMP');
+	await exec.exec(`ls -la ${process.env.RUNNER_TEMP}`);
 	await exec.exec(path);
 //	await Execute(`echo "$CREDENTIAL" | git credential-manager-core store`, options);
 };

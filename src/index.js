@@ -69,8 +69,8 @@ var StoreGitCredential = async function(username, password) {
 
 var GetGitCredential = async function() {
 	const process = execa.execa('git', ['credential-manager-core', 'get']);
-	process.stdin.write('protocol=https\n');
-	process.stdin.write('host=github.com\n');
+	process.stdin.write('protocol=https');
+	process.stdin.write('host=github.com');
 	process.stdin.write(`\n`);
 	process.stdin.end();
 	await process;
@@ -85,7 +85,7 @@ async function Run()
 	try {
 		await EnableLoginUserKeychain();
 		await StoreGitCredential(core.getInput('username'), core.getInput('password'));
-		await GetGitCredential();
+//		await GetGitCredential();
 	} catch (ex) {
 		core.setFailed(ex.message);
 	}

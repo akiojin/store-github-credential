@@ -6198,7 +6198,6 @@ var GenerateTemporaryFilename = function() {
 
 var GetTemporaryFile = async function(text) {
 	const path = GenerateTemporaryFilename();
-	console.log(`file=${text}`);
 	await promises_namespaceObject.writeFile(path, text);
 	return path;
 };
@@ -6207,8 +6206,9 @@ var GetTemporaryShellScript = async function(text) {
 	const src = await GetTemporaryFile(text);
 	const dst = `${src}.sh`;
 
-	await promises_namespaceObject.mv(src, dst);
+	await promises_namespaceObject.rename(src, dst);
 	await exec.exec(`chmod +x ${dst}`)
+	await exec.exec(`cat ${dst}`);
 
 	return dst;
 };

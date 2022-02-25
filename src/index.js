@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as io from '@actions/io'
 import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { v4 as uuidv4 } from 'uuid'
@@ -56,8 +57,8 @@ var GetTemporaryShellScript = async function(text) {
 	const src = await GetTemporaryFile(text, options);
 	const dst = `${src}.sh`;
 
-	await fsPromises.rename(src, dst);
-	await fsPromises.chmod(dst, fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK);
+	await io.mv(src, dst);
+	await exec.exec(`chmod +x ${dst}`)
 
 	return dst;
 };

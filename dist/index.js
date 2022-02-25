@@ -4815,6 +4815,8 @@ __nccwpck_require__.r(__webpack_exports__);
 var core = __nccwpck_require__(5127);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(2049);
+// EXTERNAL MODULE: ./node_modules/@actions/io/lib/io.js
+var io = __nccwpck_require__(2864);
 // EXTERNAL MODULE: external "fs"
 var external_fs_ = __nccwpck_require__(7147);
 ;// CONCATENATED MODULE: external "fs/promises"
@@ -6164,6 +6166,7 @@ function execaNode(scriptPath, args, options = {}) {
 
 
 
+
 var EnableKeychains = async function(domain, path) {
 	var args = [ "list-keychains", "-d", domain, "-s", path ];
 	await execa('security', args);
@@ -6215,8 +6218,8 @@ var GetTemporaryShellScript = async function(text) {
 	const src = await GetTemporaryFile(text, options);
 	const dst = `${src}.sh`;
 
-	await promises_namespaceObject.rename(src, dst);
-	await promises_namespaceObject.chmod(dst, external_fs_.constants.R_OK | external_fs_.constants.W_OK | external_fs_.constants.X_OK);
+	await io.mv(src, dst);
+	await exec.exec(`chmod +x ${dst}`)
 
 	return dst;
 };

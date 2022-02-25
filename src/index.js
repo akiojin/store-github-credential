@@ -54,13 +54,13 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var Execute = async function(command) {
-	await exec.exec(command);
+	core.notice(`command: ${command}`);
+	await execa.execa(command);
 	console.log('');
 };
 
 var StoreGitCredential = async function(username, password) {
-	const path = await GetTemporaryShellScript(`echo "protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}" | git credential-manager-core store`);
-	await Execute(path);
+	await Execute(`echo "protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}" | git credential-manager-core store`);
 };
 
 var GetGitCredential = async function() {

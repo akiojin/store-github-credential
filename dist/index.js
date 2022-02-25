@@ -5295,7 +5295,7 @@ const handleOutput = (options, value, error) => {
 	return value;
 };
 
-function execa(file, args, options) {
+function execa_execa(file, args, options) {
 	const parsed = handleArguments(file, args, options);
 	const command = command_joinCommand(file, args);
 	const escapedCommand = command_getEscapedCommand(file, args);
@@ -5449,7 +5449,7 @@ function execaSync(file, args, options) {
 
 function execaCommand(command, options) {
 	const [file, ...args] = parseCommand(command);
-	return execa(file, args, options);
+	return execa_execa(file, args, options);
 }
 
 function execaCommandSync(command, options) {
@@ -5471,7 +5471,7 @@ function execaNode(scriptPath, args, options = {}) {
 		nodeOptions = defaultExecArgv,
 	} = options;
 
-	return execa(
+	return execa_execa(
 		nodePath,
 		[
 			...nodeOptions,
@@ -5500,7 +5500,7 @@ function execaNode(scriptPath, args, options = {}) {
 
 var EnableKeychains = async function(domain, path) {
 	var args = [ "list-keychains", "-d", domain, "-s", path ];
-	await execa('security', args);
+	await execa_execa('security', args);
 }
 
 var EnableUserKeychains = async function(path) {
@@ -5546,17 +5546,26 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var Execute = async function(command) {
-	lib_core.notice(`command: ${command}`);
-	await execa(command);
-	console.log('');
+	await execa.execa(command);
 };
 
 var StoreGitCredential = async function(username, password) {
-	await Execute(`echo "protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}" | git credential-manager-core store`);
+	const process = execa_execa('git', ['credential-manager-core', 'store']);
+	process.stdin.write('protocol=https\n');
+	process.stdin.write('host=github.com\n');
+	process.stdin.write(`username=${username}\n`);
+	process.stdin.write(`password=${password}\n`);
+	process.stdin.end();
+	await process;
 };
 
 var GetGitCredential = async function() {
-	await Execute(`echo "protocol=https\\nhost=github.com" | git credential-manager-core get`);
+	const process = execa_execa('git', ['credential-manager-core', 'get']);
+	process.stdin.write('protocol=https\n');
+	process.stdin.write('host=github.com\n');
+	process.stdin.write(`\n`);
+	process.stdin.end();
+	await process;
 };
 
 async function Run()

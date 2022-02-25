@@ -73,14 +73,9 @@ var Execute = async function(command) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	const options = {
-		env: {
-			CREDENTIAL: `protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`
-		}
-	};
-
-//	await Execute('export', options);
-	await Execute(`echo "$CREDENTIAL" | git credential-manager-core store`, options);
+	const path = GetTemporaryShellScript(`protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`);
+	await Execute(path);
+//	await Execute(`echo "$CREDENTIAL" | git credential-manager-core store`, options);
 };
 
 var GetGitCredential = async function() {

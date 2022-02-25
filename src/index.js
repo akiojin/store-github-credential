@@ -58,19 +58,15 @@ var Execute = async function(command) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	const process = execa.execa('git', ['credential-manager-core', 'store']);
-	process.stdin.write('protocol=https\n');
-	process.stdin.write('host=github.com\n');
-	process.stdin.write(`username=${username}\n`);
-	process.stdin.write(`password=${password}\n`);
-	process.stdin.end();
-	await process;
+	await exec.exec('security', ['-a', username, '-s', 'git:https://github.com', '-w', password]);
+	await exec.exec('git', ['config', '--global', '--replace-all', 'credential.helper', 'osxkeychain']);
+	await exec.exec('git', ['config', '--global', '--add', 'credential.helper', '/usr/local/share/gcm-core/git-credential-manager-core']);
 };
 
 var GetGitCredential = async function() {
 	const process = execa.execa('git', ['credential-manager-core', 'get']);
-	process.stdin.write('protocol=https');
-	process.stdin.write('host=github.com');
+	process.stdin.write('protocol=https\n');
+	process.stdin.write('host=github.com\n');
 	process.stdin.write(`\n`);
 	process.stdin.end();
 	await process;

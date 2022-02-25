@@ -6213,7 +6213,6 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var Execute = async function(command) {
-	core.notice(command);
 	await exec.exec(command);
 };
 

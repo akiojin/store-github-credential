@@ -69,6 +69,7 @@ var Execute = async function(command, options) {
 
 var Execute = async function(command) {
 	core.notice(command);
+	console.log(command);
 	await execa.execaCommand(command);
 };
 

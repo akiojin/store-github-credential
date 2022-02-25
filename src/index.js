@@ -58,7 +58,7 @@ var Execute = async function(command) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	await exec.exec('security', ['-a', username, '-s', 'git:https://github.com', '-w', password]);
+	await exec.exec('security', ['add-generic-password', '-a', username, '-s', 'git:https://github.com', '-w', password]);
 	await exec.exec('git', ['config', '--global', '--replace-all', 'credential.helper', 'osxkeychain']);
 	await exec.exec('git', ['config', '--global', '--add', 'credential.helper', '/usr/local/share/gcm-core/git-credential-manager-core']);
 };

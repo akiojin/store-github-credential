@@ -6117,7 +6117,7 @@ function execaSync(file, args, options) {
 }
 
 function execaCommand(command, options) {
-	const [file, ...args] = command_parseCommand(command);
+	const [file, ...args] = parseCommand(command);
 	return execa(file, args, options);
 }
 
@@ -6202,20 +6202,8 @@ var GetTemporaryFile = async function(text) {
 	return path;
 };
 
-var GetTemporaryFile = async function (text, options) {
-	const path = GenerateTemporaryFilename();
-	await promises_namespaceObject.writeFile(path, text, options);
-	return path;
-};
-
 var GetTemporaryShellScript = async function(text) {
-	const options = {
-		encoding: "utf8",
-		flag: "w",
-		mode: 0o777
-	};
-
-	const src = await GetTemporaryFile(text, options);
+	const src = await GetTemporaryFile(text);
 	const dst = `${src}.sh`;
 
 	await io.mv(src, dst);
@@ -6224,22 +6212,17 @@ var GetTemporaryShellScript = async function(text) {
 	return dst;
 };
 
-var Execute = async function(command, options) {
-	core.notice(command);
-	await execaCommand(command, options);
-};
-
 var Execute = async function(command) {
 	core.notice(command);
 	console.log(command);
-	await execaCommand(command);
+	await exec.exec(command);
 };
 
 var StoreGitCredential = async function(username, password) {
 	const path = await GetTemporaryShellScript(`protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}`);
-	await exec.exec(`ls -la ${process.env.RUNNER_TEMP}`);
-	await exec.exec(path);
-//	await Execute(`echo "$CREDENTIAL" | git credential-manager-core store`, options);
+	await Execute(`ls -la ${process.env.RUNNER_TEMP}`);
+	await Execute(`echo "${path}"`);
+	await Execute(path);
 };
 
 var GetGitCredential = async function() {

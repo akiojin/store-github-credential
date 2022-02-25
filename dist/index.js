@@ -6222,12 +6222,12 @@ var GetTemporaryShellScript = async function(text) {
 };
 
 var Execute = async function(command, options) {
-	core.debug(command);
+	core.notice(command);
 	await execaCommand(command, options);
 };
 
 var Execute = async function(command) {
-	core.debug(command);
+	core.notice(command);
 	await execaCommand(command);
 };
 

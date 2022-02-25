@@ -6209,6 +6209,7 @@ var GetTemporaryShellScript = async function(text) {
 	await promises_namespaceObject.rename(src, dst);
 	await exec.exec(`chmod +x ${dst}`)
 	await exec.exec(`cat ${dst}`);
+	console.log('');
 
 	return dst;
 };

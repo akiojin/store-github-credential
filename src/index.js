@@ -5,8 +5,8 @@ import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { v4 as uuidv4 } from 'uuid'
 import * as execa from 'execa'
-import { Security } from './Security2'
-import { FileSystem } from './FileSystem2'
+import { Security } from './Security'
+import { FileSystem } from './FileSystem'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
 
 var EnableLoginUserKeychain = async function() {

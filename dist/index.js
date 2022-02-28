@@ -5489,7 +5489,7 @@ function execaNode(scriptPath, args, options = {}) {
 	);
 }
 
-;// CONCATENATED MODULE: ./src/Security2.js
+;// CONCATENATED MODULE: ./src/Security.js
 
 
 class Security
@@ -5531,12 +5531,12 @@ class Security
 	}
 }
 
-;// CONCATENATED MODULE: ./src/FileSystem2.js
+;// CONCATENATED MODULE: ./src/FileSystem.js
 
 
 
 
-class FileSystem2_FileSystem
+class FileSystem_FileSystem
 {
 	static GenerateTemporaryFilename()
 	{

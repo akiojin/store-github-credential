@@ -5489,6 +5489,71 @@ function execaNode(scriptPath, args, options = {}) {
 	);
 }
 
+;// CONCATENATED MODULE: ./src/security.js
+
+
+class Security
+{
+	static async Execute(command, args)
+	{
+        args.unshift(command);
+		await lib_exec.exec('security', args);
+	}
+
+	static async EnableKeychains(domain, path)
+	{
+		await this.Execute('list-keychains', [ '-d', domain, '-s', path ]);
+	}
+
+	static async EnableUserKeychains(path)
+	{
+		await this.EnableKeychains("user", path);
+	}
+
+	static async EnableSystemKeychains(path)
+	{
+		await this.EnableKeychains("system", path);
+	}
+
+	static async EnableCommonKeychains(path)
+	{
+		await this.EnableKeychains("common", path);
+	}
+
+	static async EnableDynamicKeychains(path)
+	{
+		await this.EnableKeychains("dynamic", path);
+	}
+
+	static async AddGenericPassword(service, account, password)
+	{
+		await this.Execute('add-generic-password', [ '-a', account, '-s', service, '-w', password ]);
+	}
+}
+
+;// CONCATENATED MODULE: ./src/filesystem.js
+
+
+
+
+class filesystem_FileSystem
+{
+	static GenerateTemporaryFilename()
+	{
+		const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
+		core.notice(`path:${path}`);
+		return path;
+	};
+	
+	static async GetTemporaryFile(text)
+	{
+		const path = GenerateTemporaryFilename();
+		await fsPromises.writeFile(path, text);
+		return path;
+	};
+	
+}
+
 ;// CONCATENATED MODULE: ./src/index.js
 
 
@@ -5498,45 +5563,14 @@ function execaNode(scriptPath, args, options = {}) {
 
 
 
-var EnableKeychains = async function(domain, path) {
-	var args = [ "list-keychains", "-d", domain, "-s", path ];
-	await execa_execa('security', args);
-}
 
-var EnableUserKeychains = async function(path) {
-	await EnableKeychains("user", path);
-}
-
-var EnableSystemKeychains = async function(path) {
-	await EnableKeychains("system", path);
-}
-
-var EnableCommonKeychains = async function(path) {
-	await EnableKeychains("common", path);
-}
-
-var EnableDynamicKeychains = async function(path) {
-	await EnableKeychains("dynamic", path);
-}
 
 var EnableLoginUserKeychain = async function() {
-	await EnableUserKeychains("~/Library/Keychains/login.keychain-db");
+	await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 }
 
-var GenerateTemporaryFilename = function() {
-	const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
-	core.notice(`path:${path}`);
-	return path;
-};
-
-var GetTemporaryFile = async function(text) {
-	const path = GenerateTemporaryFilename();
-	await fsPromises.writeFile(path, text);
-	return path;
-};
-
 var GetTemporaryShellScript = async function(text) {
-	const src = await GetTemporaryFile(text);
+	const src = await FileSystem.GetTemporaryFile(text);
 	const dst = `${src}.sh`;
 
 	await fsPromises.rename(src, dst);
@@ -5550,9 +5584,13 @@ var Execute = async function(command) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	await lib_exec.exec('security', ['add-generic-password', '-a', username, '-s', 'git:https://github.com', '-w', password]);
-	await lib_exec.exec('git', ['config', '--global', '--replace-all', 'credential.helper', 'osxkeychain']);
-	await lib_exec.exec('git', ['config', '--global', '--add', 'credential.helper', '/usr/local/share/gcm-core/git-credential-manager-core']);
+	const process = execa_execa('git', ['credential-manager-core', 'store']);
+	process.stdin.write('protocol=https\n');
+	process.stdin.write('host=github.com\n');
+	process.stdin.write(`username=${username}\n`);
+	process.stdin.write(`password=${password}\n`);
+	process.stdin.end();
+	await process;
 };
 
 var GetGitCredential = async function() {

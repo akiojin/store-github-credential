@@ -5,46 +5,15 @@ import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { v4 as uuidv4 } from 'uuid'
 import * as execa from 'execa'
-
-var EnableKeychains = async function(domain, path) {
-	var args = [ "list-keychains", "-d", domain, "-s", path ];
-	await execa.execa('security', args);
-}
-
-var EnableUserKeychains = async function(path) {
-	await EnableKeychains("user", path);
-}
-
-var EnableSystemKeychains = async function(path) {
-	await EnableKeychains("system", path);
-}
-
-var EnableCommonKeychains = async function(path) {
-	await EnableKeychains("common", path);
-}
-
-var EnableDynamicKeychains = async function(path) {
-	await EnableKeychains("dynamic", path);
-}
+import { Security } from './security'
+import { FileSystem } from './filesystem'
 
 var EnableLoginUserKeychain = async function() {
-	await EnableUserKeychains("~/Library/Keychains/login.keychain-db");
+	await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 }
 
-var GenerateTemporaryFilename = function() {
-	const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
-	core.notice(`path:${path}`);
-	return path;
-};
-
-var GetTemporaryFile = async function(text) {
-	const path = GenerateTemporaryFilename();
-	await fsPromises.writeFile(path, text);
-	return path;
-};
-
 var GetTemporaryShellScript = async function(text) {
-	const src = await GetTemporaryFile(text);
+	const src = await FileSystem.GetTemporaryFile(text);
 	const dst = `${src}.sh`;
 
 	await fsPromises.rename(src, dst);
@@ -58,9 +27,13 @@ var Execute = async function(command) {
 };
 
 var StoreGitCredential = async function(username, password) {
-	await exec.exec('security', ['add-generic-password', '-a', username, '-s', 'git:https://github.com', '-w', password]);
-	await exec.exec('git', ['config', '--global', '--replace-all', 'credential.helper', 'osxkeychain']);
-	await exec.exec('git', ['config', '--global', '--add', 'credential.helper', '/usr/local/share/gcm-core/git-credential-manager-core']);
+	const process = execa.execa('git', ['credential-manager-core', 'store']);
+	process.stdin.write('protocol=https\n');
+	process.stdin.write('host=github.com\n');
+	process.stdin.write(`username=${username}\n`);
+	process.stdin.write(`password=${password}\n`);
+	process.stdin.end();
+	await process;
 };
 
 var GetGitCredential = async function() {

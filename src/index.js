@@ -5,8 +5,9 @@ import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 import { v4 as uuidv4 } from 'uuid'
 import * as execa from 'execa'
-import { Security } from './security'
-import { FileSystem } from './filesystem'
+import { Security } from './Security2'
+import { FileSystem } from './FileSystem2'
+import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
 
 var EnableLoginUserKeychain = async function() {
 	await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
@@ -26,25 +27,6 @@ var Execute = async function(command) {
 	await execa.execa(command);
 };
 
-var StoreGitCredential = async function(username, password) {
-	const process = execa.execa('git', ['credential-manager-core', 'store']);
-	process.stdin.write('protocol=https\n');
-	process.stdin.write('host=github.com\n');
-	process.stdin.write(`username=${username}\n`);
-	process.stdin.write(`password=${password}\n`);
-	process.stdin.end();
-	await process;
-};
-
-var GetGitCredential = async function() {
-	const process = execa.execa('git', ['credential-manager-core', 'get']);
-	process.stdin.write('protocol=https\n');
-	process.stdin.write('host=github.com\n');
-	process.stdin.write(`\n`);
-	process.stdin.end();
-	await process;
-};
-
 async function Run()
 {
 	if (process.platform !== 'darwin') {
@@ -53,7 +35,7 @@ async function Run()
 	
 	try {
 		await EnableLoginUserKeychain();
-		await StoreGitCredential(core.getInput('username'), core.getInput('password'));
+		await Credential.Store(core.getInput('username'), core.getInput('password'));
 //		await GetGitCredential();
 	} catch (ex) {
 		core.setFailed(ex.message);

@@ -5489,7 +5489,7 @@ function execaNode(scriptPath, args, options = {}) {
 	);
 }
 
-;// CONCATENATED MODULE: ./src/security.js
+;// CONCATENATED MODULE: ./src/Security2.js
 
 
 class Security
@@ -5531,12 +5531,12 @@ class Security
 	}
 }
 
-;// CONCATENATED MODULE: ./src/filesystem.js
+;// CONCATENATED MODULE: ./src/FileSystem2.js
 
 
 
 
-class filesystem_FileSystem
+class FileSystem2_FileSystem
 {
 	static GenerateTemporaryFilename()
 	{
@@ -5554,7 +5554,44 @@ class filesystem_FileSystem
 	
 }
 
+;// CONCATENATED MODULE: ./src/GitCredentialManagerCore.js
+
+
+class GitCredentialManagerCore
+{	
+	static async Get()
+	{
+		const process = execa_execa('git', ['credential-manager-core', 'get']);
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
+		process.stdin.write(`\n`);
+		process.stdin.end();
+		await process;
+	};
+
+	static async Store(username, password)
+	{
+		const process = execa_execa('git', ['credential-manager-core', 'store']);
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
+		process.stdin.write(`username=${username}\n`);
+		process.stdin.write(`password=${password}\n`);
+		process.stdin.end();
+		await process;
+	};	
+
+	static async Erase()
+	{
+		const process = execa_execa('git', ['credential-manager-core', 'erase']);
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
+		process.stdin.end();
+		await process;
+	};	
+}
+
 ;// CONCATENATED MODULE: ./src/index.js
+
 
 
 
@@ -5583,25 +5620,6 @@ var Execute = async function(command) {
 	await execa.execa(command);
 };
 
-var StoreGitCredential = async function(username, password) {
-	const process = execa_execa('git', ['credential-manager-core', 'store']);
-	process.stdin.write('protocol=https\n');
-	process.stdin.write('host=github.com\n');
-	process.stdin.write(`username=${username}\n`);
-	process.stdin.write(`password=${password}\n`);
-	process.stdin.end();
-	await process;
-};
-
-var GetGitCredential = async function() {
-	const process = execa.execa('git', ['credential-manager-core', 'get']);
-	process.stdin.write('protocol=https\n');
-	process.stdin.write('host=github.com\n');
-	process.stdin.write(`\n`);
-	process.stdin.end();
-	await process;
-};
-
 async function Run()
 {
 	if (process.platform !== 'darwin') {
@@ -5610,7 +5628,7 @@ async function Run()
 	
 	try {
 		await EnableLoginUserKeychain();
-		await StoreGitCredential(lib_core.getInput('username'), lib_core.getInput('password'));
+		await GitCredentialManagerCore.Store(lib_core.getInput('username'), lib_core.getInput('password'));
 //		await GetGitCredential();
 	} catch (ex) {
 		lib_core.setFailed(ex.message);

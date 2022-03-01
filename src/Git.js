@@ -4,13 +4,8 @@ import * as core from '@actions/core'
 
 export class Git
 {
-	static async Execute(args, options)
+	static Execute(command)
 	{
-		await execa.execa('git', args, options);
-	}
-
-	static async Execute(args)
-	{
-		await execa.execa('git', args);
+		return execa.execa('git', command);
 	}
 }

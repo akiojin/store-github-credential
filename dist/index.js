@@ -5593,36 +5593,31 @@ class GitCredentialManagerCore
 		return execa_execa('echo', [command]);
 	}
 
-	static GetCredential(command)
-	{
-		return execa_execa('git', ['credential-manager-core', command]);
-	}
-
 	static async Wait(echo, credential)
 	{
 		echo.stdout.pipe(credential.stdin);
-		const { stdout } = await credential;
-		lib_core.info(`stdout: ${stdout}`);
+		const result = await credential;
+		lib_core.info(`Result: ${result}`);
 	}
 
 	static async Get()
 	{
-		const echo = this.GetEcho('protocol=https\nhost=github.com\n');
-		const credential = this.GetCredential('get');
+		const echo = this.GetEcho('"protocol=https\nhost=github.com\n"');
+		const credential = this.Execute('get');
 		await this.Wait(echo, credential);
 	};
 
 	static async Store(username, password)
 	{
-		const echo = this.GetEcho(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`);
-		const credential = this.GetCredential('store');
+		const echo = this.GetEcho(`"protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n"`);
+		const credential = this.Execute('store');
 		await this.Wait(echo, credential);
 	};	
 
 	static async Erase()
 	{
-		const echo = this.GetEcho('protocol=https\nhost=github.com\n');
-		const credential = this.GetCredential('erase');
+		const echo = this.GetEcho('"protocol=https\nhost=github.com\n"');
+		const credential = this.Execute('erase');
 		await this.Wait(echo, credential);
 	};	
 }

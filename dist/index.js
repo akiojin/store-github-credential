@@ -5590,12 +5590,12 @@ class GitCredentialManagerCore
 
 	static GetEcho(command)
 	{
-		return execa_execa(`echo "${command}"`);
+		return execa_execa('echo', [command]);
 	}
 
 	static GetCredential(command)
 	{
-		return execa_execa(`git credential-manager-core ${command}`);
+		return execa_execa('git', ['credential-manager-core', 'command']);
 	}
 
 	static async Get()

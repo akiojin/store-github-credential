@@ -21,12 +21,12 @@ export class GitCredentialManagerCore
 
 	static GetEcho(command)
 	{
-		return execa.execa(`echo "${command}"`);
+		return execa.execa('echo', [command]);
 	}
 
 	static GetCredential(command)
 	{
-		return execa.execa(`git credential-manager-core ${command}`);
+		return execa.execa('git', ['credential-manager-core', 'command']);
 	}
 
 	static async Get()

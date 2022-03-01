@@ -5596,7 +5596,7 @@ class GitCredentialManagerCore
 	static async Wait(credential)
 	{
 		const result = await credential;
-		lib_core.info(`Git Result: ${result}`);
+		lib_core.info(`Git Result: ${JSON.stringify(result)}`);
 	}
 
 	static async Get()

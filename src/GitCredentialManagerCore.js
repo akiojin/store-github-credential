@@ -27,7 +27,7 @@ export class GitCredentialManagerCore
 	static async Wait(credential)
 	{
 		const result = await credential;
-		core.info(`Git Result: ${result}`);
+		core.info(`Git Result: ${JSON.stringify(result)}`);
 	}
 
 	static async Get()

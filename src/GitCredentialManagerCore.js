@@ -8,6 +8,11 @@ export class GitCredentialManagerCore
 		return Git.CreateProcess(['credential-manager-core', command]);
 	}
 
+	static CreateGitCredentialProcess(command, input)
+	{
+		return Git.CreateProcess(['credential-manager-core', command], input);
+	}
+
 	static async Configure()
 	{
 		await this.CreateGitCredentialProcess('configure');
@@ -17,30 +22,18 @@ export class GitCredentialManagerCore
 	static async Get()
 	{
 		await Security.EnableDefaultLoginKeychain();
-
-		const credential = this.CreateGitCredentialProcess('get');
-		credential.stdin.write('protocol=https\nhost=github.com\n\n');
-		credential.stdin.end();
-		await credential;
+		await this.CreateGitCredentialProcess('get', 'protocol=https\nhost=github.com\n\n');
 	};
 
 	static async Store(username, password)
 	{
 		await Security.EnableDefaultLoginKeychain();
-
-		const credential = this.CreateGitCredentialProcess('store');
-		credential.stdin.write(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`);
-		credential.stdin.end();
-		await credential;
+		await this.CreateGitCredentialProcess('store', `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`);
 	};	
 
 	static async Erase()
 	{
 		await Security.EnableDefaultLoginKeychain();
-
-		const credential = this.CreateGitCredentialProcess('erase');
-		credential.stdin.write('protocol=https\nhost=github.com\n');
-		credential.stdin.end();
-		await credential;
+		await this.CreateGitCredentialProcess('erase', 'protocol=https\nhost=github.com\n');
 	};	
 }

@@ -5,7 +5,7 @@ export class Git
 {
 	static CreateProcess(command)
 	{
-		return execa.execa('git', command);
+		return exec.exec('git', command);
 	}
 
 	static CreateProcess(command, input)

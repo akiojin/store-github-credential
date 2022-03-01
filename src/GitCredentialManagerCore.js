@@ -21,30 +21,16 @@ export class GitCredentialManagerCore
 
 	static async Get()
 	{
-		const process = this.Execute('get');
-		process.stdin.write('protocol=https\n');
-		process.stdin.write('host=github.com\n');
-		process.stdin.end();
-		await process;
+		await execa.execa('echo "protocol=https\nhost=github.com\n"').pipe('git credential-manager-core get');
 	};
 
 	static async Store(username, password)
 	{
-		const process = this.Execute('store');
-		process.stdin.write('protocol=https\n');
-		process.stdin.write('host=github.com\n');
-		process.stdin.write(`username=${username}\n`);
-		process.stdin.write(`password=${password}\n`);
-		process.stdin.end();
-		await process;
+		await execa.execa(`echo "protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n"`).pipe('git credential-manager-core store');
 	};	
 
 	static async Erase()
 	{
-		const process = this.Execute('erase');
-		process.stdin.write('protocol=https\n');
-		process.stdin.write('host=github.com\n');
-		process.stdin.end();
-		await process;
+		await execa.execa('echo "protocol=https\nhost=github.com\n"').pipe('git credential-manager-core erase');
 	};	
 }

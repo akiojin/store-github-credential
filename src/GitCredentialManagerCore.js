@@ -4,16 +4,13 @@ import { Security } from './Security'
 
 export class GitCredentialManagerCore
 {
-	static CreateGitCredentialProcess(command)
-	{
-		core.notice(`1:${command}`);
-		return Git.CreateProcess(['credential-manager-core', command]);
-	}
-
 	static CreateGitCredentialProcess(command, input)
 	{
-		core.notice(`11:${command}`);
-		return Git.CreateProcess(['credential-manager-core', command], input);
+		if (input === null) {
+			return Git.CreateProcess(['credential-manager-core', command]);
+		} else {
+			return Git.CreateProcess(['credential-manager-core', command], input);
+		}
 	}
 
 	static async Configure()

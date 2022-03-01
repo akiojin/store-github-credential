@@ -2992,16 +2992,13 @@ var exec = __nccwpck_require__(49);
 
 class Git
 {
-	static CreateProcess(command)
-	{
-		core.notice('2');
-		return exec.exec('git', command);
-	}
-
 	static CreateProcess(command, input)
 	{
-		core.notice('22');
-		return exec.exec('git', command, { input: Buffer.from(input) })
+		if (input === null) {
+			return exec.exec('git', command);
+		} else {
+			return exec.exec('git', command, { input: Buffer.from(input) })
+		}
 	}
 }
 
@@ -3064,16 +3061,13 @@ class Security
 
 class GitCredentialManagerCore
 {
-	static CreateGitCredentialProcess(command)
-	{
-		core.notice(`1:${command}`);
-		return Git.CreateProcess(['credential-manager-core', command]);
-	}
-
 	static CreateGitCredentialProcess(command, input)
 	{
-		core.notice(`11:${command}`);
-		return Git.CreateProcess(['credential-manager-core', command], input);
+		if (input === null) {
+			return Git.CreateProcess(['credential-manager-core', command]);
+		} else {
+			return Git.CreateProcess(['credential-manager-core', command], input);
+		}
 	}
 
 	static async Configure()

@@ -5558,8 +5558,15 @@ class FileSystem_FileSystem
 
 
 
+
 class GitCredentialManagerCore
 {	
+	static async Result(process)
+	{
+		const result = await process;
+		lib_core.notice(result);
+	}
+
 	static async Get()
 	{
 		const process = execa_execa('git', ['credential-manager-core', 'get']);
@@ -5567,7 +5574,7 @@ class GitCredentialManagerCore
 		process.stdin.write('host=github.com\n');
 		process.stdin.write(`\n`);
 		process.stdin.end();
-		await process;
+		await this.Result(process);
 	};
 
 	static async Store(username, password)
@@ -5578,7 +5585,7 @@ class GitCredentialManagerCore
 		process.stdin.write(`username=${username}\n`);
 		process.stdin.write(`password=${password}\n`);
 		process.stdin.end();
-		await process;
+		await this.Result(process);
 	};	
 
 	static async Erase()
@@ -5587,7 +5594,7 @@ class GitCredentialManagerCore
 		process.stdin.write('protocol=https\n');
 		process.stdin.write('host=github.com\n');
 		process.stdin.end();
-		await process;
+		await this.Result(process);
 	};	
 }
 

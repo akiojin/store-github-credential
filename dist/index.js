@@ -5595,7 +5595,7 @@ class GitCredentialManagerCore
 
 	static GetCredential(command)
 	{
-		return execa_execa('git', ['credential-manager-core', 'command']);
+		return execa_execa('git', ['credential-manager-core', command]);
 	}
 
 	static async Wait(echo, credential)

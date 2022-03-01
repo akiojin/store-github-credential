@@ -26,7 +26,7 @@ export class GitCredentialManagerCore
 
 	static GetCredential(command)
 	{
-		return execa.execa('git', ['credential-manager-core', 'command']);
+		return execa.execa('git', ['credential-manager-core', command]);
 	}
 
 	static async Wait(echo, credential)

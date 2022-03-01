@@ -24,34 +24,33 @@ export class GitCredentialManagerCore
 		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
 	}
 
-	static async Wait(echo, credential)
+	static async Wait(credential)
 	{
-		echo.stdout.pipe(credential.stdin);
-		const r1 = await echo;
-		core.info(`Echo stdout: ${JSON.stringify(r1)}`);
-
-		const r2 = await credential;
-		core.info(`Git Result: ${r2}`);
+		const result = await credential;
+		core.info(`Git Result: ${result}`);
 	}
 
 	static async Get()
 	{
-		const echo = this.CreateEchoProcess('protocol=https\\nhost=github.com\\n');
 		const credential = this.CreateGitCredentialProcess('get');
-		await this.Wait(echo, credential);
+		credential.stdin.write('protocol=https\\nhost=github.com\\n');
+		credential.stdin.end();
+		await this.Wait(credential);
 	};
 
 	static async Store(username, password)
 	{
-		const echo = this.CreateEchoProcess(`protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}\\n`);
 		const credential = this.CreateGitCredentialProcess('store');
-		await this.Wait(echo, credential);
+		credential.stdin.write(`protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}\\n`);
+		credential.stdin.end();
+		await this.Wait(credential);
 	};	
 
 	static async Erase()
 	{
-		const echo = this.CreateEchoProcess('protocol=https\\nhost=github.com\\n');
 		const credential = this.CreateGitCredentialProcess('erase');
-		await this.Wait(echo, credential);
+		credential.stdin.write('protocol=https\\nhost=github.com\\n');
+		credential.stdin.end();
+		await this.Wait(credential);
 	};	
 }

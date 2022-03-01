@@ -5444,29 +5444,36 @@ class GitCredentialManagerCore
 		await Git.Execute(['config', '--global', 'credential.interactive', 'false']);
 	}
 
+	static GetDefaultExecOptions()
+	{
+		return {
+			cwd: __dirname,
+			env: {},
+			silent: false,
+			failOnStdErr: false,
+			ignoreReturnCode: false
+		}
+	}
 	static async Get()
 	{
-		const options = {
-			input: Buffer.from('protocol=https\nhost=github.com\n')
-		}
+		const options = GetDefaultExecOptions();
+		options.input = Buffer.from('protocol=https\nhost=github.com\n');
 
 		await this.Execute('get', options);
 	};
 
 	static async Store(username, password)
 	{
-		const options = {
-			input: Buffer.from('protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n')
-		}
+		const options = GetDefaultExecOptions();
+		options.input = Buffer.from('protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n');
 
 		await this.Execute('store', options);
 	};	
 
 	static async Erase()
 	{
-		const options = {
-			input: Buffer.from('protocol=https\nhost=github.com\n')
-		}
+		const options = GetDefaultExecOptions();
+		options.input = Buffer.from('protocol=https\nhost=github.com\n');
 
 		await this.Execute('erase', options);
 	};	

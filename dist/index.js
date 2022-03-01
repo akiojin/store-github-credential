@@ -5598,25 +5598,32 @@ class GitCredentialManagerCore
 		return execa_execa('git', ['credential-manager-core', 'command']);
 	}
 
+	static async Wait(echo, credential)
+	{
+		echo.stdout.pipe(credential.stdin);
+		const { stdout } = await credential;
+		lib_core.info(`stdout: ${stdout}`);
+	}
+
 	static async Get()
 	{
 		const echo = this.GetEcho('protocol=https\nhost=github.com\n');
 		const credential = this.GetCredential('get');
-		await echo.stdout.pipe(credential.stdin);
+		await this.Wait(echo, credential);
 	};
 
 	static async Store(username, password)
 	{
 		const echo = this.GetEcho(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`);
 		const credential = this.GetCredential('store');
-		await echo.stdout.pipe(credential.stdin);
+		await this.Wait(echo, credential);
 	};	
 
 	static async Erase()
 	{
 		const echo = this.GetEcho('protocol=https\nhost=github.com\n');
 		const credential = this.GetCredential('erase');
-		await echo.stdout.pipe(credential.stdin);
+		await this.Wait(echo, credential);
 	};	
 }
 

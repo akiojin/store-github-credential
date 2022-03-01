@@ -22,8 +22,8 @@ export class GitCredentialManagerCore
 	static async Get()
 	{
 		const process = this.Execute('get');
-		process.stdin.write('protocol=https');
-		process.stdin.write('host=github.com');
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
 		process.stdin.end();
 		await process;
 	};
@@ -31,10 +31,10 @@ export class GitCredentialManagerCore
 	static async Store(username, password)
 	{
 		const process = this.Execute('store');
-		process.stdin.write('protocol=https');
-		process.stdin.write('host=github.com');
-		process.stdin.write(`username=${username}`);
-		process.stdin.write(`password=${password}`);
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
+		process.stdin.write(`username=${username}\n`);
+		process.stdin.write(`password=${password}\n`);
 		process.stdin.end();
 		await process;
 	};	
@@ -42,8 +42,8 @@ export class GitCredentialManagerCore
 	static async Erase()
 	{
 		const process = this.Execute('erase');
-		process.stdin.write('protocol=https');
-		process.stdin.write('host=github.com');
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
 		process.stdin.end();
 		await process;
 	};	

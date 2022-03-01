@@ -2,10 +2,10 @@ import * as exec from '@actions/exec'
 
 export class Security
 {
-	static async Execute(command, args)
+	static Execute(command, args)
 	{
         args.unshift(command);
-		await exec.exec('security', args);
+		return exec.exec('security', args);
 	}
 
 	static async EnableKeychains(domain, path)
@@ -31,6 +31,16 @@ export class Security
 	static async EnableDynamicKeychains(path)
 	{
 		await this.EnableKeychains("dynamic", path);
+	}
+
+	static async EnableDefaultLoginKeychain()
+	{
+		await this.EnableUserKeychains(`${process.env.HOME}/Library/Keychains/login.keychain-db`);
+	}
+
+	static Unlock(path, password)
+	{
+		return this.Execute('unlock-keychain', [ '-p', `"${password}"`, path ]);
 	}
 
 	static async AddGenericPassword(service, account, password)

@@ -8,6 +8,7 @@ import * as execa from 'execa'
 import { Security } from './Security'
 import { FileSystem } from './FileSystem'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
+import * as coreCommand from '@actions/core/lib/command'
 
 var GetTemporaryShellScript = async function(text) {
 	const src = await FileSystem.GetTemporaryFile(text);
@@ -32,18 +33,35 @@ async function Run()
 	}
 	
 	try {
-		await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 		await Credential.Configure();
+
+		await Security.EnableDefaultLoginKeychain();
 		await Credential.Store(core.getInput('username'), core.getInput('password'));
-		await Credential.Get();
 	} catch (ex) {
 		core.setFailed(ex.message);
 	}
 }
 
-function Cleanup()
+async function Cleanup()
 {
 	core.notice('Cleanup');
+
+	try {
+		await Security.EnableDefaultLoginKeychain();
+		await Credential.Erase();
+	} catch (ex) {
+		core.setFailed(ex.message);
+	}
 }
 
-Run();
+const IsPost = !!process.env['STATE_IsPost']
+
+if (!!IsPost) {
+	Cleanup();
+} else {
+	Run();
+}
+
+if (!IsPost) {
+	coreCommand.issueCommand('save-state', {name: 'IsPost'}, 'true')
+}

@@ -5494,10 +5494,10 @@ function execaNode(scriptPath, args, options = {}) {
 
 class Security
 {
-	static async Execute(command, args)
+	static Execute(command, args)
 	{
         args.unshift(command);
-		await lib_exec.exec('security', args);
+		return lib_exec.exec('security', args);
 	}
 
 	static async EnableKeychains(domain, path)
@@ -5523,6 +5523,16 @@ class Security
 	static async EnableDynamicKeychains(path)
 	{
 		await this.EnableKeychains("dynamic", path);
+	}
+
+	static async EnableDefaultLoginKeychain()
+	{
+		await this.EnableUserKeychains(`${process.env.HOME}/Library/Keychains/login.keychain-db`);
+	}
+
+	static Unlock(path, password)
+	{
+		return this.Execute('unlock-keychain', [ '-p', `"${password}"`, path ]);
 	}
 
 	static async AddGenericPassword(service, account, password)
@@ -5579,11 +5589,6 @@ class GitCredentialManagerCore
 		return Git.CreateProcess(['credential-manager-core', command]);
 	}
 
-	static CreateEchoProcess(text)
-	{
-		return execa_execa('echo', [text]);
-	}
-
 	static async Configure()
 	{
 		process.env['GIT_TRACE'] = '1';
@@ -5593,18 +5598,12 @@ class GitCredentialManagerCore
 		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
 	}
 
-	static async Wait(credential)
-	{
-		const result = await credential;
-		lib_core.info(`Git Result: ${JSON.stringify(result)}`);
-	}
-
 	static async Get()
 	{
 		const credential = this.CreateGitCredentialProcess('get');
-		credential.stdin.write('protocol=https\nhost=github.com\n');
+		credential.stdin.write('protocol=https\nhost=github.com\n\n');
 		credential.stdin.end();
-		await this.Wait(credential);
+		await credential;
 	};
 
 	static async Store(username, password)
@@ -5612,7 +5611,7 @@ class GitCredentialManagerCore
 		const credential = this.CreateGitCredentialProcess('store');
 		credential.stdin.write(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`);
 		credential.stdin.end();
-		await this.Wait(credential);
+		await credential;
 	};	
 
 	static async Erase()
@@ -5620,11 +5619,14 @@ class GitCredentialManagerCore
 		const credential = this.CreateGitCredentialProcess('erase');
 		credential.stdin.write('protocol=https\nhost=github.com\n');
 		credential.stdin.end();
-		await this.Wait(credential);
+		await credential;
 	};	
 }
 
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/command.js
+var command = __nccwpck_require__(604);
 ;// CONCATENATED MODULE: ./src/index.js
+
 
 
 
@@ -5659,21 +5661,38 @@ async function Run()
 	}
 	
 	try {
-		await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 		await GitCredentialManagerCore.Configure();
+
+		await Security.EnableDefaultLoginKeychain();
 		await GitCredentialManagerCore.Store(lib_core.getInput('username'), lib_core.getInput('password'));
-		await GitCredentialManagerCore.Get();
 	} catch (ex) {
 		lib_core.setFailed(ex.message);
 	}
 }
 
-function Cleanup()
+async function Cleanup()
 {
-	core.notice('Cleanup');
+	lib_core.notice('Cleanup');
+
+	try {
+		await Security.EnableDefaultLoginKeychain();
+		await GitCredentialManagerCore.Erase();
+	} catch (ex) {
+		lib_core.setFailed(ex.message);
+	}
 }
 
-Run();
+const IsPost = !!process.env['STATE_IsPost']
+
+if (!!IsPost) {
+	Cleanup();
+} else {
+	Run();
+}
+
+if (!IsPost) {
+	command.issueCommand('save-state', {name: 'IsPost'}, 'true')
+}
 
 })();
 

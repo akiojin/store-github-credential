@@ -10,11 +10,6 @@ export class GitCredentialManagerCore
 		return Git.CreateProcess(['credential-manager-core', command]);
 	}
 
-	static CreateEchoProcess(text)
-	{
-		return execa.execa('echo', [text]);
-	}
-
 	static async Configure()
 	{
 		process.env['GIT_TRACE'] = '1';
@@ -24,18 +19,12 @@ export class GitCredentialManagerCore
 		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
 	}
 
-	static async Wait(credential)
-	{
-		const result = await credential;
-		core.info(`Git Result: ${JSON.stringify(result)}`);
-	}
-
 	static async Get()
 	{
 		const credential = this.CreateGitCredentialProcess('get');
-		credential.stdin.write('protocol=https\nhost=github.com\n');
+		credential.stdin.write('protocol=https\nhost=github.com\n\n');
 		credential.stdin.end();
-		await this.Wait(credential);
+		await credential;
 	};
 
 	static async Store(username, password)
@@ -43,7 +32,7 @@ export class GitCredentialManagerCore
 		const credential = this.CreateGitCredentialProcess('store');
 		credential.stdin.write(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`);
 		credential.stdin.end();
-		await this.Wait(credential);
+		await credential;
 	};	
 
 	static async Erase()
@@ -51,6 +40,6 @@ export class GitCredentialManagerCore
 		const credential = this.CreateGitCredentialProcess('erase');
 		credential.stdin.write('protocol=https\nhost=github.com\n');
 		credential.stdin.end();
-		await this.Wait(credential);
+		await credential;
 	};	
 }

@@ -6,11 +6,11 @@ export class Git
 {
 	static async Execute(args, options)
 	{
-		await exec.exec('git', args, options);
+		await execa.execa('git', args, options);
 	}
 
 	static async Execute(args)
 	{
-		await exec.exec('git', args);
+		await execa.execa('git', args);
 	}
 }

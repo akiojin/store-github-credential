@@ -31,5 +31,5 @@ jobs:
       - name: Store Git Credential
         uses: ./
         with:
-          username: akiojin
+          username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
           password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}

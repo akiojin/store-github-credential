@@ -1,8 +1,12 @@
 import * as exec from '@actions/exec'
-import { Security } from './Security'
 
 export class GitCredentialManagerCore
 {
+	static async EnableDefaultLoginKeychain()
+	{
+		await exec.exec('security', ['list-keychains', '-d', 'user', '-s', `${process.env.HOME}/Library/Keychains/login.keychain-db` ]);
+	}
+
 	static async Configure()
 	{
 		await exec.exec('git', ['credential-manager-core', 'configure']);
@@ -11,19 +15,19 @@ export class GitCredentialManagerCore
 
 	static async Get()
 	{
-		await Security.EnableDefaultLoginKeychain();
+		await this.EnableDefaultLoginKeychain();
 		await exec.exec('git' ['credential-manager-core', 'get'], { input: 'protocol=https\nhost=github.com\n\n' });
 	};
 
 	static async Store(username, password)
 	{
-		await Security.EnableDefaultLoginKeychain();
+		await this.EnableDefaultLoginKeychain();
 		await exec.exec('git', ['credential-manager-core', 'store'], { input: `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n` });
 	};	
 
 	static async Erase()
 	{
-		await Security.EnableDefaultLoginKeychain();
+		await this.EnableDefaultLoginKeychain();
 		await exec.exec('git', ['credential-manager-core', 'erase'], { input: 'protocol=https\nhost=github.com\n' });
 	};	
 }

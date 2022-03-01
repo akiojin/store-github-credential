@@ -2986,64 +2986,16 @@ __nccwpck_require__.r(__webpack_exports__);
 var core = __nccwpck_require__(127);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(49);
-;// CONCATENATED MODULE: ./src/Security.js
-
-
-class Security
-{
-	static Execute(command, args)
-	{
-        args.unshift(command);
-		return exec.exec('security', args);
-	}
-
-	static EnableKeychains(domain, path)
-	{
-		return this.Execute('list-keychains', [ '-d', domain, '-s', path ]);
-	}
-
-	static EnableUserKeychains(path)
-	{
-		return this.EnableKeychains('user', path);
-	}
-
-	static EnableSystemKeychains(path)
-	{
-		return this.EnableKeychains('system', path);
-	}
-
-	static EnableCommonKeychains(path)
-	{
-		return this.EnableKeychains('common', path);
-	}
-
-	static EnableDynamicKeychains(path)
-	{
-		return this.EnableKeychains('dynamic', path);
-	}
-
-	static EnableDefaultLoginKeychain()
-	{
-		return this.EnableUserKeychains(`${process.env.HOME}/Library/Keychains/login.keychain-db`);
-	}
-
-	static Unlock(path, password)
-	{
-		return this.Execute('unlock-keychain', [ '-p', `"${password}"`, path ]);
-	}
-
-	static AddGenericPassword(service, account, password)
-	{
-		return this.Execute('add-generic-password', [ '-a', account, '-s', service, '-w', password ]);
-	}
-}
-
 ;// CONCATENATED MODULE: ./src/GitCredentialManagerCore.js
-
 
 
 class GitCredentialManagerCore
 {
+	static async EnableDefaultLoginKeychain()
+	{
+		await exec.exec('security', ['list-keychains', '-d', 'user', '-s', `${process.env.HOME}/Library/Keychains/login.keychain-db` ]);
+	}
+
 	static async Configure()
 	{
 		await exec.exec('git', ['credential-manager-core', 'configure']);
@@ -3052,19 +3004,19 @@ class GitCredentialManagerCore
 
 	static async Get()
 	{
-		await Security.EnableDefaultLoginKeychain();
+		await this.EnableDefaultLoginKeychain();
 		await exec.exec('git' ['credential-manager-core', 'get'], { input: 'protocol=https\nhost=github.com\n\n' });
 	};
 
 	static async Store(username, password)
 	{
-		await Security.EnableDefaultLoginKeychain();
+		await this.EnableDefaultLoginKeychain();
 		await exec.exec('git', ['credential-manager-core', 'store'], { input: `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n` });
 	};	
 
 	static async Erase()
 	{
-		await Security.EnableDefaultLoginKeychain();
+		await this.EnableDefaultLoginKeychain();
 		await exec.exec('git', ['credential-manager-core', 'erase'], { input: 'protocol=https\nhost=github.com\n' });
 	};	
 }
@@ -3075,6 +3027,13 @@ var command = __nccwpck_require__(604);
 
 
 
+
+const IsPost = !!process.env['STATE_IsPost']
+
+function AllowPostProcess()
+{
+	command.issueCommand('save-state', { name: 'IsPost' }, 'true');
+}
 
 async function Run()
 {
@@ -3103,17 +3062,13 @@ async function Cleanup()
 	}
 }
 
-const IsPost = !!process.env['STATE_IsPost']
-
 if (!!IsPost) {
 	Cleanup();
 } else {
 	Run();
 }
 
-if (!IsPost) {
-	command.issueCommand('save-state', { name: 'IsPost' }, 'true')
-}
+AllowPostProcess();
 
 })();
 

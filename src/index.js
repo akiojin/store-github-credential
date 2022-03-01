@@ -2,6 +2,13 @@ import * as core from '@actions/core'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
 import * as coreCommand from '@actions/core/lib/command'
 
+const IsPost = !!process.env['STATE_IsPost']
+
+function AllowPostProcess()
+{
+	coreCommand.issueCommand('save-state', { name: 'IsPost' }, 'true');
+}
+
 async function Run()
 {
 	core.notice('Running');
@@ -29,14 +36,10 @@ async function Cleanup()
 	}
 }
 
-const IsPost = !!process.env['STATE_IsPost']
-
 if (!!IsPost) {
 	Cleanup();
 } else {
 	Run();
 }
 
-if (!IsPost) {
-	coreCommand.issueCommand('save-state', { name: 'IsPost' }, 'true')
-}
+AllowPostProcess();

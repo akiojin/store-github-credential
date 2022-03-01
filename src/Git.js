@@ -7,4 +7,9 @@ export class Git
 	{
 		return execa.execa('git', command);
 	}
+
+	static CreateProcess(command, input)
+	{
+		return exec.exec('git', command, { input: Buffer.from(input) })
+	}
 }

@@ -4157,15 +4157,7 @@ var __webpack_exports__ = {};
 __nccwpck_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var lib_core = __nccwpck_require__(127);
-// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
-var lib_exec = __nccwpck_require__(49);
-// EXTERNAL MODULE: ./node_modules/@actions/io/lib/io.js
-var io = __nccwpck_require__(864);
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(147);
-;// CONCATENATED MODULE: external "fs/promises"
-const promises_namespaceObject = require("fs/promises");
+var core = __nccwpck_require__(127);
 ;// CONCATENATED MODULE: external "node:buffer"
 const external_node_buffer_namespaceObject = require("node:buffer");
 ;// CONCATENATED MODULE: external "node:path"
@@ -5295,7 +5287,7 @@ const handleOutput = (options, value, error) => {
 	return value;
 };
 
-function execa_execa(file, args, options) {
+function execa(file, args, options) {
 	const parsed = handleArguments(file, args, options);
 	const command = command_joinCommand(file, args);
 	const escapedCommand = command_getEscapedCommand(file, args);
@@ -5449,7 +5441,7 @@ function execaSync(file, args, options) {
 
 function execaCommand(command, options) {
 	const [file, ...args] = parseCommand(command);
-	return execa_execa(file, args, options);
+	return execa(file, args, options);
 }
 
 function execaCommandSync(command, options) {
@@ -5471,7 +5463,7 @@ function execaNode(scriptPath, args, options = {}) {
 		nodeOptions = defaultExecArgv,
 	} = options;
 
-	return execa_execa(
+	return execa(
 		nodePath,
 		[
 			...nodeOptions,
@@ -5489,6 +5481,25 @@ function execaNode(scriptPath, args, options = {}) {
 	);
 }
 
+// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
+var exec = __nccwpck_require__(49);
+;// CONCATENATED MODULE: ./src/Git.js
+
+
+
+class Git
+{
+	static CreateProcess(command)
+	{
+		return execa('git', command);
+	}
+
+	static CreateProcess(command, input)
+	{
+		return exec.exec('git', command, { input: Buffer.from(input) })
+	}
+}
+
 ;// CONCATENATED MODULE: ./src/Security.js
 
 
@@ -5497,7 +5508,7 @@ class Security
 	static Execute(command, args)
 	{
         args.unshift(command);
-		return lib_exec.exec('security', args);
+		return exec.exec('security', args);
 	}
 
 	static async EnableKeychains(domain, path)
@@ -5541,44 +5552,7 @@ class Security
 	}
 }
 
-;// CONCATENATED MODULE: ./src/FileSystem.js
-
-
-
-
-class FileSystem_FileSystem
-{
-	static GenerateTemporaryFilename()
-	{
-		const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
-		core.info(`path:${path}`);
-		return path;
-	};
-	
-	static async GetTemporaryFile(text)
-	{
-		const path = GenerateTemporaryFilename();
-		await fsPromises.writeFile(path, text);
-		return path;
-	};
-	
-}
-
-;// CONCATENATED MODULE: ./src/Git.js
-
-
-
-class Git
-{
-	static CreateProcess(command)
-	{
-		return execa_execa('git', command);
-	}
-}
-
 ;// CONCATENATED MODULE: ./src/GitCredentialManagerCore.js
-
-
 
 
 
@@ -5591,15 +5565,14 @@ class GitCredentialManagerCore
 
 	static async Configure()
 	{
-		process.env['GIT_TRACE'] = '1';
-		process.env['GCM_TRACE_SECRETS'] = '1'
-
 		await this.CreateGitCredentialProcess('configure');
 		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
 	}
 
 	static async Get()
 	{
+		await Security.EnableDefaultLoginKeychain();
+
 		const credential = this.CreateGitCredentialProcess('get');
 		credential.stdin.write('protocol=https\nhost=github.com\n\n');
 		credential.stdin.end();
@@ -5608,6 +5581,8 @@ class GitCredentialManagerCore
 
 	static async Store(username, password)
 	{
+		await Security.EnableDefaultLoginKeychain();
+
 		const credential = this.CreateGitCredentialProcess('store');
 		credential.stdin.write(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`);
 		credential.stdin.end();
@@ -5616,6 +5591,8 @@ class GitCredentialManagerCore
 
 	static async Erase()
 	{
+		await Security.EnableDefaultLoginKeychain();
+
 		const credential = this.CreateGitCredentialProcess('erase');
 		credential.stdin.write('protocol=https\nhost=github.com\n');
 		credential.stdin.end();
@@ -5623,62 +5600,34 @@ class GitCredentialManagerCore
 	};	
 }
 
-// EXTERNAL MODULE: ./node_modules/@actions/core/lib/command.js
-var command = __nccwpck_require__(604);
 ;// CONCATENATED MODULE: ./src/index.js
 
 
 
-
-
-
-
-
-
-
-
-
-var GetTemporaryShellScript = async function(text) {
-	const src = await FileSystem.GetTemporaryFile(text);
-	const dst = `${src}.sh`;
-
-	await fsPromises.rename(src, dst);
-	await exec.exec(`chmod +x ${dst}`)
-
-	return dst;
-};
-
-var Execute = async function(command) {
-	await execa.execa(command);
-};
-
 async function Run()
 {
-	lib_core.notice('Running');
+	core.notice('Running');
 
 	if (process.platform !== 'darwin') {
-		lib_core.setFailed('Platform not supported.');
+		core.setFailed('Platform not supported.');
 	}
 	
 	try {
 		await GitCredentialManagerCore.Configure();
-
-		await Security.EnableDefaultLoginKeychain();
-		await GitCredentialManagerCore.Store(lib_core.getInput('username'), lib_core.getInput('password'));
+		await GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
 	} catch (ex) {
-		lib_core.setFailed(ex.message);
+		core.setFailed(ex.message);
 	}
 }
 
 async function Cleanup()
 {
-	lib_core.notice('Cleanup');
+	core.notice('Cleanup');
 
 	try {
-		await Security.EnableDefaultLoginKeychain();
 		await GitCredentialManagerCore.Erase();
 	} catch (ex) {
-		lib_core.setFailed(ex.message);
+		core.setFailed(ex.message);
 	}
 }
 
@@ -5691,7 +5640,7 @@ if (!!IsPost) {
 }
 
 if (!IsPost) {
-	command.issueCommand('save-state', {name: 'IsPost'}, 'true')
+	core.issueCommand('save-state', { name: 'IsPost' }, 'true')
 }
 
 })();

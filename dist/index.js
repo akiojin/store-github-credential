@@ -3013,34 +3013,34 @@ class Security
 		return exec.exec('security', args);
 	}
 
-	static async EnableKeychains(domain, path)
+	static EnableKeychains(domain, path)
 	{
-		await this.Execute('list-keychains', [ '-d', domain, '-s', path ]);
+		return this.Execute('list-keychains', [ '-d', domain, '-s', path ]);
 	}
 
-	static async EnableUserKeychains(path)
+	static EnableUserKeychains(path)
 	{
-		await this.EnableKeychains("user", path);
+		return this.EnableKeychains('user', path);
 	}
 
-	static async EnableSystemKeychains(path)
+	static EnableSystemKeychains(path)
 	{
-		await this.EnableKeychains("system", path);
+		return this.EnableKeychains('system', path);
 	}
 
-	static async EnableCommonKeychains(path)
+	static EnableCommonKeychains(path)
 	{
-		await this.EnableKeychains("common", path);
+		return this.EnableKeychains('common', path);
 	}
 
-	static async EnableDynamicKeychains(path)
+	static EnableDynamicKeychains(path)
 	{
-		await this.EnableKeychains("dynamic", path);
+		return this.EnableKeychains('dynamic', path);
 	}
 
-	static async EnableDefaultLoginKeychain()
+	static EnableDefaultLoginKeychain()
 	{
-		await this.EnableUserKeychains(`${process.env.HOME}/Library/Keychains/login.keychain-db`);
+		return this.EnableUserKeychains(`${process.env.HOME}/Library/Keychains/login.keychain-db`);
 	}
 
 	static Unlock(path, password)
@@ -3048,9 +3048,9 @@ class Security
 		return this.Execute('unlock-keychain', [ '-p', `"${password}"`, path ]);
 	}
 
-	static async AddGenericPassword(service, account, password)
+	static AddGenericPassword(service, account, password)
 	{
-		await this.Execute('add-generic-password', [ '-a', account, '-s', service, '-w', password ]);
+		return this.Execute('add-generic-password', [ '-a', account, '-s', service, '-w', password ]);
 	}
 }
 
@@ -3111,7 +3111,9 @@ async function Run()
 	}
 	
 	try {
+		core.notice('1');
 		await GitCredentialManagerCore.Configure();
+		core.notice('2');
 		await GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
 	} catch (ex) {
 		core.setFailed(ex.message);

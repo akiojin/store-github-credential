@@ -6,19 +6,20 @@ export class GitCredentialManagerCore
 {
 	static CreateGitCredentialProcess(command)
 	{
+		core.notice(`1:${command}`);
 		return Git.CreateProcess(['credential-manager-core', command]);
 	}
 
 	static CreateGitCredentialProcess(command, input)
 	{
+		core.notice(`1:${command}`);
 		return Git.CreateProcess(['credential-manager-core', command], input);
 	}
 
 	static async Configure()
 	{
-		core.notice('1');
 		await this.CreateGitCredentialProcess('configure');
-		core.notice('2');
+		core.notice('3');
 		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
 	}
 

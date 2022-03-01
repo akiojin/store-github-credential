@@ -3,7 +3,7 @@ import * as exec from '@actions/exec'
 
 export class Git
 {
-	static Execute(command)
+	static CreateProcess(command)
 	{
 		return execa.execa('git', command);
 	}

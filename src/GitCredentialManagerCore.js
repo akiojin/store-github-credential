@@ -5,9 +5,14 @@ import { Git } from './Git';
 
 export class GitCredentialManagerCore
 {
-	static Execute(command)
+	static CreateGitCredentialProcess(command)
 	{
-		return Git.Execute(['credential-manager-core', command]);
+		return Git.CreateProcess(['credential-manager-core', command]);
+	}
+
+	static CreateEchoProcess(text)
+	{
+		return execa.execa('echo', [text]);
 	}
 
 	static async Configure()
@@ -15,8 +20,8 @@ export class GitCredentialManagerCore
 		process.env['GIT_TRACE'] = '1';
 		process.env['GCM_TRACE_SECRETS'] = '1'
 
-		await this.Execute('configure');
-		await Git.Execute(['config', '--global', 'credential.interactive', 'false']);
+		await this.CreateGitCredentialProcess('configure');
+		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
 	}
 
 	static async Wait(echo, credential)
@@ -31,22 +36,22 @@ export class GitCredentialManagerCore
 
 	static async Get()
 	{
-		const echo = execa.execa('echo', '"protocol=https\\nhost=github.com\\n"');
-		const credential = this.Execute('get');
+		const echo = this.CreateEchoProcess('"protocol=https\\nhost=github.com\\n"');
+		const credential = this.CreateGitCredentialProcess('get');
 		await this.Wait(echo, credential);
 	};
 
 	static async Store(username, password)
 	{
-		const echo = execa.execa('echo', `"protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}\\n"`);
-		const credential = this.Execute('store');
+		const echo = this.CreateEchoProcess(`"protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}\\n"`);
+		const credential = this.CreateGitCredentialProcess('store');
 		await this.Wait(echo, credential);
 	};	
 
 	static async Erase()
 	{
-		const echo = execa.execa('echo', '"protocol=https\\nhost=github.com\\n"');
-		const credential = this.Execute('erase');
+		const echo = this.CreateEchoProcess('"protocol=https\\nhost=github.com\\n"');
+		const credential = this.CreateGitCredentialProcess('erase');
 		await this.Wait(echo, credential);
 	};	
 }

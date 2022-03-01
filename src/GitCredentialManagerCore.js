@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import { Git } from './Git';
 import { Security } from './Security'
 

@@ -2983,7 +2983,7 @@ var __webpack_exports__ = {};
 __nccwpck_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var lib_core = __nccwpck_require__(127);
+var core = __nccwpck_require__(127);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(49);
 ;// CONCATENATED MODULE: ./src/Git.js
@@ -3058,6 +3058,7 @@ class Security
 
 
 
+
 class GitCredentialManagerCore
 {
 	static CreateGitCredentialProcess(command)
@@ -3106,28 +3107,28 @@ var command = __nccwpck_require__(604);
 
 async function Run()
 {
-	lib_core.notice('Running');
+	core.notice('Running');
 
 	if (process.platform !== 'darwin') {
-		lib_core.setFailed('Platform not supported.');
+		core.setFailed('Platform not supported.');
 	}
 	
 	try {
 		await GitCredentialManagerCore.Configure();
-		await GitCredentialManagerCore.Store(lib_core.getInput('username'), lib_core.getInput('password'));
+		await GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
 	} catch (ex) {
-		lib_core.setFailed(ex.message);
+		core.setFailed(ex.message);
 	}
 }
 
 async function Cleanup()
 {
-	lib_core.notice('Cleanup');
+	core.notice('Cleanup');
 
 	try {
 		await GitCredentialManagerCore.Erase();
 	} catch (ex) {
-		lib_core.setFailed(ex.message);
+		core.setFailed(ex.message);
 	}
 }
 

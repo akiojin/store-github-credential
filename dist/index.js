@@ -5605,21 +5605,21 @@ class GitCredentialManagerCore
 
 	static async Get()
 	{
-		const echo = this.CreateEchoProcess('"protocol=https\\nhost=github.com\\n"');
+		const echo = this.CreateEchoProcess('protocol=https\\nhost=github.com\\n');
 		const credential = this.CreateGitCredentialProcess('get');
 		await this.Wait(echo, credential);
 	};
 
 	static async Store(username, password)
 	{
-		const echo = this.CreateEchoProcess(`"protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}\\n"`);
+		const echo = this.CreateEchoProcess(`protocol=https\\nhost=github.com\\nusername=${username}\\npassword=${password}\\n`);
 		const credential = this.CreateGitCredentialProcess('store');
 		await this.Wait(echo, credential);
 	};	
 
 	static async Erase()
 	{
-		const echo = this.CreateEchoProcess('"protocol=https\\nhost=github.com\\n"');
+		const echo = this.CreateEchoProcess('protocol=https\\nhost=github.com\\n');
 		const credential = this.CreateGitCredentialProcess('erase');
 		await this.Wait(echo, credential);
 	};	

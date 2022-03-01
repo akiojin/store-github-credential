@@ -5591,8 +5591,11 @@ class GitCredentialManagerCore
 	static async Wait(echo, credential)
 	{
 		echo.stdout.pipe(credential.stdin);
-		const result = await credential;
-		lib_core.info(`Result: ${result}`);
+		const r1 = await echo;
+		lib_core.info(`Echo Result: ${r1}`);
+
+		const r2 = await credential;
+		lib_core.info(`Git Result: ${r2}`);
 	}
 
 	static async Get()

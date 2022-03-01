@@ -22,8 +22,11 @@ export class GitCredentialManagerCore
 	static async Wait(echo, credential)
 	{
 		echo.stdout.pipe(credential.stdin);
-		const result = await credential;
-		core.info(`Result: ${result}`);
+		const r1 = await echo;
+		core.info(`Echo Result: ${r1}`);
+
+		const r2 = await credential;
+		core.info(`Git Result: ${r2}`);
 	}
 
 	static async Get()

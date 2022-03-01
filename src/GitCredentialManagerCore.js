@@ -7,14 +7,14 @@ export class GitCredentialManagerCore
 	static async Result(process)
 	{
 		const result = await process;
-		core.notice(`command = ${result.command}`);
-		core.notice(`exitCode = ${result.exitCode}`);
-		core.notice(`stdout = ${result.stdout}`);
-		core.notice(`stderr = ${result.stderr}`);
-		core.notice(`failed = ${result.failed}`);
-		core.notice(`timedOut = ${result.timedOut}`);
-		core.notice(`isCanceled = ${result.isCanceled}`);
-		core.notice(`killed = ${result.killed}`);
+		core.info(`command = ${result.command}`);
+		core.info(`exitCode = ${result.exitCode}`);
+		core.info(`stdout = ${result.stdout}`);
+		core.info(`stderr = ${result.stderr}`);
+		core.info(`failed = ${result.failed}`);
+		core.info(`timedOut = ${result.timedOut}`);
+		core.info(`isCanceled = ${result.isCanceled}`);
+		core.info(`killed = ${result.killed}`);
 	}
 
 	static async Configure()

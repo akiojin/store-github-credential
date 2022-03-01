@@ -7,7 +7,7 @@ export class FileSystem
 	static GenerateTemporaryFilename()
 	{
 		const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
-		core.notice(`path:${path}`);
+		core.info(`path:${path}`);
 		return path;
 	};
 	

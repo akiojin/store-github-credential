@@ -5541,7 +5541,7 @@ class FileSystem_FileSystem
 	static GenerateTemporaryFilename()
 	{
 		const path = `${process.env.RUNNER_TEMP}/${uuidv4()}`;
-		core.notice(`path:${path}`);
+		core.info(`path:${path}`);
 		return path;
 	};
 	
@@ -5564,14 +5564,14 @@ class GitCredentialManagerCore
 	static async Result(process)
 	{
 		const result = await process;
-		lib_core.notice(`command = ${result.command}`);
-		lib_core.notice(`exitCode = ${result.exitCode}`);
-		lib_core.notice(`stdout = ${result.stdout}`);
-		lib_core.notice(`stderr = ${result.stderr}`);
-		lib_core.notice(`failed = ${result.failed}`);
-		lib_core.notice(`timedOut = ${result.timedOut}`);
-		lib_core.notice(`isCanceled = ${result.isCanceled}`);
-		lib_core.notice(`killed = ${result.killed}`);
+		lib_core.info(`command = ${result.command}`);
+		lib_core.info(`exitCode = ${result.exitCode}`);
+		lib_core.info(`stdout = ${result.stdout}`);
+		lib_core.info(`stderr = ${result.stderr}`);
+		lib_core.info(`failed = ${result.failed}`);
+		lib_core.info(`timedOut = ${result.timedOut}`);
+		lib_core.info(`isCanceled = ${result.isCanceled}`);
+		lib_core.info(`killed = ${result.killed}`);
 	}
 
 	static async Configure()

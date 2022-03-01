@@ -9,10 +9,6 @@ import { Security } from './Security'
 import { FileSystem } from './FileSystem'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
 
-var EnableLoginUserKeychain = async function() {
-	await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
-}
-
 var GetTemporaryShellScript = async function(text) {
 	const src = await FileSystem.GetTemporaryFile(text);
 	const dst = `${src}.sh`;
@@ -36,7 +32,7 @@ async function Run()
 	}
 	
 	try {
-		await EnableLoginUserKeychain();
+		await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 		await Credential.Store(core.getInput('username'), core.getInput('password'));
 		await Credential.Get();
 	} catch (ex) {

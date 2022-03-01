@@ -5610,10 +5610,6 @@ class GitCredentialManagerCore
 
 
 
-var EnableLoginUserKeychain = async function() {
-	await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
-}
-
 var GetTemporaryShellScript = async function(text) {
 	const src = await FileSystem.GetTemporaryFile(text);
 	const dst = `${src}.sh`;
@@ -5637,7 +5633,7 @@ async function Run()
 	}
 	
 	try {
-		await EnableLoginUserKeychain();
+		await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
 		await GitCredentialManagerCore.Store(lib_core.getInput('username'), lib_core.getInput('password'));
 		await GitCredentialManagerCore.Get();
 	} catch (ex) {

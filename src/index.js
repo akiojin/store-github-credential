@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
+import * as coreCommand from '@actions/core/lib/command'
 
 async function Run()
 {
@@ -37,5 +38,5 @@ if (!!IsPost) {
 }
 
 if (!IsPost) {
-	core.saveState('IsPost', 'true');
+	coreCommand.issueCommand('save-state', { name: 'IsPost' }, 'true')
 }

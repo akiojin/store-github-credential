@@ -5564,7 +5564,14 @@ class GitCredentialManagerCore
 	static async Result(process)
 	{
 		const result = await process;
-		lib_core.notice(result);
+		lib_core.notice(`command = ${result.command}`);
+		lib_core.notice(`exitCode = ${result.exitCode}`);
+		lib_core.notice(`stdout = ${result.stdout}`);
+		lib_core.notice(`stderr = ${result.stderr}`);
+		lib_core.notice(`failed = ${result.failed}`);
+		lib_core.notice(`timedOut = ${result.timedOut}`);
+		lib_core.notice(`isCanceled = ${result.isCanceled}`);
+		lib_core.notice(`killed = ${result.killed}`);
 	}
 
 	static async Configure()

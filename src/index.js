@@ -36,7 +36,7 @@ async function Run()
 	try {
 		await EnableLoginUserKeychain();
 		await Credential.Store(core.getInput('username'), core.getInput('password'));
-//		await GetGitCredential();
+		await Credential.Get();
 	} catch (ex) {
 		core.setFailed(ex.message);
 	}

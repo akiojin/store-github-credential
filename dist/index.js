@@ -5629,7 +5629,7 @@ async function Run()
 	try {
 		await EnableLoginUserKeychain();
 		await GitCredentialManagerCore.Store(lib_core.getInput('username'), lib_core.getInput('password'));
-//		await GetGitCredential();
+		await GitCredentialManagerCore.Get();
 	} catch (ex) {
 		lib_core.setFailed(ex.message);
 	}

@@ -49,8 +49,4 @@ function Cleanup()
 	core.notice('Cleanup');
 }
 
-if (!!process.env['STATE_isPost']) {
-	await Run();
-} else {
-	await Cleanup();
-}
+Run();

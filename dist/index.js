@@ -5560,11 +5560,20 @@ class FileSystem_FileSystem
 
 
 class GitCredentialManagerCore
-{	
+{
 	static async Result(process)
 	{
 		const result = await process;
 		lib_core.notice(result);
+	}
+
+	static async Configure()
+	{
+		process.env['GIT_TRACE'] = '1';
+		process.env['GCM_TRACE_SECRETS'] = '1'
+
+		await this.Result(execa_execa('git', ['credential-manager-core', 'configure']));
+		await this.Result(execa_execa('git', ['config', '--global', 'credential.interactive', 'false']));
 	}
 
 	static async Get()
@@ -5634,6 +5643,7 @@ async function Run()
 	
 	try {
 		await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
+		await GitCredentialManagerCore.Configure();
 		await GitCredentialManagerCore.Store(lib_core.getInput('username'), lib_core.getInput('password'));
 		await GitCredentialManagerCore.Get();
 	} catch (ex) {

@@ -33,6 +33,7 @@ async function Run()
 	
 	try {
 		await Security.EnableUserKeychains("~/Library/Keychains/login.keychain-db");
+		await Credential.Configure();
 		await Credential.Store(core.getInput('username'), core.getInput('password'));
 		await Credential.Get();
 	} catch (ex) {

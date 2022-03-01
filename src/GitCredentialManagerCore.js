@@ -12,7 +12,7 @@ export class GitCredentialManagerCore
 
 	static CreateGitCredentialProcess(command, input)
 	{
-		core.notice(`1:${command}`);
+		core.notice(`11:${command}`);
 		return Git.CreateProcess(['credential-manager-core', command], input);
 	}
 

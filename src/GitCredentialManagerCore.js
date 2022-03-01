@@ -5,28 +5,31 @@ export class GitCredentialManagerCore
 {	
 	static async Get()
 	{
-		const options = {
-			input: Buffer.from(`protocol=https\nhost=github.com`)
-		};
-
-		await exec.exec('git', ['credential-manager-core', 'get'], options);
+		const process = execa.execa('git', ['credential-manager-core', 'get']);
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
+		process.stdin.write(`\n`);
+		process.stdin.end();
+		await process;
 	};
 
 	static async Store(username, password)
 	{
-		const options = {
-			input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`)
-		};
-
-		await exec.exec('git', ['credential-manager-core', 'store'], options);
+		const process = execa.execa('git', ['credential-manager-core', 'store']);
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
+		process.stdin.write(`username=${username}\n`);
+		process.stdin.write(`password=${password}\n`);
+		process.stdin.end();
+		await process;
 	};	
 
 	static async Erase()
 	{
-		const options = {
-			input: Buffer.from(`protocol=https\nhost=github.com`)
-		};
-
-		await exec.exec('git', ['credential-manager-core', 'erase'], options);
+		const process = execa.execa('git', ['credential-manager-core', 'erase']);
+		process.stdin.write('protocol=https\n');
+		process.stdin.write('host=github.com\n');
+		process.stdin.end();
+		await process;
 	};	
 }

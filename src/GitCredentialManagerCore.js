@@ -23,7 +23,7 @@ export class GitCredentialManagerCore
 	{
 		echo.stdout.pipe(credential.stdin);
 		const r1 = await echo;
-		core.info(`Echo Result: ${r1}`);
+		core.info(`Echo stdout: ${JSON.stringify(r1)}`);
 
 		const r2 = await credential;
 		core.info(`Git Result: ${r2}`);

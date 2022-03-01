@@ -5592,7 +5592,7 @@ class GitCredentialManagerCore
 	{
 		echo.stdout.pipe(credential.stdin);
 		const r1 = await echo;
-		lib_core.info(`Echo Result: ${r1}`);
+		lib_core.info(`Echo stdout: ${JSON.stringify(r1)}`);
 
 		const r2 = await credential;
 		lib_core.info(`Git Result: ${r2}`);

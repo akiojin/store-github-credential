@@ -5425,8 +5425,32 @@ class Git
 
 class GitCredentialManagerCore
 {
-	static async Execute(command, options)
+	static GetDefaultExecOptions()
 	{
+		return {
+			cwd: __dirname,
+			env: {},
+			silent: false,
+			failOnStdErr: false,
+			ignoreReturnCode: false
+		}
+	}
+
+	static GetInput()
+	{
+		return 'protocol=https\nhost=github.com\n';
+	}
+
+	static GetInput(username, password)
+	{
+		return 'protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n';
+	}
+
+	static async Execute(command, input)
+	{
+		const options = this.GetDefaultExecOptions();
+		options.input = Buffer.from(input);
+
 		await Git.Execute(['credential-manager-core', command], options);
 	}
 
@@ -5444,38 +5468,19 @@ class GitCredentialManagerCore
 		await Git.Execute(['config', '--global', 'credential.interactive', 'false']);
 	}
 
-	static GetDefaultExecOptions()
-	{
-		return {
-			cwd: __dirname,
-			env: {},
-			silent: false,
-			failOnStdErr: false,
-			ignoreReturnCode: false
-		}
-	}
 	static async Get()
 	{
-		const options = GetDefaultExecOptions();
-		options.input = Buffer.from('protocol=https\nhost=github.com\n');
-
-		await this.Execute('get', options);
+		await this.Execute('get', this.GetInput());
 	};
 
 	static async Store(username, password)
 	{
-		const options = GetDefaultExecOptions();
-		options.input = Buffer.from('protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n');
-
-		await this.Execute('store', options);
+		await this.Execute('store', this.GetInput(username, password));
 	};	
 
 	static async Erase()
 	{
-		const options = GetDefaultExecOptions();
-		options.input = Buffer.from('protocol=https\nhost=github.com\n');
-
-		await this.Execute('erase', options);
+		await this.Execute('erase', this.GetInput());
 	};	
 }
 

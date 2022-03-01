@@ -5635,7 +5635,16 @@ async function Run()
 	}
 }
 
-Run();
+function Cleanup()
+{
+	lib_core.notice('Post process');
+}
+
+if (!!process.env['STATE_isPost']) {
+	Run();
+} else {
+	Cleanup();
+}
 })();
 
 module.exports = __webpack_exports__;

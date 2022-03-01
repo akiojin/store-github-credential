@@ -42,4 +42,13 @@ async function Run()
 	}
 }
 
-Run();
+function Cleanup()
+{
+	core.notice('Post process');
+}
+
+if (!!process.env['STATE_isPost']) {
+	Run();
+} else {
+	Cleanup();
+}

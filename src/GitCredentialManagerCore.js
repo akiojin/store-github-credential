@@ -15,7 +15,9 @@ export class GitCredentialManagerCore
 
 	static async Configure()
 	{
+		core.notice('1');
 		await this.CreateGitCredentialProcess('configure');
+		core.notice('2');
 		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
 	}
 

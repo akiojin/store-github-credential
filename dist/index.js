@@ -2983,7 +2983,7 @@ var __webpack_exports__ = {};
 __nccwpck_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(127);
+var lib_core = __nccwpck_require__(127);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(49);
 ;// CONCATENATED MODULE: ./src/Git.js
@@ -3072,7 +3072,9 @@ class GitCredentialManagerCore
 
 	static async Configure()
 	{
+		core.notice('1');
 		await this.CreateGitCredentialProcess('configure');
+		core.notice('2');
 		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
 	}
 
@@ -3104,30 +3106,28 @@ var command = __nccwpck_require__(604);
 
 async function Run()
 {
-	core.notice('Running');
+	lib_core.notice('Running');
 
 	if (process.platform !== 'darwin') {
-		core.setFailed('Platform not supported.');
+		lib_core.setFailed('Platform not supported.');
 	}
 	
 	try {
-		core.notice('1');
 		await GitCredentialManagerCore.Configure();
-		core.notice('2');
-		await GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
+		await GitCredentialManagerCore.Store(lib_core.getInput('username'), lib_core.getInput('password'));
 	} catch (ex) {
-		core.setFailed(ex.message);
+		lib_core.setFailed(ex.message);
 	}
 }
 
 async function Cleanup()
 {
-	core.notice('Cleanup');
+	lib_core.notice('Cleanup');
 
 	try {
 		await GitCredentialManagerCore.Erase();
 	} catch (ex) {
-		core.setFailed(ex.message);
+		lib_core.setFailed(ex.message);
 	}
 }
 

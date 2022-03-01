@@ -11,9 +11,7 @@ async function Run()
 	}
 	
 	try {
-		core.notice('1');
 		await Credential.Configure();
-		core.notice('2');
 		await Credential.Store(core.getInput('username'), core.getInput('password'));
 	} catch (ex) {
 		core.setFailed(ex.message);

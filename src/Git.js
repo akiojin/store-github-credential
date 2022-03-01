@@ -1,14 +1,14 @@
-import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 
 export class Git
 {
-	static CreateProcess(command, input)
+	static CreateProcess(command)
 	{
-		if (input === null) {
-			return exec.exec('git', command);
-		} else {
-			return exec.exec('git', command, { input: Buffer.from(input) })
-		}
+		return exec.exec('git', command);
+	}
+
+	static CreateProcessWithInput(command, input)
+	{
+		return exec.exec('git', command, { input: Buffer.from(input) })
 	}
 }

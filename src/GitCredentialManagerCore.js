@@ -1,40 +1,29 @@
-import * as core from '@actions/core'
-import { Git } from './Git';
+import * as exec from '@actions/exec'
 import { Security } from './Security'
 
 export class GitCredentialManagerCore
 {
-	static CreateGitCredentialProcess(command, input)
-	{
-		if (input === null) {
-			return Git.CreateProcess(['credential-manager-core', command]);
-		} else {
-			return Git.CreateProcess(['credential-manager-core', command], input);
-		}
-	}
-
 	static async Configure()
 	{
-		await this.CreateGitCredentialProcess('configure');
-		core.notice('3');
-		await Git.CreateProcess(['config', '--global', 'credential.interactive', 'false']);
+		await exec.exec('git', ['credential-manager-core', 'configure']);
+		await exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
 	}
 
 	static async Get()
 	{
 		await Security.EnableDefaultLoginKeychain();
-		await this.CreateGitCredentialProcess('get', 'protocol=https\nhost=github.com\n\n');
+		await exec.exec('git' ['credential-manager-core', 'get'], { input: 'protocol=https\nhost=github.com\n\n' });
 	};
 
 	static async Store(username, password)
 	{
 		await Security.EnableDefaultLoginKeychain();
-		await this.CreateGitCredentialProcess('store', `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`);
+		await exec.exec('git', ['credential-manager-core', 'store'], { input: `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n` });
 	};	
 
 	static async Erase()
 	{
 		await Security.EnableDefaultLoginKeychain();
-		await this.CreateGitCredentialProcess('erase', 'protocol=https\nhost=github.com\n');
+		await exec.exec('git', ['credential-manager-core', 'erase'], { input: 'protocol=https\nhost=github.com\n' });
 	};	
 }

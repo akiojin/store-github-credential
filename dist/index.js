@@ -5640,7 +5640,7 @@ if (!!IsPost) {
 }
 
 if (!IsPost) {
-	core.issueCommand('save-state', { name: 'IsPost' }, 'true')
+	core.saveState('IsPost', 'true');
 }
 
 })();

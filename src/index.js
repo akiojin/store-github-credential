@@ -29,6 +29,8 @@ var Execute = async function(command) {
 
 async function Run()
 {
+	core.notice('Running');
+
 	if (process.platform !== 'darwin') {
 		core.setFailed('Platform not supported.');
 	}
@@ -44,11 +46,11 @@ async function Run()
 
 function Cleanup()
 {
-	core.notice('Post process');
+	core.notice('Cleanup');
 }
 
 if (!!process.env['STATE_isPost']) {
-	Run();
+	await Run();
 } else {
-	Cleanup();
+	await Cleanup();
 }

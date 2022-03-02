@@ -28,8 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Store Git Credential
-        uses: ./
+      - uses: ./
         with:
           username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
           password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}

@@ -2822,6 +2822,194 @@ exports.debug = debug; // for test
 
 /***/ }),
 
+/***/ 390:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GitCredentialManagerCore = void 0;
+const exec = __importStar(__nccwpck_require__(49));
+class GitCredentialManagerCore {
+    static EnableDefaultLoginKeychain() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const args = [
+                'list-keychains',
+                '-d', 'user',
+                '-s', `${process.env.HOME}/Library/Keychains/login.keychain-db`
+            ];
+            yield exec.exec('security', args);
+        });
+    }
+    static Configure() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield exec.exec('git', ['credential-manager-core', 'configure']);
+            yield exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
+        });
+    }
+    static Get() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const args = [
+                'credential-manager-core',
+                'get'
+            ];
+            const options = {
+                input: Buffer.from('protocol=https\nhost=github.com\n\n')
+            };
+            yield this.EnableDefaultLoginKeychain();
+            yield exec.exec('git', args, options);
+        });
+    }
+    ;
+    static Store(username, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const args = [
+                'credential-manager-core',
+                'store'
+            ];
+            const options = {
+                input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`)
+            };
+            yield this.EnableDefaultLoginKeychain();
+            yield exec.exec('git', args, options);
+        });
+    }
+    ;
+    static Erase() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const args = [
+                'credential-manager-core',
+                'erase'
+            ];
+            const options = {
+                input: Buffer.from('protocol=https\nhost=github.com\n')
+            };
+            yield this.EnableDefaultLoginKeychain();
+            yield exec.exec('git', args, options);
+        });
+    }
+    ;
+}
+exports.GitCredentialManagerCore = GitCredentialManagerCore;
+
+
+/***/ }),
+
+/***/ 116:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(127));
+const os = __importStar(__nccwpck_require__(37));
+const GitCredentialManagerCore_1 = __nccwpck_require__(390);
+const coreCommand = __importStar(__nccwpck_require__(604));
+const IsPost = !!process.env['STATE_IsPost'];
+function AllowPostProcess() {
+    coreCommand.issueCommand('save-state', { name: 'IsPost' }, 'true');
+}
+function Run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.notice('Running');
+        if (os.platform() !== 'darwin') {
+            core.setFailed('Action requires macOS agent.');
+        }
+        try {
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
+        }
+        catch (ex) {
+            core.setFailed(ex.message);
+        }
+    });
+}
+function Cleanup() {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.notice('Cleanup');
+        try {
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
+        }
+        catch (ex) {
+            core.setFailed(ex.message);
+        }
+    });
+}
+if (!!IsPost) {
+    Cleanup();
+}
+else {
+    Run();
+}
+AllowPostProcess();
+
+
+/***/ }),
+
 /***/ 491:
 /***/ ((module) => {
 
@@ -2959,119 +3147,17 @@ module.exports = require("util");
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-// ESM COMPAT FLAG
-__nccwpck_require__.r(__webpack_exports__);
-
-// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(127);
-// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
-var exec = __nccwpck_require__(49);
-;// CONCATENATED MODULE: ./src/GitCredentialManagerCore.js
-
-
-class GitCredentialManagerCore
-{
-	static async EnableDefaultLoginKeychain()
-	{
-		await exec.exec('security', ['list-keychains', '-d', 'user', '-s', `${process.env.HOME}/Library/Keychains/login.keychain-db` ]);
-	}
-
-	static async Configure()
-	{
-		await exec.exec('git', ['credential-manager-core', 'configure']);
-		await exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
-	}
-
-	static async Get()
-	{
-		await this.EnableDefaultLoginKeychain();
-		await exec.exec('git' ['credential-manager-core', 'get'], { input: 'protocol=https\nhost=github.com\n\n' });
-	};
-
-	static async Store(username, password)
-	{
-		await this.EnableDefaultLoginKeychain();
-		await exec.exec('git', ['credential-manager-core', 'store'], { input: `protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n` });
-	};	
-
-	static async Erase()
-	{
-		await this.EnableDefaultLoginKeychain();
-		await exec.exec('git', ['credential-manager-core', 'erase'], { input: 'protocol=https\nhost=github.com\n' });
-	};	
-}
-
-// EXTERNAL MODULE: ./node_modules/@actions/core/lib/command.js
-var command = __nccwpck_require__(604);
-;// CONCATENATED MODULE: ./src/index.js
-
-
-
-
-const IsPost = !!process.env['STATE_IsPost']
-
-function AllowPostProcess()
-{
-	command.issueCommand('save-state', { name: 'IsPost' }, 'true');
-}
-
-async function Run()
-{
-	core.notice('Running');
-
-	if (process.platform !== 'darwin') {
-		core.setFailed('Platform not supported.');
-	}
-	
-	try {
-		await GitCredentialManagerCore.Configure();
-		await GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
-	} catch (ex) {
-		core.setFailed(ex.message);
-	}
-}
-
-async function Cleanup()
-{
-	core.notice('Cleanup');
-
-	try {
-		await GitCredentialManagerCore.Erase();
-	} catch (ex) {
-		core.setFailed(ex.message);
-	}
-}
-
-if (!!IsPost) {
-	Cleanup();
-} else {
-	Run();
-}
-
-AllowPostProcess();
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(116);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;

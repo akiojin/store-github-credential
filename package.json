@@ -1,8 +1,8 @@
 {
   "name": "store-github-credential",
-  "version": "1.0.0",
+  "version": "1.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,7 +12,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/akiojin/store-github-credential/issues"
   },
@@ -20,5 +20,8 @@
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/exec": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21"
   }
 }

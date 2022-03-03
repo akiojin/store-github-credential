@@ -46,8 +46,10 @@ async function Cleanup()
 
 async function UnlockLoginKeychain(password?: string)
 {
+	await Security.ListKeychains();
 	const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
 	await Security.ListKeychains(keychain)
+	await Security.ListKeychains();
 
 	if (password != null && password !== '') {
 		await Security.Lock(keychain);

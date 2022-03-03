@@ -2943,10 +2943,20 @@ class Security {
         return exec.exec('security', ['lock-keychain', '-a']);
     }
     static Unlock(password, keychainPath) {
-        return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`, keychainPath]);
+        if (keychainPath != null) {
+            return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`, keychainPath]);
+        }
+        else {
+            return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`]);
+        }
     }
     static ListKeychains(keychainPath) {
-        return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath]);
+        if (keychainPath != null) {
+            return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath]);
+        }
+        else {
+            return exec.exec('security', ['list-keychains', '-d', 'user']);
+        }
     }
 }
 exports.Security = Security;
@@ -3033,8 +3043,10 @@ function Cleanup() {
 }
 function UnlockLoginKeychain(password) {
     return __awaiter(this, void 0, void 0, function* () {
+        yield Security_1.Security.ListKeychains();
         const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
         yield Security_1.Security.ListKeychains(keychain);
+        yield Security_1.Security.ListKeychains();
         if (password != null && password !== '') {
             yield Security_1.Security.Lock(keychain);
             yield Security_1.Security.Unlock(password, keychain);

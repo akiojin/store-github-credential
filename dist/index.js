@@ -2863,7 +2863,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitCredentialManagerCore = void 0;
 const exec = __importStar(__nccwpck_require__(49));
 class GitCredentialManagerCore {
-    static EnableDefaultLoginKeychain() {
+    static EnableLoginKeychain() {
         return __awaiter(this, void 0, void 0, function* () {
             const args = [
                 'list-keychains',
@@ -2873,51 +2873,42 @@ class GitCredentialManagerCore {
             yield exec.exec('security', args);
         });
     }
+    static Execute(command, options) {
+        return exec.exec('git', ['credential-manager-core', command], options);
+    }
     static Configure() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield exec.exec('git', ['credential-manager-core', 'configure']);
+            yield this.Execute('configure');
             yield exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
         });
     }
     static Get() {
         return __awaiter(this, void 0, void 0, function* () {
-            const args = [
-                'credential-manager-core',
-                'get'
-            ];
             const options = {
                 input: Buffer.from('protocol=https\nhost=github.com\n\n')
             };
-            yield this.EnableDefaultLoginKeychain();
-            yield exec.exec('git', args, options);
+            yield this.EnableLoginKeychain();
+            yield this.Execute('get', options);
         });
     }
     ;
     static Store(username, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const args = [
-                'credential-manager-core',
-                'store'
-            ];
             const options = {
                 input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`)
             };
-            yield this.EnableDefaultLoginKeychain();
-            yield exec.exec('git', args, options);
+            yield this.EnableLoginKeychain();
+            yield this.Execute('store', options);
         });
     }
     ;
     static Erase() {
         return __awaiter(this, void 0, void 0, function* () {
-            const args = [
-                'credential-manager-core',
-                'erase'
-            ];
             const options = {
                 input: Buffer.from('protocol=https\nhost=github.com\n')
             };
-            yield this.EnableDefaultLoginKeychain();
-            yield exec.exec('git', args, options);
+            yield this.EnableLoginKeychain();
+            yield this.Execute('erase', options);
         });
     }
     ;

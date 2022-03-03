@@ -2863,57 +2863,93 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitCredentialManagerCore = void 0;
 const exec = __importStar(__nccwpck_require__(49));
 class GitCredentialManagerCore {
-    static EnableLoginKeychain() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = [
-                'list-keychains',
-                '-d', 'user',
-                '-s', `${process.env.HOME}/Library/Keychains/login.keychain-db`
-            ];
-            yield exec.exec('security', args);
-        });
-    }
     static Execute(command, options) {
         return exec.exec('git', ['credential-manager-core', command], options);
     }
     static Configure() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.Execute('configure');
-            yield exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
+            return exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
         });
     }
     static Get() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = {
-                input: Buffer.from('protocol=https\nhost=github.com\n\n')
-            };
-            yield this.EnableLoginKeychain();
-            yield this.Execute('get', options);
-        });
+        const options = {
+            input: Buffer.from('protocol=https\nhost=github.com\n\n')
+        };
+        return this.Execute('get', options);
     }
     ;
     static Store(username, password) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = {
-                input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`)
-            };
-            yield this.EnableLoginKeychain();
-            yield this.Execute('store', options);
-        });
+        const options = {
+            input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`)
+        };
+        return this.Execute('store', options);
     }
     ;
     static Erase() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = {
-                input: Buffer.from('protocol=https\nhost=github.com\n')
-            };
-            yield this.EnableLoginKeychain();
-            yield this.Execute('erase', options);
-        });
+        const options = {
+            input: Buffer.from('protocol=https\nhost=github.com\n')
+        };
+        return this.Execute('erase', options);
     }
     ;
 }
 exports.GitCredentialManagerCore = GitCredentialManagerCore;
+
+
+/***/ }),
+
+/***/ 11:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Security = void 0;
+const exec = __importStar(__nccwpck_require__(49));
+class Security {
+    static Lock(keychainPath) {
+        if (keychainPath == null) {
+            return exec.exec('security', ['lock-keychain']);
+        }
+        else {
+            return exec.exec('security', ['lock-keychain', keychainPath]);
+        }
+    }
+    static LockAll() {
+        return exec.exec('security', ['lock-keychain', '-a']);
+    }
+    static Unlock(password, keychainPath) {
+        return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`, keychainPath]);
+    }
+    static ListKeychains(keychainPath) {
+        return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath]);
+    }
+}
+exports.Security = Security;
 
 
 /***/ }),
@@ -2960,6 +2996,7 @@ const core = __importStar(__nccwpck_require__(127));
 const os = __importStar(__nccwpck_require__(37));
 const GitCredentialManagerCore_1 = __nccwpck_require__(390);
 const coreCommand = __importStar(__nccwpck_require__(604));
+const Security_1 = __nccwpck_require__(11);
 const IsPost = !!process.env['STATE_IsPost'];
 function AllowPostProcess() {
     coreCommand.issueCommand('save-state', { name: 'IsPost' }, 'true');
@@ -2971,6 +3008,9 @@ function Run() {
             core.setFailed('Action requires macOS agent.');
         }
         try {
+            const password = core.getInput('keychain_password');
+            coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
+            yield UnlockLoginKeychain(password);
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
         }
@@ -2983,10 +3023,21 @@ function Cleanup() {
     return __awaiter(this, void 0, void 0, function* () {
         core.notice('Cleanup');
         try {
+            yield UnlockLoginKeychain(process.env['STATE_KEYCHAIN_PASSWORD']);
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
         }
         catch (ex) {
             core.setFailed(ex.message);
+        }
+    });
+}
+function UnlockLoginKeychain(password) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
+        yield Security_1.Security.ListKeychains(keychain);
+        if (password !== undefined && password !== '') {
+            yield Security_1.Security.Lock(keychain);
+            yield Security_1.Security.Unlock(password, keychain);
         }
     });
 }

@@ -9,6 +9,10 @@ inputs:
     description: 'Password or Personal Access Token (PAT)'
     required: true
     default: ''
+  keychain_password:
+    description: 'Keychain password'
+    required: false
+    default: ''
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -9,7 +9,7 @@ inputs:
     description: 'Password or Personal Access Token (PAT)'
     required: true
     default: ''
-  keychain_password:
+  keychain-password:
     description: 'Keychain password'
     required: false
     default: ''

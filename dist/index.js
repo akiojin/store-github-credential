@@ -3008,7 +3008,7 @@ function Run() {
             core.setFailed('Action requires macOS agent.');
         }
         try {
-            const password = core.getInput('keychain_password');
+            const password = core.getInput('keychain-password');
             coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
             yield UnlockLoginKeychain(password);
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
@@ -3035,7 +3035,7 @@ function UnlockLoginKeychain(password) {
     return __awaiter(this, void 0, void 0, function* () {
         const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
         yield Security_1.Security.ListKeychains(keychain);
-        if (password !== undefined && password !== '') {
+        if (password != null && password !== '') {
             yield Security_1.Security.Lock(keychain);
             yield Security_1.Security.Unlock(password, keychain);
         }

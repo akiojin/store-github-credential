@@ -21,7 +21,7 @@ async function Run()
 	}
 	
 	try {
-		const password = core.getInput('keychain_password')
+		const password = core.getInput('keychain-password')
 		coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password)
 
 		await UnlockLoginKeychain(password)
@@ -49,7 +49,7 @@ async function UnlockLoginKeychain(password?: string)
 	const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
 	await Security.ListKeychains(keychain)
 
-	if (password !== undefined && password !== '') {
+	if (password != null && password !== '') {
 		await Security.Lock(keychain);
 		await Security.Unlock(password, keychain)
 	}

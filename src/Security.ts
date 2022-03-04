@@ -2,7 +2,7 @@ import * as exec from '@actions/exec'
 
 export class Security
 {
-	static Lock(keychainPath?: string): Promise<number>
+	static LockKeychain(keychainPath?: string): Promise<number>
 	{
 		if (keychainPath == null) {
 			return exec.exec('security', ['lock-keychain'])
@@ -11,14 +11,14 @@ export class Security
 		}
 	}
 
-	static LockAll(): Promise<number>
+	static LockKeychainAll(): Promise<number>
 	{
 		return exec.exec('security', ['lock-keychain', '-a'])
 	}
 
-	static Unlock(password: string, keychainPath: string): Promise<number>
-	static Unlock(password: string): Promise<number>
-	static Unlock(password: string, keychainPath?: string): Promise<number>
+	static UnlockKeychain(password: string, keychainPath: string): Promise<number>
+	static UnlockKeychain(password: string): Promise<number>
+	static UnlockKeychain(password: string, keychainPath?: string): Promise<number>
 	{
 		if (keychainPath != null) {
 			return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`, keychainPath])
@@ -27,9 +27,34 @@ export class Security
 		}
 	}
 
+	static CreateKeychain(keychainPath: string, password: string): Promise<number>
+	{
+		return exec.exec('security', ['create-keychain', '-p', password, keychainPath])
+	}
+
+	static DeleteKeychain(keychainPath: string): Promise<number>
+	{
+		return exec.exec('security', ['delete-keychain', keychainPath])
+	}
+
+	static SetKeychain(keychain: string, keychainPath: string): Promise<number>
+	{
+		return exec.exec('security', [keychain, '-d', 'user', '-s', keychainPath])
+	}
+
+	static SetDefaultKeychain(keychainPath: string): Promise<number>
+	{
+		return this.SetKeychain('default-keychain', keychainPath)
+	}
+
 	static ShowDefaultKeychain(): Promise<number>
 	{
 		return exec.exec('security', ['default-keychain'])
+	}
+
+	static SetLoginKeychain(keychainPath: string): Promise<number>
+	{
+		return this.SetKeychain('login-keychain', keychainPath)
 	}
 
 	static ShowLoginKeychain(): Promise<number>
@@ -42,7 +67,7 @@ export class Security
 		return exec.exec('security', ['list-keychains', '-d', 'user'])
 	}
 
-	static ListKeychains(keychainPath: string): Promise<number>
+	static SetListKeychains(keychainPath: string): Promise<number>
 	{
 		return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath])
 	}

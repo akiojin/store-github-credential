@@ -2931,7 +2931,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Security = void 0;
 const exec = __importStar(__nccwpck_require__(49));
 class Security {
-    static Lock(keychainPath) {
+    static LockKeychain(keychainPath) {
         if (keychainPath == null) {
             return exec.exec('security', ['lock-keychain']);
         }
@@ -2939,10 +2939,10 @@ class Security {
             return exec.exec('security', ['lock-keychain', keychainPath]);
         }
     }
-    static LockAll() {
+    static LockKeychainAll() {
         return exec.exec('security', ['lock-keychain', '-a']);
     }
-    static Unlock(password, keychainPath) {
+    static UnlockKeychain(password, keychainPath) {
         if (keychainPath != null) {
             return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`, keychainPath]);
         }
@@ -2950,8 +2950,23 @@ class Security {
             return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`]);
         }
     }
+    static CreateKeychain(keychainPath, password) {
+        return exec.exec('security', ['create-keychain', '-p', password, keychainPath]);
+    }
+    static DeleteKeychain(keychainPath) {
+        return exec.exec('security', ['delete-keychain', keychainPath]);
+    }
+    static SetKeychain(keychain, keychainPath) {
+        return exec.exec('security', [keychain, '-d', 'user', '-s', keychainPath]);
+    }
+    static SetDefaultKeychain(keychainPath) {
+        return this.SetKeychain('default-keychain', keychainPath);
+    }
     static ShowDefaultKeychain() {
         return exec.exec('security', ['default-keychain']);
+    }
+    static SetLoginKeychain(keychainPath) {
+        return this.SetKeychain('login-keychain', keychainPath);
     }
     static ShowLoginKeychain() {
         return exec.exec('security', ['login-keychain']);
@@ -2959,7 +2974,7 @@ class Security {
     static ShowListKeychains() {
         return exec.exec('security', ['list-keychains', '-d', 'user']);
     }
-    static ListKeychains(keychainPath) {
+    static SetListKeychains(keychainPath) {
         return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath]);
     }
     static FindGenericPassword(service) {
@@ -3014,7 +3029,9 @@ const os = __importStar(__nccwpck_require__(37));
 const GitCredentialManagerCore_1 = __nccwpck_require__(390);
 const coreCommand = __importStar(__nccwpck_require__(604));
 const Security_1 = __nccwpck_require__(11);
+const uuid_1 = __nccwpck_require__(151);
 const IsPost = !!process.env['STATE_IsPost'];
+const CustomKeychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
 function AllowPostProcess() {
     coreCommand.issueCommand('save-state', { name: 'IsPost' }, 'true');
 }
@@ -3025,9 +3042,12 @@ function Run() {
             core.setFailed('Action requires macOS agent.');
         }
         try {
-            const password = core.getInput('keychain-password');
+            const password = core.getInput('keychain-password') || (0, uuid_1.v4)();
             coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
-            yield UnlockLoginKeychain(password);
+            yield Security_1.Security.CreateKeychain(CustomKeychain, password);
+            yield Security_1.Security.SetDefaultKeychain(CustomKeychain);
+            yield Security_1.Security.SetLoginKeychain(CustomKeychain);
+            yield Security_1.Security.UnlockKeychain(CustomKeychain);
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
         }
@@ -3040,9 +3060,9 @@ function Cleanup() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Cleanup');
         try {
-            yield UnlockLoginKeychain(process.env['STATE_KEYCHAIN_PASSWORD']);
-            yield Security_1.Security.FindGenericPassword('git:https://github.com');
-            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
+            yield Security_1.Security.SetDefaultKeychain(CustomKeychain);
+            yield Security_1.Security.SetLoginKeychain(CustomKeychain);
+            yield Security_1.Security.DeleteKeychain(CustomKeychain);
         }
         catch (ex) {
             core.setFailed(ex.message);
@@ -3053,12 +3073,11 @@ function UnlockLoginKeychain(password) {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('list-keychain Before:');
         yield Security_1.Security.ShowListKeychains();
-        const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
-        yield Security_1.Security.ListKeychains(keychain);
+        yield Security_1.Security.SetListKeychains(CustomKeychain);
         core.info('list-keychain After:');
         yield Security_1.Security.ShowListKeychains();
         if (password != null && password !== '') {
-            yield Security_1.Security.Unlock(password, keychain);
+            yield Security_1.Security.UnlockKeychain(password, CustomKeychain);
         }
     });
 }
@@ -3069,6 +3088,14 @@ else {
     Run();
 }
 AllowPostProcess();
+
+
+/***/ }),
+
+/***/ 151:
+/***/ ((module) => {
+
+module.exports = eval("require")("uuid");
 
 
 /***/ }),

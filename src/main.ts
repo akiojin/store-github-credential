@@ -23,7 +23,6 @@ async function Run()
 
 		await Security.CreateKeychain(CustomKeychain, password)
 		await Security.SetDefaultKeychain(CustomKeychain)
-		await Security.SetLoginKeychain(CustomKeychain)
 		await Security.UnlockKeychain(CustomKeychain)
 
 		await Credential.Configure()
@@ -39,7 +38,6 @@ async function Cleanup()
 
 	try {
 		await Security.SetDefaultKeychain(CustomKeychain)
-		await Security.SetLoginKeychain(CustomKeychain)
 		await Security.DeleteKeychain(CustomKeychain)
 	} catch (ex: any) {
 		core.setFailed(ex.message)

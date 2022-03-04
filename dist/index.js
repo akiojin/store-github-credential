@@ -3043,7 +3043,6 @@ function Run() {
             coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
             yield Security_1.Security.CreateKeychain(CustomKeychain, password);
             yield Security_1.Security.SetDefaultKeychain(CustomKeychain);
-            yield Security_1.Security.SetLoginKeychain(CustomKeychain);
             yield Security_1.Security.UnlockKeychain(CustomKeychain);
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
@@ -3058,7 +3057,6 @@ function Cleanup() {
         core.info('Cleanup');
         try {
             yield Security_1.Security.SetDefaultKeychain(CustomKeychain);
-            yield Security_1.Security.SetLoginKeychain(CustomKeychain);
             yield Security_1.Security.DeleteKeychain(CustomKeychain);
         }
         catch (ex) {

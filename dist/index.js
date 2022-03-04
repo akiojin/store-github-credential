@@ -3048,7 +3048,6 @@ function UnlockLoginKeychain(password) {
         yield Security_1.Security.ListKeychains(keychain);
         yield Security_1.Security.ListKeychains();
         if (password != null && password !== '') {
-            yield Security_1.Security.Lock(keychain);
             yield Security_1.Security.Unlock(password, keychain);
         }
     });

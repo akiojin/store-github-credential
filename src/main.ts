@@ -14,7 +14,7 @@ function AllowPostProcess()
 
 async function Run()
 {
-	core.notice('Running')
+	core.info('Running')
 
 	if (os.platform() !== 'darwin') {
 		core.setFailed('Action requires macOS agent.')
@@ -34,7 +34,7 @@ async function Run()
 
 async function Cleanup()
 {
-	core.notice('Cleanup')
+	core.info('Cleanup')
 
 	try {
 		await UnlockLoginKeychain(process.env['STATE_KEYCHAIN_PASSWORD'])
@@ -46,13 +46,16 @@ async function Cleanup()
 
 async function UnlockLoginKeychain(password?: string)
 {
+	core.info('list-keychain Before:');
 	await Security.ListKeychains();
+
 	const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
 	await Security.ListKeychains(keychain)
+
+	core.info('list-keychain After:');
 	await Security.ListKeychains();
 
 	if (password != null && password !== '') {
-		await Security.Lock(keychain);
 		await Security.Unlock(password, keychain)
 	}
 }

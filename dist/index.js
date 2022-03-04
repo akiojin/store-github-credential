@@ -3037,6 +3037,7 @@ function Cleanup() {
         core.info('Cleanup');
         try {
             yield UnlockLoginKeychain(process.env['STATE_KEYCHAIN_PASSWORD']);
+            yield Security_1.Security.FindGenericPassword('git:https://github.com');
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
         }
         catch (ex) {
@@ -3050,7 +3051,6 @@ function UnlockLoginKeychain(password) {
         yield Security_1.Security.ListKeychains();
         const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
         yield Security_1.Security.ListKeychains(keychain);
-        yield Security_1.Security.FindGenericPassword('git:https://github.com');
         core.info('list-keychain After:');
         yield Security_1.Security.ListKeychains();
         if (password != null && password !== '') {

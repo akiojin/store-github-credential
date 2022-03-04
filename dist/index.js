@@ -3046,7 +3046,8 @@ function Run() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Running');
         try {
-            const password = core.getInput('keychain-password') || (0, uuid_1.v4)();
+            const ID = (0, uuid_1.v4)();
+            const password = core.getInput('keychain-password') || ID;
             SaveKeychainPassword(password);
             yield Security_1.Security.CreateKeychain(CustomKeychain, password);
             yield Security_1.Security.SetDefaultKeychain(CustomKeychain);

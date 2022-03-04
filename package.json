@@ -19,7 +19,9 @@
   "homepage": "https://github.com/akiojin/store-github-credential#readme",
   "dependencies": {
     "@actions/core": "^1.6.0",
-    "@actions/exec": "^1.1.0",
+    "@actions/exec": "^1.1.0"
+  },
+  "devDependencies": {
     "@types/node": "^17.0.21",
     "@types/uuid": "^8.3.4"
   }

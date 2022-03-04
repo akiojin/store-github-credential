@@ -3035,17 +3035,27 @@ const CustomKeychain = `${process.env.HOME}/Library/Keychains/default-login.keyc
 function AllowPostProcess() {
     coreCommand.issueCommand('save-state', { name: 'POST' }, 'true');
 }
+function LoadKeychainPassword() {
+    return process.env['STATE_KEYCHAIN_PASSWORD'];
+}
+function SaveKeychainPassword(password) {
+    coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
+}
 function Run() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Running');
         try {
             const password = core.getInput('keychain-password') || 'default-keychain-password';
-            coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
+            SaveKeychainPassword(password);
             yield Security_1.Security.CreateKeychain(CustomKeychain, password);
             yield Security_1.Security.SetDefaultKeychain(CustomKeychain);
+            yield Security_1.Security.SetListKeychains(CustomKeychain);
             yield Security_1.Security.UnlockKeychain(CustomKeychain);
+            yield Security_1.Security.ShowDefaultKeychain();
+            yield Security_1.Security.ShowListKeychains();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
         }
         catch (ex) {
             core.setFailed(ex.message);

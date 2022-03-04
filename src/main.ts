@@ -42,6 +42,7 @@ async function Run()
 
 		await Credential.Configure()
 		await Credential.Store(core.getInput('username'), core.getInput('password'))
+		await Credential.Get()
 	} catch (ex: any) {
 		core.setFailed(ex.message)
 	}

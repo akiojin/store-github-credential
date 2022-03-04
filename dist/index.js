@@ -2951,7 +2951,7 @@ class Security {
         }
     }
     static CreateKeychain(keychainPath, password) {
-        return exec.exec('security', ['create-keychain', '-p', password, keychainPath]);
+        return exec.exec('security', ['create-keychain', '-p', `"${password}"`, keychainPath]);
     }
     static DeleteKeychain(keychainPath) {
         return exec.exec('security', ['delete-keychain', keychainPath]);
@@ -2978,7 +2978,7 @@ class Security {
         return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath]);
     }
     static FindGenericPassword(service) {
-        return exec.exec('security', ['find-generic-password', '-s', service]);
+        return exec.exec('security', ['find-generic-password', '-s', `"${service}"`]);
     }
 }
 exports.Security = Security;

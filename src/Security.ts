@@ -29,7 +29,7 @@ export class Security
 
 	static CreateKeychain(keychainPath: string, password: string): Promise<number>
 	{
-		return exec.exec('security', ['create-keychain', '-p', password, keychainPath])
+		return exec.exec('security', ['create-keychain', '-p', `"${password}"`, keychainPath])
 	}
 
 	static DeleteKeychain(keychainPath: string): Promise<number>
@@ -74,6 +74,6 @@ export class Security
 
 	static FindGenericPassword(service: string)
 	{
-		return exec.exec('security', ['find-generic-password', '-s', service])
+		return exec.exec('security', ['find-generic-password', '-s', `"${service}"`])
 	}
 }

@@ -27,15 +27,24 @@ export class Security
 		}
 	}
 
-	static ListKeychains(): Promise<number>
-	static ListKeychains(keychainPath?: string): Promise<number>
-	static ListKeychains(keychainPath?: string): Promise<number>
+	static ShowDefaultKeychain(): Promise<number>
 	{
-		if (keychainPath != null) {
-			return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath])
-		} else {
-			return exec.exec('security', ['list-keychains', '-d', 'user'])
-		}
+		return exec.exec('security', ['default-keychain'])
+	}
+
+	static ShowLoginKeychain(): Promise<number>
+	{
+		return exec.exec('security', ['login-keychain'])
+	}
+
+	static ShowListKeychains(): Promise<number>
+	{
+		return exec.exec('security', ['list-keychains', '-d', 'user'])
+	}
+
+	static ListKeychains(keychainPath: string): Promise<number>
+	{
+		return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath])
 	}
 
 	static FindGenericPassword(service: string)

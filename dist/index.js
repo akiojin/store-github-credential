@@ -2950,13 +2950,17 @@ class Security {
             return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`]);
         }
     }
+    static ShowDefaultKeychain() {
+        return exec.exec('security', ['default-keychain']);
+    }
+    static ShowLoginKeychain() {
+        return exec.exec('security', ['login-keychain']);
+    }
+    static ShowListKeychains() {
+        return exec.exec('security', ['list-keychains', '-d', 'user']);
+    }
     static ListKeychains(keychainPath) {
-        if (keychainPath != null) {
-            return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath]);
-        }
-        else {
-            return exec.exec('security', ['list-keychains', '-d', 'user']);
-        }
+        return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath]);
     }
     static FindGenericPassword(service) {
         return exec.exec('security', ['find-generic-password', '-s', service]);
@@ -3048,11 +3052,11 @@ function Cleanup() {
 function UnlockLoginKeychain(password) {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('list-keychain Before:');
-        yield Security_1.Security.ListKeychains();
+        yield Security_1.Security.ShowListKeychains();
         const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
         yield Security_1.Security.ListKeychains(keychain);
         core.info('list-keychain After:');
-        yield Security_1.Security.ListKeychains();
+        yield Security_1.Security.ShowListKeychains();
         if (password != null && password !== '') {
             yield Security_1.Security.Unlock(password, keychain);
         }

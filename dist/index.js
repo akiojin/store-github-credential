@@ -3030,10 +3030,10 @@ const GitCredentialManagerCore_1 = __nccwpck_require__(390);
 const coreCommand = __importStar(__nccwpck_require__(604));
 const Security_1 = __nccwpck_require__(11);
 const uuid_1 = __nccwpck_require__(151);
-const IsPost = !!process.env['STATE_IsPost'];
-const CustomKeychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
+const IsPost = !!process.env[`STATE_POST`];
+const CustomKeychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
 function AllowPostProcess() {
-    coreCommand.issueCommand('save-state', { name: 'IsPost' }, 'true');
+    coreCommand.issueCommand('save-state', { name: 'POST' }, 'true');
 }
 function Run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -3066,18 +3066,6 @@ function Cleanup() {
         }
         catch (ex) {
             core.setFailed(ex.message);
-        }
-    });
-}
-function UnlockLoginKeychain(password) {
-    return __awaiter(this, void 0, void 0, function* () {
-        core.info('list-keychain Before:');
-        yield Security_1.Security.ShowListKeychains();
-        yield Security_1.Security.SetListKeychains(CustomKeychain);
-        core.info('list-keychain After:');
-        yield Security_1.Security.ShowListKeychains();
-        if (password != null && password !== '') {
-            yield Security_1.Security.UnlockKeychain(password, CustomKeychain);
         }
     });
 }

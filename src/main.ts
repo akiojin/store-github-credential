@@ -6,6 +6,7 @@ import { Security } from './Security'
 import { v4 as uuidv4 } from 'uuid'
 
 const IsPost = !!process.env[`STATE_POST`]
+const IsMacOS = os.platform() === 'darwin'
 const CustomKeychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`
 
 function AllowPostProcess()
@@ -17,10 +18,6 @@ async function Run()
 {
 	core.info('Running')
 
-	if (os.platform() !== 'darwin') {
-		core.setFailed('Action requires macOS agent.')
-	}
-	
 	try {
 		const password = core.getInput('keychain-password') || uuidv4()
 		coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password)
@@ -50,10 +47,14 @@ async function Cleanup()
 	}
 }
 
-if (!!IsPost) {
-	Cleanup()
+if (!IsMacOS) {
+	core.setFailed('Action requires macOS agent.')
 } else {
-	Run()
+	if (!!IsPost) {
+		Cleanup()
+	} else {
+		Run()
+	}
+	
+	AllowPostProcess()
 }
-
-AllowPostProcess()

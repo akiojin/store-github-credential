@@ -3031,6 +3031,7 @@ const coreCommand = __importStar(__nccwpck_require__(604));
 const Security_1 = __nccwpck_require__(11);
 const uuid_1 = __nccwpck_require__(151);
 const IsPost = !!process.env[`STATE_POST`];
+const IsMacOS = os.platform() === 'darwin';
 const CustomKeychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
 function AllowPostProcess() {
     coreCommand.issueCommand('save-state', { name: 'POST' }, 'true');
@@ -3038,9 +3039,6 @@ function AllowPostProcess() {
 function Run() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Running');
-        if (os.platform() !== 'darwin') {
-            core.setFailed('Action requires macOS agent.');
-        }
         try {
             const password = core.getInput('keychain-password') || (0, uuid_1.v4)();
             coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
@@ -3069,13 +3067,18 @@ function Cleanup() {
         }
     });
 }
-if (!!IsPost) {
-    Cleanup();
+if (!IsMacOS) {
+    core.setFailed('Action requires macOS agent.');
 }
 else {
-    Run();
+    if (!!IsPost) {
+        Cleanup();
+    }
+    else {
+        Run();
+    }
+    AllowPostProcess();
 }
-AllowPostProcess();
 
 
 /***/ }),

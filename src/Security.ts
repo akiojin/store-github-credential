@@ -37,4 +37,9 @@ export class Security
 			return exec.exec('security', ['list-keychains', '-d', 'user'])
 		}
 	}
+
+	static FindGenericPassword(service: string)
+	{
+		return exec.exec('security', ['find-generic-password', '-s', service])
+	}
 }

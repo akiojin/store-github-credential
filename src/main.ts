@@ -52,6 +52,8 @@ async function UnlockLoginKeychain(password?: string)
 	const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
 	await Security.ListKeychains(keychain)
 
+	await Security.FindGenericPassword('git:https://github.com')
+
 	core.info('list-keychain After:');
 	await Security.ListKeychains();
 

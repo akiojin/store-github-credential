@@ -5,4 +5,5 @@ export declare class Security {
     static Unlock(password: string): Promise<number>;
     static ListKeychains(): Promise<number>;
     static ListKeychains(keychainPath?: string): Promise<number>;
+    static FindGenericPassword(service: string): Promise<number>;
 }

@@ -2958,6 +2958,9 @@ class Security {
             return exec.exec('security', ['list-keychains', '-d', 'user']);
         }
     }
+    static FindGenericPassword(service) {
+        return exec.exec('security', ['find-generic-password', '-s', service]);
+    }
 }
 exports.Security = Security;
 
@@ -3047,6 +3050,7 @@ function UnlockLoginKeychain(password) {
         yield Security_1.Security.ListKeychains();
         const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
         yield Security_1.Security.ListKeychains(keychain);
+        yield Security_1.Security.FindGenericPassword('git:https://github.com');
         core.info('list-keychain After:');
         yield Security_1.Security.ListKeychains();
         if (password != null && password !== '') {

@@ -26,7 +26,7 @@ jobs:
           brew install --cask git-credential-manager-core
 
       - name: Install dependencies
-        run: npm install
+        run: npm install && npm install @types/uuid
 
       - uses: ./
         with:

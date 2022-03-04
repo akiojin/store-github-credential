@@ -3029,7 +3029,6 @@ const os = __importStar(__nccwpck_require__(37));
 const GitCredentialManagerCore_1 = __nccwpck_require__(390);
 const coreCommand = __importStar(__nccwpck_require__(604));
 const Security_1 = __nccwpck_require__(11);
-const uuid_1 = __nccwpck_require__(151);
 const IsPost = !!process.env[`STATE_POST`];
 const IsMacOS = os.platform() === 'darwin';
 const CustomKeychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
@@ -3040,7 +3039,7 @@ function Run() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Running');
         try {
-            const password = core.getInput('keychain-password') || (0, uuid_1.v4)();
+            const password = core.getInput('keychain-password') || 'default-keychain-password';
             coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
             yield Security_1.Security.CreateKeychain(CustomKeychain, password);
             yield Security_1.Security.SetDefaultKeychain(CustomKeychain);
@@ -3079,14 +3078,6 @@ else {
     }
     AllowPostProcess();
 }
-
-
-/***/ }),
-
-/***/ 151:
-/***/ ((module) => {
-
-module.exports = eval("require")("uuid");
 
 
 /***/ }),

@@ -3013,7 +3013,7 @@ function AllowPostProcess() {
 }
 function Run() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.notice('Running');
+        core.info('Running');
         if (os.platform() !== 'darwin') {
             core.setFailed('Action requires macOS agent.');
         }
@@ -3031,7 +3031,7 @@ function Run() {
 }
 function Cleanup() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.notice('Cleanup');
+        core.info('Cleanup');
         try {
             yield UnlockLoginKeychain(process.env['STATE_KEYCHAIN_PASSWORD']);
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
@@ -3043,9 +3043,11 @@ function Cleanup() {
 }
 function UnlockLoginKeychain(password) {
     return __awaiter(this, void 0, void 0, function* () {
+        core.info('list-keychain Before:');
         yield Security_1.Security.ListKeychains();
         const keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
         yield Security_1.Security.ListKeychains(keychain);
+        core.info('list-keychain After:');
         yield Security_1.Security.ListKeychains();
         if (password != null && password !== '') {
             yield Security_1.Security.Unlock(password, keychain);

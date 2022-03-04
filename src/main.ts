@@ -3,6 +3,7 @@ import * as os from 'os'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
 import * as coreCommand from '@actions/core/lib/command'
 import { Security } from './Security'
+import { v4 as uuidv4 } from 'uuid';
 
 const IsPost = !!process.env[`STATE_POST`]
 const IsMacOS = os.platform() === 'darwin'
@@ -29,7 +30,7 @@ async function Run()
 	core.info('Running')
 
 	try {
-		const password = core.getInput('keychain-password') || 'default-keychain-password'
+		const password = core.getInput('keychain-password') || uuidv4()
 		SaveKeychainPassword(password)
 
 		await Security.CreateKeychain(CustomKeychain, password)

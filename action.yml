@@ -9,6 +9,14 @@ inputs:
     description: 'Password or Personal Access Token (PAT)'
     required: true
     default: 'A personal access token with access to the GitHub repository'
+  timeout:
+    description: 'Specify timeout interval in seconds.'
+    required: false
+    default: '21600'
+  keychain:
+    description: 'If you want to use a keychain that has already been created, specify the path to that keychain.'
+    required: false
+    default: ''
   keychain-password:
     description: 'Keychain password'
     required: false

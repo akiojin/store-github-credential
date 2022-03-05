@@ -1,42 +1,40 @@
 import * as core from '@actions/core'
 import * as os from 'os'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
-import * as coreCommand from '@actions/core/lib/command'
 import { Security } from './Security'
+import { BooleanStateValue, StateHelper, StringStateValue } from './StateHelper'
 
-const IsPost = !!process.env[`STATE_POST`]
 const IsMacOS = os.platform() === 'darwin'
 
-const CustomKeychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`
-
-function AllowPostProcess()
-{
-	coreCommand.issueCommand('save-state', { name: 'POST' }, 'true')
-}
-
-function LoadKeychainPassword()
-{
-	return process.env['STATE_KEYCHAIN_PASSWORD'];
-}
-
-function SaveKeychainPassword(password: string)
-{
-	coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password)
-}
+const PostProcess = new BooleanStateValue('IS_POST_PROCESS')
+const KeychainCreated = new BooleanStateValue('KEYCHAIN_CREATED')
+const Keychain = new StringStateValue('KEYCHAIN')
 
 async function Run()
 {
 	core.info('Running')
 
 	try {
-		const ID: string = 'default-keychain-password'
-		const password: string = core.getInput('keychain-password') || ID
-		SaveKeychainPassword(password)
+		const password: string = core.getInput('keychain-password') || Math.random().toString(36)
 
-		await Security.CreateKeychain(CustomKeychain, password)
-		await Security.SetDefaultKeychain(CustomKeychain)
-		await Security.SetListKeychains(CustomKeychain)
-		await Security.UnlockKeychain(CustomKeychain)
+		var keychain: string = core.getInput('keychain')
+		if (keychain === '') {
+			keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`
+
+			await Security.CreateKeychain(keychain, password)
+
+			KeychainCreated.Set(true)
+			Keychain.Set(keychain)
+		} else {
+			KeychainCreated.Set(false)
+		}
+
+		core.setOutput('keychain', keychain)
+		core.setOutput('keychain-password', password)
+
+		await Security.SetDefaultKeychain(keychain)
+		await Security.SetListKeychains(keychain)
+		await Security.UnlockKeychain(keychain)
 
 		await Security.ShowDefaultKeychain()
 		await Security.ShowListKeychains()
@@ -54,8 +52,9 @@ async function Cleanup()
 	core.info('Cleanup')
 
 	try {
-		await Security.SetDefaultKeychain(CustomKeychain)
-		await Security.DeleteKeychain(CustomKeychain)
+		if (!!KeychainCreated.Get()) {
+			await Security.DeleteKeychain(Keychain.Get())
+		}
 	} catch (ex: any) {
 		core.setFailed(ex.message)
 	}
@@ -64,11 +63,11 @@ async function Cleanup()
 if (!IsMacOS) {
 	core.setFailed('Action requires macOS agent.')
 } else {
-	if (!!IsPost) {
+	if (!!PostProcess.Get()) {
 		Cleanup()
 	} else {
 		Run()
 	}
 	
-	AllowPostProcess()
+	PostProcess.Set(true)
 }

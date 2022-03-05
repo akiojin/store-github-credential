@@ -2931,42 +2931,63 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Security = void 0;
 const exec = __importStar(__nccwpck_require__(49));
 class Security {
-    static LockKeychain(keychainPath) {
-        if (keychainPath == null) {
+    static ImportCertificateFromFile(keychain, certificate, passphrase) {
+        const args = [
+            'import', certificate,
+            '-k', keychain,
+            '-P', passphrase,
+            '-f', 'pkcs12',
+            '-A',
+            '-T', '/usr/bin/codesign',
+            '-T', '/usr/bin/security'
+        ];
+        return exec.exec('security', args);
+    }
+    static LockKeychain(keychain) {
+        if (keychain == null) {
             return exec.exec('security', ['lock-keychain']);
         }
         else {
-            return exec.exec('security', ['lock-keychain', keychainPath]);
+            return exec.exec('security', ['lock-keychain', keychain]);
         }
     }
     static LockKeychainAll() {
         return exec.exec('security', ['lock-keychain', '-a']);
     }
-    static UnlockKeychain(password, keychainPath) {
-        if (keychainPath != null) {
-            return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`, keychainPath]);
+    static UnlockKeychain(keychain, password) {
+        if (password == null) {
+            throw new Error('Password required.');
+        }
+        if (keychain != null) {
+            return exec.exec('security', ['unlock-keychain', '-p', password, keychain]);
         }
         else {
-            return exec.exec('security', ['unlock-keychain', '-p', `"${password}"`]);
+            return exec.exec('security', ['unlock-keychain', '-p', password]);
         }
     }
-    static CreateKeychain(keychainPath, password) {
-        return exec.exec('security', ['create-keychain', '-p', `"${password}"`, keychainPath]);
+    static CreateKeychain(keychain, password) {
+        if (password === '') {
+            throw new Error('Password required.');
+        }
+        return exec.exec('security', ['create-keychain', '-p', password, keychain]);
     }
-    static DeleteKeychain(keychainPath) {
-        return exec.exec('security', ['delete-keychain', keychainPath]);
+    static SetKeychainTimeout(keychain, seconds) {
+        return exec.exec('security', ['set-keychain-settings', '-lut', seconds.toString(), keychain]);
     }
-    static SetKeychain(keychain, keychainPath) {
-        return exec.exec('security', [keychain, '-d', 'user', '-s', keychainPath]);
+    static DeleteKeychain(keychain) {
+        return exec.exec('security', ['delete-keychain', keychain]);
     }
-    static SetDefaultKeychain(keychainPath) {
-        return this.SetKeychain('default-keychain', keychainPath);
+    static SetKeychain(name, keychain) {
+        return exec.exec('security', [name, '-d', 'user', '-s', keychain]);
+    }
+    static SetDefaultKeychain(keychain) {
+        return this.SetKeychain('default-keychain', keychain);
     }
     static ShowDefaultKeychain() {
         return exec.exec('security', ['default-keychain']);
     }
-    static SetLoginKeychain(keychainPath) {
-        return this.SetKeychain('login-keychain', keychainPath);
+    static SetLoginKeychain(keychain) {
+        return this.SetKeychain('login-keychain', keychain);
     }
     static ShowLoginKeychain() {
         return exec.exec('security', ['login-keychain']);
@@ -2974,14 +2995,97 @@ class Security {
     static ShowListKeychains() {
         return exec.exec('security', ['list-keychains', '-d', 'user']);
     }
-    static SetListKeychains(keychainPath) {
-        return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychainPath]);
+    static SetListKeychains(keychain) {
+        return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychain]);
+    }
+    static AllowAccessForAppleTools(keychain, password) {
+        const args = [
+            'set-key-partition-list',
+            '-S', 'apple-tool:,apple:',
+            '-s',
+            '-k', password,
+            keychain
+        ];
+        return exec.exec('security', args);
     }
     static FindGenericPassword(service) {
         return exec.exec('security', ['find-generic-password', '-s', `"${service}"`]);
     }
+    static ShowCodeSignings(keychain) {
+        return exec.exec('security', ['find-identity', '-p', 'codesigning', '-v', keychain]);
+    }
 }
 exports.Security = Security;
+
+
+/***/ }),
+
+/***/ 968:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BooleanStateValue = exports.StringStateValue = exports.StateHelper = void 0;
+const coreCommand = __importStar(__nccwpck_require__(604));
+class StateHelper {
+    static Set(key, value) {
+        coreCommand.issueCommand('save-state', { name: key }, value);
+    }
+    static Get(key) {
+        return process.env[`STATE_${key}`] || '';
+    }
+}
+exports.StateHelper = StateHelper;
+class StringStateValue {
+    constructor(key) {
+        this.key = '';
+        this.key = key;
+    }
+    Set(value) {
+        StateHelper.Set(this.key, value);
+    }
+    Get() {
+        return StateHelper.Get(this.key);
+    }
+}
+exports.StringStateValue = StringStateValue;
+class BooleanStateValue {
+    constructor(key) {
+        this.key = '';
+        this.key = key;
+    }
+    Set(value) {
+        StateHelper.Set(this.key, value.toString());
+    }
+    Get() {
+        return !!StateHelper.Get(this.key);
+    }
+}
+exports.BooleanStateValue = BooleanStateValue;
 
 
 /***/ }),
@@ -3027,31 +3131,32 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(127));
 const os = __importStar(__nccwpck_require__(37));
 const GitCredentialManagerCore_1 = __nccwpck_require__(390);
-const coreCommand = __importStar(__nccwpck_require__(604));
 const Security_1 = __nccwpck_require__(11);
-const IsPost = !!process.env[`STATE_POST`];
+const StateHelper_1 = __nccwpck_require__(968);
 const IsMacOS = os.platform() === 'darwin';
-const CustomKeychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
-function AllowPostProcess() {
-    coreCommand.issueCommand('save-state', { name: 'POST' }, 'true');
-}
-function LoadKeychainPassword() {
-    return process.env['STATE_KEYCHAIN_PASSWORD'];
-}
-function SaveKeychainPassword(password) {
-    coreCommand.issueCommand('save-state', { name: 'KEYCHAIN_PASSWORD' }, password);
-}
+const PostProcess = new StateHelper_1.BooleanStateValue('IS_POST_PROCESS');
+const KeychainCreated = new StateHelper_1.BooleanStateValue('KEYCHAIN_CREATED');
+const Keychain = new StateHelper_1.StringStateValue('KEYCHAIN');
 function Run() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Running');
         try {
-            const ID = 'default-keychain-password';
-            const password = core.getInput('keychain-password') || ID;
-            SaveKeychainPassword(password);
-            yield Security_1.Security.CreateKeychain(CustomKeychain, password);
-            yield Security_1.Security.SetDefaultKeychain(CustomKeychain);
-            yield Security_1.Security.SetListKeychains(CustomKeychain);
-            yield Security_1.Security.UnlockKeychain(CustomKeychain);
+            const password = core.getInput('keychain-password') || Math.random().toString(36);
+            var keychain = core.getInput('keychain');
+            if (keychain === '') {
+                keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
+                yield Security_1.Security.CreateKeychain(keychain, password);
+                KeychainCreated.Set(true);
+                Keychain.Set(keychain);
+            }
+            else {
+                KeychainCreated.Set(false);
+            }
+            core.setOutput('keychain', keychain);
+            core.setOutput('keychain-password', password);
+            yield Security_1.Security.SetDefaultKeychain(keychain);
+            yield Security_1.Security.SetListKeychains(keychain);
+            yield Security_1.Security.UnlockKeychain(keychain);
             yield Security_1.Security.ShowDefaultKeychain();
             yield Security_1.Security.ShowListKeychains();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
@@ -3067,8 +3172,9 @@ function Cleanup() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Cleanup');
         try {
-            yield Security_1.Security.SetDefaultKeychain(CustomKeychain);
-            yield Security_1.Security.DeleteKeychain(CustomKeychain);
+            if (!!KeychainCreated.Get()) {
+                yield Security_1.Security.DeleteKeychain(Keychain.Get());
+            }
         }
         catch (ex) {
             core.setFailed(ex.message);
@@ -3079,13 +3185,13 @@ if (!IsMacOS) {
     core.setFailed('Action requires macOS agent.');
 }
 else {
-    if (!!IsPost) {
+    if (!!PostProcess.Get()) {
         Cleanup();
     }
     else {
         Run();
     }
-    AllowPostProcess();
+    PostProcess.Set(true);
 }
 
 

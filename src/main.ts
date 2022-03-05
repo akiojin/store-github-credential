@@ -9,19 +9,22 @@ const IsMacOS = os.platform() === 'darwin'
 const PostProcess = new BooleanStateValue('IS_POST_PROCESS')
 const KeychainCreated = new BooleanStateValue('KEYCHAIN_CREATED')
 const Keychain = new StringStateValue('KEYCHAIN')
+const KeychainPassword = new StringStateValue('KEYCHAIN_PASSWORD')
 
 async function Run()
 {
 	core.info('Running')
 
 	try {
-		const password: string = core.getInput('keychain-password') || Math.random().toString(36)
+		const keychainPassword: string = core.getInput('keychain-password') || Math.random().toString(36)
+		core.setSecret(keychainPassword)
+		KeychainPassword.Set(keychainPassword)
 
 		var keychain: string = core.getInput('keychain')
 		if (keychain === '') {
 			keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`
 
-			await Security.CreateKeychain(keychain, password)
+			await Security.CreateKeychain(keychain, keychainPassword)
 
 			KeychainCreated.Set(true)
 			Keychain.Set(keychain)
@@ -30,7 +33,7 @@ async function Run()
 		}
 
 		core.setOutput('keychain', keychain)
-		core.setOutput('keychain-password', password)
+		core.setOutput('keychain-password', keychainPassword)
 
 		await Security.SetDefaultKeychain(keychain)
 		await Security.SetListKeychains(keychain)

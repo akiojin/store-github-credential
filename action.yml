@@ -6,9 +6,9 @@ inputs:
     required: true
     default: 'GitHub username'
   password:
-    description: 'Password or Personal Access Token (PAT)'
+    description: 'A personal access token with access to the GitHub repository'
     required: true
-    default: 'A personal access token with access to the GitHub repository'
+    default: ''
   timeout:
     description: 'Specify timeout interval in seconds.'
     required: false
@@ -20,7 +20,7 @@ inputs:
   keychain-password:
     description: 'Keychain password'
     required: false
-    default: 'Internally generated keychain passwords'
+    default: ''
 runs:
   using: 'node16'
   main: 'dist/index.js'

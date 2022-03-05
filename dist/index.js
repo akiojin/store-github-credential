@@ -3137,15 +3137,18 @@ const IsMacOS = os.platform() === 'darwin';
 const PostProcess = new StateHelper_1.BooleanStateValue('IS_POST_PROCESS');
 const KeychainCreated = new StateHelper_1.BooleanStateValue('KEYCHAIN_CREATED');
 const Keychain = new StateHelper_1.StringStateValue('KEYCHAIN');
+const KeychainPassword = new StateHelper_1.StringStateValue('KEYCHAIN_PASSWORD');
 function Run() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Running');
         try {
-            const password = core.getInput('keychain-password') || Math.random().toString(36);
+            const keychainPassword = core.getInput('keychain-password') || Math.random().toString(36);
+            core.setSecret(keychainPassword);
+            KeychainPassword.Set(keychainPassword);
             var keychain = core.getInput('keychain');
             if (keychain === '') {
                 keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
-                yield Security_1.Security.CreateKeychain(keychain, password);
+                yield Security_1.Security.CreateKeychain(keychain, keychainPassword);
                 KeychainCreated.Set(true);
                 Keychain.Set(keychain);
             }
@@ -3153,7 +3156,7 @@ function Run() {
                 KeychainCreated.Set(false);
             }
             core.setOutput('keychain', keychain);
-            core.setOutput('keychain-password', password);
+            core.setOutput('keychain-password', keychainPassword);
             yield Security_1.Security.SetDefaultKeychain(keychain);
             yield Security_1.Security.SetListKeychains(keychain);
             yield Security_1.Security.UnlockKeychain(keychain);

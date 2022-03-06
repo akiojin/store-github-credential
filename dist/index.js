@@ -2956,7 +2956,7 @@ class Security {
     }
     static UnlockKeychain(keychain, password) {
         if (password == null) {
-            throw new Error('Password required.');
+            throw new Error('UnlockKeychain: Password required.');
         }
         if (keychain != null) {
             return exec.exec('security', ['unlock-keychain', '-p', password, keychain]);
@@ -2967,9 +2967,9 @@ class Security {
     }
     static CreateKeychain(keychain, password) {
         if (password === '') {
-            throw new Error('Password required.');
+            throw new Error('CreaterKeychain: Password required.');
         }
-        return exec.exec('security', ['create-keychain', '-p', password, keychain]);
+        return exec.exec('security', ['create-keychain', '-p', `${password}`, keychain]);
     }
     static SetKeychainTimeout(keychain, seconds) {
         return exec.exec('security', ['set-keychain-settings', '-lut', seconds.toString(), keychain]);
@@ -3135,7 +3135,6 @@ const Security_1 = __nccwpck_require__(11);
 const StateHelper_1 = __nccwpck_require__(968);
 const IsMacOS = os.platform() === 'darwin';
 const PostProcess = new StateHelper_1.BooleanStateValue('IS_POST_PROCESS');
-const KeychainCreated = new StateHelper_1.BooleanStateValue('KEYCHAIN_CREATED');
 const Keychain = new StateHelper_1.StringStateValue('KEYCHAIN');
 const KeychainPassword = new StateHelper_1.StringStateValue('KEYCHAIN_PASSWORD');
 function Run() {
@@ -3145,16 +3144,12 @@ function Run() {
             const keychainPassword = core.getInput('keychain-password') || Math.random().toString(36);
             core.setSecret(keychainPassword);
             KeychainPassword.Set(keychainPassword);
-            var keychain = core.getInput('keychain');
+            let keychain = core.getInput('keychain');
             if (keychain === '') {
                 keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
                 yield Security_1.Security.CreateKeychain(keychain, keychainPassword);
                 yield Security_1.Security.SetKeychainTimeout(keychain, +core.getInput('keychain-timeout'));
-                KeychainCreated.Set(true);
                 Keychain.Set(keychain);
-            }
-            else {
-                KeychainCreated.Set(false);
             }
             core.setOutput('keychain', keychain);
             core.setOutput('keychain-password', keychainPassword);
@@ -3176,7 +3171,7 @@ function Cleanup() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Cleanup');
         try {
-            if (!!KeychainCreated.Get()) {
+            if (Keychain.Get() === '') {
                 yield Security_1.Security.DeleteKeychain(Keychain.Get());
             }
         }

@@ -36,7 +36,7 @@ export class Security
 	static UnlockKeychain(keychain?: string, password?: string): Promise<number>
 	{
 		if (password == null) {
-			throw new Error('Password required.')
+			throw new Error('UnlockKeychain: Password required.')
 		}
 
 		if (keychain != null) {
@@ -49,10 +49,10 @@ export class Security
 	static CreateKeychain(keychain: string, password: string): Promise<number>
 	{
 		if (password === '') {
-			throw new Error('Password required.')
+			throw new Error('CreaterKeychain: Password required.')
 		}
 
-		return exec.exec('security', ['create-keychain', '-p', password, keychain])
+		return exec.exec('security', ['create-keychain', '-p', `${password}`, keychain])
 	}
 
 	static SetKeychainTimeout(keychain: string, seconds: number)

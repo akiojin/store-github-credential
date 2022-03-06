@@ -2,12 +2,11 @@ import * as core from '@actions/core'
 import * as os from 'os'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
 import { Security } from './Security'
-import { BooleanStateValue, StateHelper, StringStateValue } from './StateHelper'
+import { BooleanStateValue, StringStateValue } from './StateHelper'
 
 const IsMacOS = os.platform() === 'darwin'
 
 const PostProcess = new BooleanStateValue('IS_POST_PROCESS')
-const KeychainCreated = new BooleanStateValue('KEYCHAIN_CREATED')
 const Keychain = new StringStateValue('KEYCHAIN')
 const KeychainPassword = new StringStateValue('KEYCHAIN_PASSWORD')
 
@@ -20,17 +19,14 @@ async function Run()
 		core.setSecret(keychainPassword)
 		KeychainPassword.Set(keychainPassword)
 
-		var keychain: string = core.getInput('keychain')
+		let keychain: string = core.getInput('keychain')
 		if (keychain === '') {
 			keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`
 
 			await Security.CreateKeychain(keychain, keychainPassword)
 			await Security.SetKeychainTimeout(keychain, +core.getInput('keychain-timeout'))
 
-			KeychainCreated.Set(true)
 			Keychain.Set(keychain)
-		} else {
-			KeychainCreated.Set(false)
 		}
 
 		core.setOutput('keychain', keychain)
@@ -56,7 +52,7 @@ async function Cleanup()
 	core.info('Cleanup')
 
 	try {
-		if (!!KeychainCreated.Get()) {
+		if (Keychain.Get() === '') {
 			await Security.DeleteKeychain(Keychain.Get())
 		}
 	} catch (ex: any) {

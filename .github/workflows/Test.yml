@@ -30,5 +30,5 @@ jobs:
 
       - uses: ./
         with:
-          username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
-          password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}
+          github-username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
+          github-password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}

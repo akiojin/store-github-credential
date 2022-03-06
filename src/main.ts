@@ -25,6 +25,7 @@ async function Run()
 			keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`
 
 			await Security.CreateKeychain(keychain, keychainPassword)
+			await Security.SetKeychainTimeout(keychain, +core.getInput('keychain-timeout'))
 
 			KeychainCreated.Set(true)
 			Keychain.Set(keychain)
@@ -35,15 +36,15 @@ async function Run()
 		core.setOutput('keychain', keychain)
 		core.setOutput('keychain-password', keychainPassword)
 
+		await Security.UnlockKeychain(keychain)
 		await Security.SetDefaultKeychain(keychain)
 		await Security.SetListKeychains(keychain)
-		await Security.UnlockKeychain(keychain)
 
 		await Security.ShowDefaultKeychain()
 		await Security.ShowListKeychains()
 
 		await Credential.Configure()
-		await Credential.Store(core.getInput('username'), core.getInput('password'))
+		await Credential.Store(core.getInput('github-username'), core.getInput('github-password'))
 		await Credential.Get()
 	} catch (ex: any) {
 		core.setFailed(ex.message)

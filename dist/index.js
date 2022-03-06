@@ -3149,6 +3149,7 @@ function Run() {
             if (keychain === '') {
                 keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
                 yield Security_1.Security.CreateKeychain(keychain, keychainPassword);
+                yield Security_1.Security.SetKeychainTimeout(keychain, +core.getInput('keychain-timeout'));
                 KeychainCreated.Set(true);
                 Keychain.Set(keychain);
             }
@@ -3157,13 +3158,13 @@ function Run() {
             }
             core.setOutput('keychain', keychain);
             core.setOutput('keychain-password', keychainPassword);
+            yield Security_1.Security.UnlockKeychain(keychain);
             yield Security_1.Security.SetDefaultKeychain(keychain);
             yield Security_1.Security.SetListKeychains(keychain);
-            yield Security_1.Security.UnlockKeychain(keychain);
             yield Security_1.Security.ShowDefaultKeychain();
             yield Security_1.Security.ShowListKeychains();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
-            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('username'), core.getInput('password'));
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('github-username'), core.getInput('github-password'));
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
         }
         catch (ex) {

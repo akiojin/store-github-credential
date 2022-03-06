@@ -1,18 +1,14 @@
 name: 'Store GitHub credential'
 description: 'This action internally creates a new keychain and stores the GitHub credentials in that keychain.'
 inputs:
-  username:
+  github-username:
     description: 'GitHub username'
     required: true
     default: 'GitHub username'
-  password:
+  github-password:
     description: 'A personal access token with access to the GitHub repository'
     required: true
     default: ''
-  timeout:
-    description: 'Specify timeout interval in seconds.'
-    required: false
-    default: '21600'
   keychain:
     description: 'If you want to use a keychain that has already been created, specify the path to that keychain.'
     required: false
@@ -21,6 +17,10 @@ inputs:
     description: 'Keychain password'
     required: false
     default: ''
+  keychain-timeout:
+    description: 'Specify timeout interval in seconds.'
+    required: false
+    default: '21600'
 runs:
   using: 'node16'
   main: 'dist/index.js'

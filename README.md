@@ -21,10 +21,25 @@ brew upgrade git-credential-manager-core
 ## Usage
 ### Simple usage
 ```yml
+# Use default login.keychain-db
 - uses: store-git-credential-github-action
   with:
     username: ${{ secrets.GIT_CREDENTIAL_USERNAME }}
     password: ${{ secrets.GIT_CREDENTIAL_PASSWORD }}
+```
+
+### Custom keychain usage
+```yml
+# Creating a temporary keychain
+- uses: akiojin/setup-temporary-keychain-github-action@v1.0
+  id: setup-temporary-keychain
+
+- uses: store-git-credential-github-action
+  with:
+    username: ${{ secrets.GIT_CREDENTIAL_USERNAME }}
+    password: ${{ secrets.GIT_CREDENTIAL_PASSWORD }}
+    keychain: ${{ steps.setup-temporary-keychain.outputs.keychain }}
+    keychain-password: ${{ steps.setup-temporary-keychain.outputs.keychain-password }}
 ```
 
 ## Additional Arguments

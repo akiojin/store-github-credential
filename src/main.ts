@@ -8,23 +8,28 @@ const IsMacOS = os.platform() === 'darwin'
 
 const PostProcess = new BooleanStateValue('IS_POST_PROCESS')
 const Keychain = new StringStateValue('KEYCHAIN')
-const KeychainPassword = new StringStateValue('KEYCHAIN_PASSWORD')
 
 async function Run()
 {
-	core.info('Running')
-
 	try {
-		const keychainPassword: string = core.getInput('keychain-password') || Math.random().toString(36)
-		core.setSecret(keychainPassword)
-		KeychainPassword.Set(keychainPassword)
+		const githubUsername: string = core.getInput('github-username')
+		const githubPassword: string = core.getInput('github-password')
+
+		if (githubUsername === '') {
+			throw new Error('github-username is null.')
+		}
+		if (githubPassword === '') {
+			throw new Error('github-password is null.')
+		}
 
 		let keychain: string = core.getInput('keychain')
 		if (keychain === '') {
 			keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
 		}
 
+		const keychainPassword: string = core.getInput('keychain-password')
 		if (keychainPassword !== '') {
+			core.setSecret(keychainPassword)
 			await Security.UnlockKeychain(keychain, keychainPassword)
 		}
 
@@ -38,7 +43,7 @@ async function Run()
 		await Security.ShowListKeychains()
 
 		await Credential.Configure()
-		await Credential.Store(core.getInput('github-username'), core.getInput('github-password'))
+		await Credential.Store(githubUsername, githubPassword)
 		await Credential.Get()
 	} catch (ex: any) {
 		core.setFailed(ex.message)
@@ -47,8 +52,6 @@ async function Run()
 
 async function Cleanup()
 {
-	core.info('Cleanup')
-
 	try {
 		await Security.SetDefaultKeychain(Keychain.Get())
 		await Credential.Erase()

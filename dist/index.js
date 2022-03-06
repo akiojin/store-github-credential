@@ -3136,19 +3136,24 @@ const StateHelper_1 = __nccwpck_require__(968);
 const IsMacOS = os.platform() === 'darwin';
 const PostProcess = new StateHelper_1.BooleanStateValue('IS_POST_PROCESS');
 const Keychain = new StateHelper_1.StringStateValue('KEYCHAIN');
-const KeychainPassword = new StateHelper_1.StringStateValue('KEYCHAIN_PASSWORD');
 function Run() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.info('Running');
         try {
-            const keychainPassword = core.getInput('keychain-password') || Math.random().toString(36);
-            core.setSecret(keychainPassword);
-            KeychainPassword.Set(keychainPassword);
+            const githubUsername = core.getInput('github-username');
+            const githubPassword = core.getInput('github-password');
+            if (githubUsername === '') {
+                throw new Error('github-username is null.');
+            }
+            if (githubPassword === '') {
+                throw new Error('github-password is null.');
+            }
             let keychain = core.getInput('keychain');
             if (keychain === '') {
                 keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
             }
+            const keychainPassword = core.getInput('keychain-password');
             if (keychainPassword !== '') {
+                core.setSecret(keychainPassword);
                 yield Security_1.Security.UnlockKeychain(keychain, keychainPassword);
             }
             yield Security_1.Security.SetDefaultKeychain(keychain);
@@ -3158,7 +3163,7 @@ function Run() {
             yield Security_1.Security.ShowDefaultKeychain();
             yield Security_1.Security.ShowListKeychains();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
-            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('github-username'), core.getInput('github-password'));
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(githubUsername, githubPassword);
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
         }
         catch (ex) {
@@ -3168,7 +3173,6 @@ function Run() {
 }
 function Cleanup() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.info('Cleanup');
         try {
             yield Security_1.Security.SetDefaultKeychain(Keychain.Get());
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();

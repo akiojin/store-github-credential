@@ -1,5 +1,5 @@
 name: 'Store GitHub credential'
-description: 'This action internally creates a new keychain and stores the GitHub credentials in that keychain.'
+description: 'This action stores the GitHub credentials in the specified keychain.'
 inputs:
   github-username:
     description: 'GitHub username'
@@ -10,11 +10,11 @@ inputs:
     required: true
     default: ''
   keychain:
-    description: 'If you want to use a keychain that has already been created, specify the path to that keychain.'
+    description: 'Path of the keychain to use. If omitted, the default login keychain is used.'
     required: false
     default: ''
   keychain-password:
-    description: 'Keychain password'
+    description: 'Password for the keychain if specified in the keychain parameter; default login keychain password if the kerchain parameter is omitted.'
     required: false
     default: ''
 runs:

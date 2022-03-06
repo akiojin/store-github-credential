@@ -24,8 +24,8 @@ brew upgrade git-credential-manager-core
 # Use default login.keychain-db
 - uses: store-git-credential-github-action
   with:
-    username: ${{ secrets.GIT_CREDENTIAL_USERNAME }}
-    password: ${{ secrets.GIT_CREDENTIAL_PASSWORD }}
+    github-username: ${{ secrets.GIT_CREDENTIAL_USERNAME }}
+    github-password: ${{ secrets.GIT_CREDENTIAL_PASSWORD }}
 ```
 
 ### Custom keychain usage
@@ -36,8 +36,8 @@ brew upgrade git-credential-manager-core
 
 - uses: store-git-credential-github-action
   with:
-    username: ${{ secrets.GIT_CREDENTIAL_USERNAME }}
-    password: ${{ secrets.GIT_CREDENTIAL_PASSWORD }}
+    github-username: ${{ secrets.GIT_CREDENTIAL_USERNAME }}
+    github-password: ${{ secrets.GIT_CREDENTIAL_PASSWORD }}
     keychain: ${{ steps.setup-temporary-keychain.outputs.keychain }}
     keychain-password: ${{ steps.setup-temporary-keychain.outputs.keychain-password }}
 ```

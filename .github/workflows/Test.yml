@@ -28,7 +28,19 @@ jobs:
       - name: Install dependencies
         run: npm install && npm install @types/uuid
 
-      - uses: ./
+      - name: Default Loging keychain
+        uses: ./
         with:
           github-username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
           github-password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}
+
+      - uses: akiojin/setup-temporary-github-action@v1.0
+        id: setup-temporary-keychain
+
+      - name: Create temporary keychain
+        uses: ./
+        with:
+          github-username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
+          github-password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}
+          keychain: ${{ steps.setup-temporary-keychain.outputs.keychain }}
+          keychain-password: ${{ steps.setup-temporary-keychain.outputs.keychain-password }}

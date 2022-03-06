@@ -21,18 +21,16 @@ async function Run()
 
 		let keychain: string = core.getInput('keychain')
 		if (keychain === '') {
-			keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`
-
-			await Security.CreateKeychain(keychain, keychainPassword)
-			await Security.SetKeychainTimeout(keychain, +core.getInput('keychain-timeout'))
-
-			Keychain.Set(keychain)
+			keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
 		}
 
-		core.setOutput('keychain', keychain)
-		core.setOutput('keychain-password', keychainPassword)
+		if (keychainPassword !== '') {
+			await Security.UnlockKeychain(keychain, keychainPassword)
+		}
 
-		await Security.UnlockKeychain(keychain, keychainPassword)
+		await Security.SetDefaultKeychain(keychain)
+		await Security.SetListKeychains(keychain)
+
 		await Security.SetDefaultKeychain(keychain)
 		await Security.SetListKeychains(keychain)
 
@@ -52,9 +50,8 @@ async function Cleanup()
 	core.info('Cleanup')
 
 	try {
-		if (Keychain.Get() === '') {
-			await Security.DeleteKeychain(Keychain.Get())
-		}
+		await Security.SetDefaultKeychain(Keychain.Get())
+		await Credential.Erase()
 	} catch (ex: any) {
 		core.setFailed(ex.message)
 	}

@@ -17,10 +17,6 @@ inputs:
     description: 'Keychain password'
     required: false
     default: ''
-  keychain-timeout:
-    description: 'Specify timeout interval in seconds.'
-    required: false
-    default: '21600'
 runs:
   using: 'node16'
   main: 'dist/index.js'

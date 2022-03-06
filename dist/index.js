@@ -3146,14 +3146,13 @@ function Run() {
             KeychainPassword.Set(keychainPassword);
             let keychain = core.getInput('keychain');
             if (keychain === '') {
-                keychain = `${process.env.HOME}/Library/Keychains/default-login.keychain-db`;
-                yield Security_1.Security.CreateKeychain(keychain, keychainPassword);
-                yield Security_1.Security.SetKeychainTimeout(keychain, +core.getInput('keychain-timeout'));
-                Keychain.Set(keychain);
+                keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
             }
-            core.setOutput('keychain', keychain);
-            core.setOutput('keychain-password', keychainPassword);
-            yield Security_1.Security.UnlockKeychain(keychain, keychainPassword);
+            if (keychainPassword !== '') {
+                yield Security_1.Security.UnlockKeychain(keychain, keychainPassword);
+            }
+            yield Security_1.Security.SetDefaultKeychain(keychain);
+            yield Security_1.Security.SetListKeychains(keychain);
             yield Security_1.Security.SetDefaultKeychain(keychain);
             yield Security_1.Security.SetListKeychains(keychain);
             yield Security_1.Security.ShowDefaultKeychain();
@@ -3171,9 +3170,8 @@ function Cleanup() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Cleanup');
         try {
-            if (Keychain.Get() === '') {
-                yield Security_1.Security.DeleteKeychain(Keychain.Get());
-            }
+            yield Security_1.Security.SetDefaultKeychain(Keychain.Get());
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
         }
         catch (ex) {
             core.setFailed(ex.message);

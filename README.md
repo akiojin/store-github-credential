@@ -1,8 +1,8 @@
 # store-git-credential-github-action
 ![Test][0]
 
-This action internally creates a new keychain and stores the GitHub credentials in that keychain.
-The saved keychain is destroyed upon exit.
+This action saves the GitHub credentials to the specified keychain.
+The GitHub credentials are deleted at the end of the workflow.
 
 ## Requirement
 You will need to install [git-credential-manager-core][1]
@@ -30,19 +30,24 @@ brew upgrade git-credential-manager-core
 ## Additional Arguments
 See [action.yml][3] for more details.
 
-- `username`
+- `github-username`
   - **Requied**: true
   - **Type**: string
   - **Description**: GitHub username
-- `password`
+- `github-password`
   - **Requied**: true
   - **Type**: string
   - **Description**: A personal access token with access to the GitHub repository
+- `keychain`
+  - **Requied**: false
+  - **Type**: string
+  - **Description**: Path of the keychain to use. If omitted, the default login keychain is used.
+  - **Default**: '$HOME/Library/Keychains/loging.keychain-db'
 - `keychain-password`
   - **Requied**: false
   - **Type**: string
-  - **Description**: Internally generated keychain passwords
-  - **Default**: UUID
+  - **Description**: Password for the keychain if specified in the keychain parameter; default login keychain password if the kerchain parameter is omitted.
+  - **Default**: ''
 
 GitHub personal access tokens can be obtained at `Settings > Developer settings > Personal access tokens`.
 Access rights require `repo` permissions.

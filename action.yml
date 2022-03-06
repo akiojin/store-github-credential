@@ -6,7 +6,7 @@ inputs:
     required: true
     default: 'GitHub username'
   github-password:
-    description: 'A personal access token with access to the GitHub repository'
+    description: 'A personal access token with access to the GitHub repository.'
     required: true
     default: ''
   keychain:

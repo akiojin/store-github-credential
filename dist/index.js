@@ -3153,7 +3153,7 @@ function Run() {
             }
             core.setOutput('keychain', keychain);
             core.setOutput('keychain-password', keychainPassword);
-            yield Security_1.Security.UnlockKeychain(keychain);
+            yield Security_1.Security.UnlockKeychain(keychain, keychainPassword);
             yield Security_1.Security.SetDefaultKeychain(keychain);
             yield Security_1.Security.SetListKeychains(keychain);
             yield Security_1.Security.ShowDefaultKeychain();

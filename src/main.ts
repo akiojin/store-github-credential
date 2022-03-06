@@ -32,7 +32,7 @@ async function Run()
 		core.setOutput('keychain', keychain)
 		core.setOutput('keychain-password', keychainPassword)
 
-		await Security.UnlockKeychain(keychain)
+		await Security.UnlockKeychain(keychain, keychainPassword)
 		await Security.SetDefaultKeychain(keychain)
 		await Security.SetListKeychains(keychain)
 

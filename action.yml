@@ -4,11 +4,9 @@ inputs:
   github-username:
     description: 'GitHub username'
     required: true
-    default: 'GitHub username'
   github-password:
     description: 'A personal access token with access to the GitHub repository.'
     required: true
-    default: ''
   keychain:
     description: 'Path of the keychain to use. If omitted, the default login keychain is used.'
     required: false

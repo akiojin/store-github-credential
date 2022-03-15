@@ -45,24 +45,12 @@ brew upgrade git-credential-manager-core
 ## Additional Arguments
 See [action.yml][3] for more details.
 
-- `github-username`
-  - **Requied**: true
-  - **Type**: string
-  - **Description**: GitHub username
-- `github-password`
-  - **Requied**: true
-  - **Type**: string
-  - **Description**: A personal access token with access to the GitHub repository
-- `keychain`
-  - **Requied**: false
-  - **Type**: string
-  - **Description**: Path of the keychain to use. If omitted, the default login keychain is used.
-  - **Default**: '$HOME/Library/Keychains/loging.keychain-db'
-- `keychain-password`
-  - **Requied**: false
-  - **Type**: string
-  - **Description**: Password for the keychain if specified in the keychain parameter; default login keychain password if the kerchain parameter is omitted.
-  - **Default**: ''
+|Name|Required|Type|Default|Description|
+|:--|:--|:--|:--|:--|
+|`github-username`|`true`|`boolean`||GitHub username.|
+|`github-password`|`true`|`boolean`||A personal access token with access to the GitHub repository.|
+|`keychain`|`false`|`string`|Default keychain|Path of the keychain to use. If omitted, the default login keychain is used.|
+|`keychain-password`|`false`|`string`|""|Password for the keychain if specified in the keychain parameter; default login keychain password if the kerchain parameter is omitted.|
 
 GitHub personal access tokens can be obtained at `Settings > Developer settings > Personal access tokens`.
 Access rights require `repo` permissions.

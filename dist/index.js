@@ -4561,18 +4561,13 @@ function Run() {
                 }
                 yield keychain_1.Keychain.SetDefaultKeychain(keychain);
                 yield keychain_1.Keychain.SetListKeychain(keychain);
-                yield keychain_1.Keychain.SetDefaultKeychain(keychain);
-                yield keychain_1.Keychain.SetListKeychain(keychain);
                 KeychainCache.Set(keychain);
-                yield keychain_1.Keychain.ShowDefaultKeychain();
-                yield keychain_1.Keychain.ShowListKeychains();
             }
             core.endGroup();
             core.startGroup('git credential-manager-core Settings');
             {
                 yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
                 yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(githubUsername, githubPassword);
-                yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
             }
             core.endGroup();
         }

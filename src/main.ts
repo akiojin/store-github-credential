@@ -39,13 +39,8 @@ async function Run()
 
 			await Keychain.SetDefaultKeychain(keychain)
 			await Keychain.SetListKeychain(keychain)
-			await Keychain.SetDefaultKeychain(keychain)
-			await Keychain.SetListKeychain(keychain)
 
 			KeychainCache.Set(keychain)
-
-			await Keychain.ShowDefaultKeychain()
-			await Keychain.ShowListKeychains()
 		}
 		core.endGroup()
 
@@ -53,7 +48,6 @@ async function Run()
 		{
 			await Credential.Configure()
 			await Credential.Store(githubUsername, githubPassword)
-			await Credential.Get()
 		}
 		core.endGroup()
 	} catch (ex: any) {

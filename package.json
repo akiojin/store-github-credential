@@ -1,22 +1,24 @@
 {
-  "name": "store-github-credential",
-  "version": "1.1",
-  "description": "",
+  "name": "store-git-credential-github-action",
+  "version": "1.5",
+  "description": "This action saves the GitHub credentials to the specified keychain.",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/akiojin/store-github-credential.git"
+    "url": "git+https://github.com/akiojin/store-git-credential-github-action.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "git", "credential"
+  ],
+  "author": "akiojin",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/akiojin/store-github-credential/issues"
+    "url": "https://github.com/akiojin/store-git-credential-github-action/issues"
   },
-  "homepage": "https://github.com/akiojin/store-github-credential#readme",
+  "homepage": "https://github.com/akiojin/store-git-credential-github-action#readme",
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/exec": "^1.1.0",

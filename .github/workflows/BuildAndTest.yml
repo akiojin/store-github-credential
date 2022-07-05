@@ -31,10 +31,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install git-credential-manager-core
-        run: |
-          brew tap microsoft/git
-          brew install --cask git-credential-manager-core
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '17'
 
       - run: npm install
 

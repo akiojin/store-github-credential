@@ -1,6 +1,6 @@
 {
   "name": "store-git-credential-github-action",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "This action saves the GitHub credentials to the specified keychain.",
   "main": "dist/index.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "url": "git+https://github.com/akiojin/store-git-credential-github-action.git"
   },
   "keywords": [
-    "git", "credential"
+    "git",
+    "credential"
   ],
   "author": "akiojin",
   "license": "MIT",

@@ -37,9 +37,6 @@ jobs:
 
       - name: Install git-credential-manager-core
         run: |
-          brew --version
-          brew doctor
-          brew update
           brew tap microsoft/git
           brew install --cask git-credential-manager-core
 

@@ -38,9 +38,8 @@ jobs:
       - name: Install git-credential-manager-core
         run: |
           brew update
-          brew install git
           brew tap microsoft/git
-          brew install --cask git-credential-manager-core
+          brew cask install git-credential-manager-core
 
       - run: npm install
 

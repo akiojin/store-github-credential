@@ -16,22 +16,22 @@ async function Run()
 		const githubUsername: string = core.getInput('github-username')
 		const githubPassword: string = core.getInput('github-password')
 
-		if (githubUsername === '') {
+		if (!githubUsername) {
 			throw new Error('github-username is null.')
 		}
-		if (githubPassword === '') {
+		if (!githubPassword) {
 			throw new Error('github-password is null.')
 		}
 
 		let keychain: string = core.getInput('keychain')
-		if (keychain === '') {
+		if (!keychain) {
 			keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
 		}
 
 		core.startGroup('Keychain Settings')
 		{
 			const keychainPassword: string = core.getInput('keychain-password')
-			if (keychainPassword !== '') {
+			if (!!keychainPassword) {
 				KeychainPasswordCache.Set(keychainPassword)
 				core.setSecret(keychainPassword)
 				await Keychain.UnlockKeychain(keychain, keychainPassword)

@@ -4392,14 +4392,11 @@ class GitCredentialManagerCore {
             return exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
         });
     }
-    static CreateBuffer(protocol, host) {
-        return Buffer.from(`protocol=${protocol}\nhost=${host}\n\n`);
-    }
     static Get() {
         return __awaiter(this, void 0, void 0, function* () {
             let output = '';
             const options = {
-                input: this.CreateBuffer('https', 'github.com'),
+                input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
                 listeners: {
                     stdout(data) {
                         output += data.toString();
@@ -4417,7 +4414,7 @@ class GitCredentialManagerCore {
     }
     static Get2() {
         const options = {
-            input: this.CreateBuffer('https', 'github.com'),
+            input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
         };
         return this.Execute('get', options);
     }
@@ -4430,7 +4427,7 @@ class GitCredentialManagerCore {
      */
     static Store(username, password) {
         const options = {
-            input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`)
+            input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n\n`)
         };
         return this.Execute('store', options);
     }
@@ -4441,7 +4438,7 @@ class GitCredentialManagerCore {
      */
     static Erase() {
         const options = {
-            input: this.CreateBuffer('https', 'github.com'),
+            input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
         };
         return this.Execute('erase', options);
     }

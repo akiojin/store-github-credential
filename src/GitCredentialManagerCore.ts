@@ -14,16 +14,11 @@ export class GitCredentialManagerCore
     return exec.exec('git', ['config', '--global', 'credential.interactive', 'false'])
   }
 
-  static CreateBuffer(protocol: string, host: string): Buffer
-  {
-    return Buffer.from(`protocol=${protocol}\nhost=${host}\n\n`)
-  }
-
   static async Get(): Promise<string>
   {
     let output = ''
     const options: exec.ExecOptions = {
-      input: this.CreateBuffer('https', 'github.com'),
+      input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
       listeners: {
         stdout (data: Buffer) {
           output += data.toString()
@@ -42,7 +37,7 @@ export class GitCredentialManagerCore
   static Get2(): Promise<number>
   {
     const options: exec.ExecOptions = {
-      input: this.CreateBuffer('https', 'github.com'),
+      input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
     }
 
     return this.Execute('get', options)
@@ -58,7 +53,7 @@ export class GitCredentialManagerCore
   static Store(username: string, password: string): Promise<number>
   {
     const options: exec.ExecOptions = {
-      input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`)
+      input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n\n`)
     }
 
     return this.Execute('store', options)
@@ -72,7 +67,7 @@ export class GitCredentialManagerCore
   static Erase(): Promise<number>
   {
     const options: exec.ExecOptions = {
-      input: this.CreateBuffer('https', 'github.com'),
+      input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
     }
 
     return this.Execute('erase', options)

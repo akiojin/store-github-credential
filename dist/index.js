@@ -4393,24 +4393,10 @@ class GitCredentialManagerCore {
         });
     }
     static Get() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let output = '';
-            const options = {
-                input: Buffer.from('protocol=https\nhost=github.com\n\n'),
-                listeners: {
-                    stdout(data) {
-                        output += data.toString();
-                    }
-                }
-            };
-            try {
-                yield this.Execute('get', options);
-                return output;
-            }
-            catch (ex) {
-                return '';
-            }
-        });
+        const options = {
+            input: Buffer.from('protocol=https\nhost=github.com\n\n'),
+        };
+        return this.Execute('get', options);
     }
     static Store(username, password) {
         const options = {
@@ -4572,9 +4558,8 @@ function SettingKeychain() {
 function SettingCredential() {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('git credential-manager-core Settings');
-        var get = '';
-        //await Credential.Get()
-        core.info(get);
+        var get = yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
+        //  core.info(get)
         if (!get) {
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('github-username'), core.getInput('github-password'));

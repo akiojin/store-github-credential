@@ -14,24 +14,13 @@ export class GitCredentialManagerCore
     return exec.exec('git', ['config', '--global', 'credential.interactive', 'false'])
   }
 
-  static async Get(): Promise<string>
+  static Get(): Promise<number>
   {
-    let output = ''
     const options: exec.ExecOptions = {
       input: Buffer.from('protocol=https\nhost=github.com\n\n'),
-      listeners: {
-        stdout (data: Buffer) {
-          output += data.toString()
-        } 
-      }
     }
 
-    try {
-      await this.Execute('get', options)
-      return output;
-    } catch (ex: any) {
-      return ''
-    }
+	return this.Execute('get', options)
   }
 
   static Store(username: string, password: string): Promise<number>

@@ -415,6 +415,23 @@ function getIDToken(aud) {
     });
 }
 exports.getIDToken = getIDToken;
+/**
+ * Summary exports
+ */
+var summary_1 = __nccwpck_require__(833);
+Object.defineProperty(exports, "summary", ({ enumerable: true, get: function () { return summary_1.summary; } }));
+/**
+ * @deprecated use core.summary
+ */
+var summary_2 = __nccwpck_require__(833);
+Object.defineProperty(exports, "markdownSummary", ({ enumerable: true, get: function () { return summary_2.markdownSummary; } }));
+/**
+ * Path exports
+ */
+var path_utils_1 = __nccwpck_require__(255);
+Object.defineProperty(exports, "toPosixPath", ({ enumerable: true, get: function () { return path_utils_1.toPosixPath; } }));
+Object.defineProperty(exports, "toWin32Path", ({ enumerable: true, get: function () { return path_utils_1.toWin32Path; } }));
+Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: function () { return path_utils_1.toPlatformPath; } }));
 //# sourceMappingURL=core.js.map
 
 /***/ }),
@@ -484,8 +501,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OidcClient = void 0;
-const http_client_1 = __nccwpck_require__(967);
-const auth_1 = __nccwpck_require__(956);
+const http_client_1 = __nccwpck_require__(99);
+const auth_1 = __nccwpck_require__(231);
 const core_1 = __nccwpck_require__(508);
 class OidcClient {
     static createHttpClient(allowRetry = true, maxRetry = 10) {
@@ -549,6 +566,361 @@ class OidcClient {
 }
 exports.OidcClient = OidcClient;
 //# sourceMappingURL=oidc-utils.js.map
+
+/***/ }),
+
+/***/ 255:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toPlatformPath = exports.toWin32Path = exports.toPosixPath = void 0;
+const path = __importStar(__nccwpck_require__(17));
+/**
+ * toPosixPath converts the given path to the posix form. On Windows, \\ will be
+ * replaced with /.
+ *
+ * @param pth. Path to transform.
+ * @return string Posix path.
+ */
+function toPosixPath(pth) {
+    return pth.replace(/[\\]/g, '/');
+}
+exports.toPosixPath = toPosixPath;
+/**
+ * toWin32Path converts the given path to the win32 form. On Linux, / will be
+ * replaced with \\.
+ *
+ * @param pth. Path to transform.
+ * @return string Win32 path.
+ */
+function toWin32Path(pth) {
+    return pth.replace(/[/]/g, '\\');
+}
+exports.toWin32Path = toWin32Path;
+/**
+ * toPlatformPath converts the given path to a platform-specific path. It does
+ * this by replacing instances of / and \ with the platform-specific path
+ * separator.
+ *
+ * @param pth The path to platformize.
+ * @return string The platform-specific path.
+ */
+function toPlatformPath(pth) {
+    return pth.replace(/[/\\]/g, path.sep);
+}
+exports.toPlatformPath = toPlatformPath;
+//# sourceMappingURL=path-utils.js.map
+
+/***/ }),
+
+/***/ 833:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.summary = exports.markdownSummary = exports.SUMMARY_DOCS_URL = exports.SUMMARY_ENV_VAR = void 0;
+const os_1 = __nccwpck_require__(37);
+const fs_1 = __nccwpck_require__(147);
+const { access, appendFile, writeFile } = fs_1.promises;
+exports.SUMMARY_ENV_VAR = 'GITHUB_STEP_SUMMARY';
+exports.SUMMARY_DOCS_URL = 'https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary';
+class Summary {
+    constructor() {
+        this._buffer = '';
+    }
+    /**
+     * Finds the summary file path from the environment, rejects if env var is not found or file does not exist
+     * Also checks r/w permissions.
+     *
+     * @returns step summary file path
+     */
+    filePath() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this._filePath) {
+                return this._filePath;
+            }
+            const pathFromEnv = process.env[exports.SUMMARY_ENV_VAR];
+            if (!pathFromEnv) {
+                throw new Error(`Unable to find environment variable for $${exports.SUMMARY_ENV_VAR}. Check if your runtime environment supports job summaries.`);
+            }
+            try {
+                yield access(pathFromEnv, fs_1.constants.R_OK | fs_1.constants.W_OK);
+            }
+            catch (_a) {
+                throw new Error(`Unable to access summary file: '${pathFromEnv}'. Check if the file has correct read/write permissions.`);
+            }
+            this._filePath = pathFromEnv;
+            return this._filePath;
+        });
+    }
+    /**
+     * Wraps content in an HTML tag, adding any HTML attributes
+     *
+     * @param {string} tag HTML tag to wrap
+     * @param {string | null} content content within the tag
+     * @param {[attribute: string]: string} attrs key-value list of HTML attributes to add
+     *
+     * @returns {string} content wrapped in HTML element
+     */
+    wrap(tag, content, attrs = {}) {
+        const htmlAttrs = Object.entries(attrs)
+            .map(([key, value]) => ` ${key}="${value}"`)
+            .join('');
+        if (!content) {
+            return `<${tag}${htmlAttrs}>`;
+        }
+        return `<${tag}${htmlAttrs}>${content}</${tag}>`;
+    }
+    /**
+     * Writes text in the buffer to the summary buffer file and empties buffer. Will append by default.
+     *
+     * @param {SummaryWriteOptions} [options] (optional) options for write operation
+     *
+     * @returns {Promise<Summary>} summary instance
+     */
+    write(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const overwrite = !!(options === null || options === void 0 ? void 0 : options.overwrite);
+            const filePath = yield this.filePath();
+            const writeFunc = overwrite ? writeFile : appendFile;
+            yield writeFunc(filePath, this._buffer, { encoding: 'utf8' });
+            return this.emptyBuffer();
+        });
+    }
+    /**
+     * Clears the summary buffer and wipes the summary file
+     *
+     * @returns {Summary} summary instance
+     */
+    clear() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.emptyBuffer().write({ overwrite: true });
+        });
+    }
+    /**
+     * Returns the current summary buffer as a string
+     *
+     * @returns {string} string of summary buffer
+     */
+    stringify() {
+        return this._buffer;
+    }
+    /**
+     * If the summary buffer is empty
+     *
+     * @returns {boolen} true if the buffer is empty
+     */
+    isEmptyBuffer() {
+        return this._buffer.length === 0;
+    }
+    /**
+     * Resets the summary buffer without writing to summary file
+     *
+     * @returns {Summary} summary instance
+     */
+    emptyBuffer() {
+        this._buffer = '';
+        return this;
+    }
+    /**
+     * Adds raw text to the summary buffer
+     *
+     * @param {string} text content to add
+     * @param {boolean} [addEOL=false] (optional) append an EOL to the raw text (default: false)
+     *
+     * @returns {Summary} summary instance
+     */
+    addRaw(text, addEOL = false) {
+        this._buffer += text;
+        return addEOL ? this.addEOL() : this;
+    }
+    /**
+     * Adds the operating system-specific end-of-line marker to the buffer
+     *
+     * @returns {Summary} summary instance
+     */
+    addEOL() {
+        return this.addRaw(os_1.EOL);
+    }
+    /**
+     * Adds an HTML codeblock to the summary buffer
+     *
+     * @param {string} code content to render within fenced code block
+     * @param {string} lang (optional) language to syntax highlight code
+     *
+     * @returns {Summary} summary instance
+     */
+    addCodeBlock(code, lang) {
+        const attrs = Object.assign({}, (lang && { lang }));
+        const element = this.wrap('pre', this.wrap('code', code), attrs);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML list to the summary buffer
+     *
+     * @param {string[]} items list of items to render
+     * @param {boolean} [ordered=false] (optional) if the rendered list should be ordered or not (default: false)
+     *
+     * @returns {Summary} summary instance
+     */
+    addList(items, ordered = false) {
+        const tag = ordered ? 'ol' : 'ul';
+        const listItems = items.map(item => this.wrap('li', item)).join('');
+        const element = this.wrap(tag, listItems);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML table to the summary buffer
+     *
+     * @param {SummaryTableCell[]} rows table rows
+     *
+     * @returns {Summary} summary instance
+     */
+    addTable(rows) {
+        const tableBody = rows
+            .map(row => {
+            const cells = row
+                .map(cell => {
+                if (typeof cell === 'string') {
+                    return this.wrap('td', cell);
+                }
+                const { header, data, colspan, rowspan } = cell;
+                const tag = header ? 'th' : 'td';
+                const attrs = Object.assign(Object.assign({}, (colspan && { colspan })), (rowspan && { rowspan }));
+                return this.wrap(tag, data, attrs);
+            })
+                .join('');
+            return this.wrap('tr', cells);
+        })
+            .join('');
+        const element = this.wrap('table', tableBody);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds a collapsable HTML details element to the summary buffer
+     *
+     * @param {string} label text for the closed state
+     * @param {string} content collapsable content
+     *
+     * @returns {Summary} summary instance
+     */
+    addDetails(label, content) {
+        const element = this.wrap('details', this.wrap('summary', label) + content);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML image tag to the summary buffer
+     *
+     * @param {string} src path to the image you to embed
+     * @param {string} alt text description of the image
+     * @param {SummaryImageOptions} options (optional) addition image attributes
+     *
+     * @returns {Summary} summary instance
+     */
+    addImage(src, alt, options) {
+        const { width, height } = options || {};
+        const attrs = Object.assign(Object.assign({}, (width && { width })), (height && { height }));
+        const element = this.wrap('img', null, Object.assign({ src, alt }, attrs));
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML section heading element
+     *
+     * @param {string} text heading text
+     * @param {number | string} [level=1] (optional) the heading level, default: 1
+     *
+     * @returns {Summary} summary instance
+     */
+    addHeading(text, level) {
+        const tag = `h${level}`;
+        const allowedTag = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag)
+            ? tag
+            : 'h1';
+        const element = this.wrap(allowedTag, text);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML thematic break (<hr>) to the summary buffer
+     *
+     * @returns {Summary} summary instance
+     */
+    addSeparator() {
+        const element = this.wrap('hr', null);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML line break (<br>) to the summary buffer
+     *
+     * @returns {Summary} summary instance
+     */
+    addBreak() {
+        const element = this.wrap('br', null);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML blockquote to the summary buffer
+     *
+     * @param {string} text quote text
+     * @param {string} cite (optional) citation url
+     *
+     * @returns {Summary} summary instance
+     */
+    addQuote(text, cite) {
+        const attrs = Object.assign({}, (cite && { cite }));
+        const element = this.wrap('blockquote', text, attrs);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML anchor tag to the summary buffer
+     *
+     * @param {string} text link text/content
+     * @param {string} href hyperlink
+     *
+     * @returns {Summary} summary instance
+     */
+    addLink(text, href) {
+        const element = this.wrap('a', text, { href });
+        return this.addRaw(element).addEOL();
+    }
+}
+const _summary = new Summary();
+/**
+ * @deprecated use `core.summary`
+ */
+exports.markdownSummary = _summary;
+exports.summary = _summary;
+//# sourceMappingURL=summary.js.map
 
 /***/ }),
 
@@ -1334,28 +1706,41 @@ class ExecState extends events.EventEmitter {
 
 /***/ }),
 
-/***/ 956:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 231:
+/***/ (function(__unused_webpack_module, exports) {
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PersonalAccessTokenCredentialHandler = exports.BearerCredentialHandler = exports.BasicCredentialHandler = void 0;
 class BasicCredentialHandler {
     constructor(username, password) {
         this.username = username;
         this.password = password;
     }
     prepareRequest(options) {
-        options.headers['Authorization'] =
-            'Basic ' +
-                Buffer.from(this.username + ':' + this.password).toString('base64');
+        if (!options.headers) {
+            throw Error('The request has no headers');
+        }
+        options.headers['Authorization'] = `Basic ${Buffer.from(`${this.username}:${this.password}`).toString('base64')}`;
     }
     // This handler cannot handle 401
-    canHandleAuthentication(response) {
+    canHandleAuthentication() {
         return false;
     }
-    handleAuthentication(httpClient, requestInfo, objs) {
-        return null;
+    handleAuthentication() {
+        return __awaiter(this, void 0, void 0, function* () {
+            throw new Error('not implemented');
+        });
     }
 }
 exports.BasicCredentialHandler = BasicCredentialHandler;
@@ -1366,14 +1751,19 @@ class BearerCredentialHandler {
     // currently implements pre-authorization
     // TODO: support preAuth = false where it hooks on 401
     prepareRequest(options) {
-        options.headers['Authorization'] = 'Bearer ' + this.token;
+        if (!options.headers) {
+            throw Error('The request has no headers');
+        }
+        options.headers['Authorization'] = `Bearer ${this.token}`;
     }
     // This handler cannot handle 401
-    canHandleAuthentication(response) {
+    canHandleAuthentication() {
         return false;
     }
-    handleAuthentication(httpClient, requestInfo, objs) {
-        return null;
+    handleAuthentication() {
+        return __awaiter(this, void 0, void 0, function* () {
+            throw new Error('not implemented');
+        });
     }
 }
 exports.BearerCredentialHandler = BearerCredentialHandler;
@@ -1384,32 +1774,66 @@ class PersonalAccessTokenCredentialHandler {
     // currently implements pre-authorization
     // TODO: support preAuth = false where it hooks on 401
     prepareRequest(options) {
-        options.headers['Authorization'] =
-            'Basic ' + Buffer.from('PAT:' + this.token).toString('base64');
+        if (!options.headers) {
+            throw Error('The request has no headers');
+        }
+        options.headers['Authorization'] = `Basic ${Buffer.from(`PAT:${this.token}`).toString('base64')}`;
     }
     // This handler cannot handle 401
-    canHandleAuthentication(response) {
+    canHandleAuthentication() {
         return false;
     }
-    handleAuthentication(httpClient, requestInfo, objs) {
-        return null;
+    handleAuthentication() {
+        return __awaiter(this, void 0, void 0, function* () {
+            throw new Error('not implemented');
+        });
     }
 }
 exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHandler;
-
+//# sourceMappingURL=auth.js.map
 
 /***/ }),
 
-/***/ 967:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ 99:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const http = __nccwpck_require__(685);
-const https = __nccwpck_require__(687);
-const pm = __nccwpck_require__(848);
-let tunnel;
+exports.HttpClient = exports.isHttps = exports.HttpClientResponse = exports.HttpClientError = exports.getProxyUrl = exports.MediaTypes = exports.Headers = exports.HttpCodes = void 0;
+const http = __importStar(__nccwpck_require__(685));
+const https = __importStar(__nccwpck_require__(687));
+const pm = __importStar(__nccwpck_require__(513));
+const tunnel = __importStar(__nccwpck_require__(751));
 var HttpCodes;
 (function (HttpCodes) {
     HttpCodes[HttpCodes["OK"] = 200] = "OK";
@@ -1454,7 +1878,7 @@ var MediaTypes;
  * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
  */
 function getProxyUrl(serverUrl) {
-    let proxyUrl = pm.getProxyUrl(new URL(serverUrl));
+    const proxyUrl = pm.getProxyUrl(new URL(serverUrl));
     return proxyUrl ? proxyUrl.href : '';
 }
 exports.getProxyUrl = getProxyUrl;
@@ -1487,20 +1911,22 @@ class HttpClientResponse {
         this.message = message;
     }
     readBody() {
-        return new Promise(async (resolve, reject) => {
-            let output = Buffer.alloc(0);
-            this.message.on('data', (chunk) => {
-                output = Buffer.concat([output, chunk]);
-            });
-            this.message.on('end', () => {
-                resolve(output.toString());
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                let output = Buffer.alloc(0);
+                this.message.on('data', (chunk) => {
+                    output = Buffer.concat([output, chunk]);
+                });
+                this.message.on('end', () => {
+                    resolve(output.toString());
+                });
+            }));
         });
     }
 }
 exports.HttpClientResponse = HttpClientResponse;
 function isHttps(requestUrl) {
-    let parsedUrl = new URL(requestUrl);
+    const parsedUrl = new URL(requestUrl);
     return parsedUrl.protocol === 'https:';
 }
 exports.isHttps = isHttps;
@@ -1543,141 +1969,169 @@ class HttpClient {
         }
     }
     options(requestUrl, additionalHeaders) {
-        return this.request('OPTIONS', requestUrl, null, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.request('OPTIONS', requestUrl, null, additionalHeaders || {});
+        });
     }
     get(requestUrl, additionalHeaders) {
-        return this.request('GET', requestUrl, null, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.request('GET', requestUrl, null, additionalHeaders || {});
+        });
     }
     del(requestUrl, additionalHeaders) {
-        return this.request('DELETE', requestUrl, null, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.request('DELETE', requestUrl, null, additionalHeaders || {});
+        });
     }
     post(requestUrl, data, additionalHeaders) {
-        return this.request('POST', requestUrl, data, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.request('POST', requestUrl, data, additionalHeaders || {});
+        });
     }
     patch(requestUrl, data, additionalHeaders) {
-        return this.request('PATCH', requestUrl, data, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.request('PATCH', requestUrl, data, additionalHeaders || {});
+        });
     }
     put(requestUrl, data, additionalHeaders) {
-        return this.request('PUT', requestUrl, data, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.request('PUT', requestUrl, data, additionalHeaders || {});
+        });
     }
     head(requestUrl, additionalHeaders) {
-        return this.request('HEAD', requestUrl, null, additionalHeaders || {});
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.request('HEAD', requestUrl, null, additionalHeaders || {});
+        });
     }
     sendStream(verb, requestUrl, stream, additionalHeaders) {
-        return this.request(verb, requestUrl, stream, additionalHeaders);
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.request(verb, requestUrl, stream, additionalHeaders);
+        });
     }
     /**
      * Gets a typed object from an endpoint
      * Be aware that not found returns a null.  Other errors (4xx, 5xx) reject the promise
      */
-    async getJson(requestUrl, additionalHeaders = {}) {
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        let res = await this.get(requestUrl, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
+    getJson(requestUrl, additionalHeaders = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+            const res = yield this.get(requestUrl, additionalHeaders);
+            return this._processResponse(res, this.requestOptions);
+        });
     }
-    async postJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.post(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
+    postJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = JSON.stringify(obj, null, 2);
+            additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+            additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+            const res = yield this.post(requestUrl, data, additionalHeaders);
+            return this._processResponse(res, this.requestOptions);
+        });
     }
-    async putJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.put(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
+    putJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = JSON.stringify(obj, null, 2);
+            additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+            additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+            const res = yield this.put(requestUrl, data, additionalHeaders);
+            return this._processResponse(res, this.requestOptions);
+        });
     }
-    async patchJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.patch(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
+    patchJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = JSON.stringify(obj, null, 2);
+            additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+            additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+            const res = yield this.patch(requestUrl, data, additionalHeaders);
+            return this._processResponse(res, this.requestOptions);
+        });
     }
     /**
      * Makes a raw http request.
      * All other methods such as get, post, patch, and request ultimately call this.
      * Prefer get, del, post and patch
      */
-    async request(verb, requestUrl, data, headers) {
-        if (this._disposed) {
-            throw new Error('Client has already been disposed.');
-        }
-        let parsedUrl = new URL(requestUrl);
-        let info = this._prepareRequest(verb, parsedUrl, headers);
-        // Only perform retries on reads since writes may not be idempotent.
-        let maxTries = this._allowRetries && RetryableHttpVerbs.indexOf(verb) != -1
-            ? this._maxRetries + 1
-            : 1;
-        let numTries = 0;
-        let response;
-        while (numTries < maxTries) {
-            response = await this.requestRaw(info, data);
-            // Check if it's an authentication challenge
-            if (response &&
-                response.message &&
-                response.message.statusCode === HttpCodes.Unauthorized) {
-                let authenticationHandler;
-                for (let i = 0; i < this.handlers.length; i++) {
-                    if (this.handlers[i].canHandleAuthentication(response)) {
-                        authenticationHandler = this.handlers[i];
-                        break;
-                    }
-                }
-                if (authenticationHandler) {
-                    return authenticationHandler.handleAuthentication(this, info, data);
-                }
-                else {
-                    // We have received an unauthorized response but have no handlers to handle it.
-                    // Let the response return to the caller.
-                    return response;
-                }
+    request(verb, requestUrl, data, headers) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this._disposed) {
+                throw new Error('Client has already been disposed.');
             }
-            let redirectsRemaining = this._maxRedirects;
-            while (HttpRedirectCodes.indexOf(response.message.statusCode) != -1 &&
-                this._allowRedirects &&
-                redirectsRemaining > 0) {
-                const redirectUrl = response.message.headers['location'];
-                if (!redirectUrl) {
-                    // if there's no location to redirect to, we won't
-                    break;
-                }
-                let parsedRedirectUrl = new URL(redirectUrl);
-                if (parsedUrl.protocol == 'https:' &&
-                    parsedUrl.protocol != parsedRedirectUrl.protocol &&
-                    !this._allowRedirectDowngrade) {
-                    throw new Error('Redirect from HTTPS to HTTP protocol. This downgrade is not allowed for security reasons. If you want to allow this behavior, set the allowRedirectDowngrade option to true.');
-                }
-                // we need to finish reading the response before reassigning response
-                // which will leak the open socket.
-                await response.readBody();
-                // strip authorization header if redirected to a different hostname
-                if (parsedRedirectUrl.hostname !== parsedUrl.hostname) {
-                    for (let header in headers) {
-                        // header names are case insensitive
-                        if (header.toLowerCase() === 'authorization') {
-                            delete headers[header];
+            const parsedUrl = new URL(requestUrl);
+            let info = this._prepareRequest(verb, parsedUrl, headers);
+            // Only perform retries on reads since writes may not be idempotent.
+            const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb)
+                ? this._maxRetries + 1
+                : 1;
+            let numTries = 0;
+            let response;
+            do {
+                response = yield this.requestRaw(info, data);
+                // Check if it's an authentication challenge
+                if (response &&
+                    response.message &&
+                    response.message.statusCode === HttpCodes.Unauthorized) {
+                    let authenticationHandler;
+                    for (const handler of this.handlers) {
+                        if (handler.canHandleAuthentication(response)) {
+                            authenticationHandler = handler;
+                            break;
                         }
                     }
+                    if (authenticationHandler) {
+                        return authenticationHandler.handleAuthentication(this, info, data);
+                    }
+                    else {
+                        // We have received an unauthorized response but have no handlers to handle it.
+                        // Let the response return to the caller.
+                        return response;
+                    }
                 }
-                // let's make the request with the new redirectUrl
-                info = this._prepareRequest(verb, parsedRedirectUrl, headers);
-                response = await this.requestRaw(info, data);
-                redirectsRemaining--;
-            }
-            if (HttpResponseRetryCodes.indexOf(response.message.statusCode) == -1) {
-                // If not a retry code, return immediately instead of retrying
-                return response;
-            }
-            numTries += 1;
-            if (numTries < maxTries) {
-                await response.readBody();
-                await this._performExponentialBackoff(numTries);
-            }
-        }
-        return response;
+                let redirectsRemaining = this._maxRedirects;
+                while (response.message.statusCode &&
+                    HttpRedirectCodes.includes(response.message.statusCode) &&
+                    this._allowRedirects &&
+                    redirectsRemaining > 0) {
+                    const redirectUrl = response.message.headers['location'];
+                    if (!redirectUrl) {
+                        // if there's no location to redirect to, we won't
+                        break;
+                    }
+                    const parsedRedirectUrl = new URL(redirectUrl);
+                    if (parsedUrl.protocol === 'https:' &&
+                        parsedUrl.protocol !== parsedRedirectUrl.protocol &&
+                        !this._allowRedirectDowngrade) {
+                        throw new Error('Redirect from HTTPS to HTTP protocol. This downgrade is not allowed for security reasons. If you want to allow this behavior, set the allowRedirectDowngrade option to true.');
+                    }
+                    // we need to finish reading the response before reassigning response
+                    // which will leak the open socket.
+                    yield response.readBody();
+                    // strip authorization header if redirected to a different hostname
+                    if (parsedRedirectUrl.hostname !== parsedUrl.hostname) {
+                        for (const header in headers) {
+                            // header names are case insensitive
+                            if (header.toLowerCase() === 'authorization') {
+                                delete headers[header];
+                            }
+                        }
+                    }
+                    // let's make the request with the new redirectUrl
+                    info = this._prepareRequest(verb, parsedRedirectUrl, headers);
+                    response = yield this.requestRaw(info, data);
+                    redirectsRemaining--;
+                }
+                if (!response.message.statusCode ||
+                    !HttpResponseRetryCodes.includes(response.message.statusCode)) {
+                    // If not a retry code, return immediately instead of retrying
+                    return response;
+                }
+                numTries += 1;
+                if (numTries < maxTries) {
+                    yield response.readBody();
+                    yield this._performExponentialBackoff(numTries);
+                }
+            } while (numTries < maxTries);
+            return response;
+        });
     }
     /**
      * Needs to be called if keepAlive is set to true in request options.
@@ -1694,14 +2148,22 @@ class HttpClient {
      * @param data
      */
     requestRaw(info, data) {
-        return new Promise((resolve, reject) => {
-            let callbackForResult = function (err, res) {
-                if (err) {
-                    reject(err);
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                function callbackForResult(err, res) {
+                    if (err) {
+                        reject(err);
+                    }
+                    else if (!res) {
+                        // If `err` is not passed, then `res` must be passed.
+                        reject(new Error('Unknown error'));
+                    }
+                    else {
+                        resolve(res);
+                    }
                 }
-                resolve(res);
-            };
-            this.requestRawWithCallback(info, data, callbackForResult);
+                this.requestRawWithCallback(info, data, callbackForResult);
+            });
         });
     }
     /**
@@ -1711,21 +2173,24 @@ class HttpClient {
      * @param onResult
      */
     requestRawWithCallback(info, data, onResult) {
-        let socket;
         if (typeof data === 'string') {
+            if (!info.options.headers) {
+                info.options.headers = {};
+            }
             info.options.headers['Content-Length'] = Buffer.byteLength(data, 'utf8');
         }
         let callbackCalled = false;
-        let handleResult = (err, res) => {
+        function handleResult(err, res) {
             if (!callbackCalled) {
                 callbackCalled = true;
                 onResult(err, res);
             }
-        };
-        let req = info.httpModule.request(info.options, (msg) => {
-            let res = new HttpClientResponse(msg);
-            handleResult(null, res);
+        }
+        const req = info.httpModule.request(info.options, (msg) => {
+            const res = new HttpClientResponse(msg);
+            handleResult(undefined, res);
         });
+        let socket;
         req.on('socket', sock => {
             socket = sock;
         });
@@ -1734,12 +2199,12 @@ class HttpClient {
             if (socket) {
                 socket.end();
             }
-            handleResult(new Error('Request timeout: ' + info.options.path), null);
+            handleResult(new Error(`Request timeout: ${info.options.path}`));
         });
         req.on('error', function (err) {
             // err has statusCode property
             // res should have headers
-            handleResult(err, null);
+            handleResult(err);
         });
         if (data && typeof data === 'string') {
             req.write(data, 'utf8');
@@ -1760,7 +2225,7 @@ class HttpClient {
      * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
      */
     getAgent(serverUrl) {
-        let parsedUrl = new URL(serverUrl);
+        const parsedUrl = new URL(serverUrl);
         return this._getAgent(parsedUrl);
     }
     _prepareRequest(method, requestUrl, headers) {
@@ -1784,21 +2249,19 @@ class HttpClient {
         info.options.agent = this._getAgent(info.parsedUrl);
         // gives handlers an opportunity to participate
         if (this.handlers) {
-            this.handlers.forEach(handler => {
+            for (const handler of this.handlers) {
                 handler.prepareRequest(info.options);
-            });
+            }
         }
         return info;
     }
     _mergeHeaders(headers) {
-        const lowercaseKeys = obj => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCase()] = obj[k]), c), {});
         if (this.requestOptions && this.requestOptions.headers) {
-            return Object.assign({}, lowercaseKeys(this.requestOptions.headers), lowercaseKeys(headers));
+            return Object.assign({}, lowercaseKeys(this.requestOptions.headers), lowercaseKeys(headers || {}));
         }
         return lowercaseKeys(headers || {});
     }
     _getExistingOrDefaultHeader(additionalHeaders, header, _default) {
-        const lowercaseKeys = obj => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCase()] = obj[k]), c), {});
         let clientHeader;
         if (this.requestOptions && this.requestOptions.headers) {
             clientHeader = lowercaseKeys(this.requestOptions.headers)[header];
@@ -1807,8 +2270,8 @@ class HttpClient {
     }
     _getAgent(parsedUrl) {
         let agent;
-        let proxyUrl = pm.getProxyUrl(parsedUrl);
-        let useProxy = proxyUrl && proxyUrl.hostname;
+        const proxyUrl = pm.getProxyUrl(parsedUrl);
+        const useProxy = proxyUrl && proxyUrl.hostname;
         if (this._keepAlive && useProxy) {
             agent = this._proxyAgent;
         }
@@ -1816,29 +2279,22 @@ class HttpClient {
             agent = this._agent;
         }
         // if agent is already assigned use that agent.
-        if (!!agent) {
+        if (agent) {
             return agent;
         }
         const usingSsl = parsedUrl.protocol === 'https:';
         let maxSockets = 100;
-        if (!!this.requestOptions) {
+        if (this.requestOptions) {
             maxSockets = this.requestOptions.maxSockets || http.globalAgent.maxSockets;
         }
-        if (useProxy) {
-            // If using proxy, need tunnel
-            if (!tunnel) {
-                tunnel = __nccwpck_require__(751);
-            }
+        // This is `useProxy` again, but we need to check `proxyURl` directly for TypeScripts's flow analysis.
+        if (proxyUrl && proxyUrl.hostname) {
             const agentOptions = {
-                maxSockets: maxSockets,
+                maxSockets,
                 keepAlive: this._keepAlive,
-                proxy: {
-                    ...((proxyUrl.username || proxyUrl.password) && {
-                        proxyAuth: `${proxyUrl.username}:${proxyUrl.password}`
-                    }),
-                    host: proxyUrl.hostname,
-                    port: proxyUrl.port
-                }
+                proxy: Object.assign(Object.assign({}, ((proxyUrl.username || proxyUrl.password) && {
+                    proxyAuth: `${proxyUrl.username}:${proxyUrl.password}`
+                })), { host: proxyUrl.hostname, port: proxyUrl.port })
             };
             let tunnelAgent;
             const overHttps = proxyUrl.protocol === 'https:';
@@ -1853,7 +2309,7 @@ class HttpClient {
         }
         // if reusing agent across request and tunneling agent isn't assigned create a new agent
         if (this._keepAlive && !agent) {
-            const options = { keepAlive: this._keepAlive, maxSockets: maxSockets };
+            const options = { keepAlive: this._keepAlive, maxSockets };
             agent = usingSsl ? new https.Agent(options) : new http.Agent(options);
             this._agent = agent;
         }
@@ -1872,109 +2328,117 @@ class HttpClient {
         return agent;
     }
     _performExponentialBackoff(retryNumber) {
-        retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
-        const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
-        return new Promise(resolve => setTimeout(() => resolve(), ms));
+        return __awaiter(this, void 0, void 0, function* () {
+            retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
+            const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
+            return new Promise(resolve => setTimeout(() => resolve(), ms));
+        });
     }
-    static dateTimeDeserializer(key, value) {
-        if (typeof value === 'string') {
-            let a = new Date(value);
-            if (!isNaN(a.valueOf())) {
-                return a;
-            }
-        }
-        return value;
-    }
-    async _processResponse(res, options) {
-        return new Promise(async (resolve, reject) => {
-            const statusCode = res.message.statusCode;
-            const response = {
-                statusCode: statusCode,
-                result: null,
-                headers: {}
-            };
-            // not found leads to null obj returned
-            if (statusCode == HttpCodes.NotFound) {
-                resolve(response);
-            }
-            let obj;
-            let contents;
-            // get the result from the body
-            try {
-                contents = await res.readBody();
-                if (contents && contents.length > 0) {
-                    if (options && options.deserializeDates) {
-                        obj = JSON.parse(contents, HttpClient.dateTimeDeserializer);
+    _processResponse(res, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                const statusCode = res.message.statusCode || 0;
+                const response = {
+                    statusCode,
+                    result: null,
+                    headers: {}
+                };
+                // not found leads to null obj returned
+                if (statusCode === HttpCodes.NotFound) {
+                    resolve(response);
+                }
+                // get the result from the body
+                function dateTimeDeserializer(key, value) {
+                    if (typeof value === 'string') {
+                        const a = new Date(value);
+                        if (!isNaN(a.valueOf())) {
+                            return a;
+                        }
+                    }
+                    return value;
+                }
+                let obj;
+                let contents;
+                try {
+                    contents = yield res.readBody();
+                    if (contents && contents.length > 0) {
+                        if (options && options.deserializeDates) {
+                            obj = JSON.parse(contents, dateTimeDeserializer);
+                        }
+                        else {
+                            obj = JSON.parse(contents);
+                        }
+                        response.result = obj;
+                    }
+                    response.headers = res.message.headers;
+                }
+                catch (err) {
+                    // Invalid resource (contents not json);  leaving result obj null
+                }
+                // note that 3xx redirects are handled by the http layer.
+                if (statusCode > 299) {
+                    let msg;
+                    // if exception/error in body, attempt to get better error
+                    if (obj && obj.message) {
+                        msg = obj.message;
+                    }
+                    else if (contents && contents.length > 0) {
+                        // it may be the case that the exception is in the body message as string
+                        msg = contents;
                     }
                     else {
-                        obj = JSON.parse(contents);
+                        msg = `Failed request: (${statusCode})`;
                     }
-                    response.result = obj;
-                }
-                response.headers = res.message.headers;
-            }
-            catch (err) {
-                // Invalid resource (contents not json);  leaving result obj null
-            }
-            // note that 3xx redirects are handled by the http layer.
-            if (statusCode > 299) {
-                let msg;
-                // if exception/error in body, attempt to get better error
-                if (obj && obj.message) {
-                    msg = obj.message;
-                }
-                else if (contents && contents.length > 0) {
-                    // it may be the case that the exception is in the body message as string
-                    msg = contents;
+                    const err = new HttpClientError(msg, statusCode);
+                    err.result = response.result;
+                    reject(err);
                 }
                 else {
-                    msg = 'Failed request: (' + statusCode + ')';
+                    resolve(response);
                 }
-                let err = new HttpClientError(msg, statusCode);
-                err.result = response.result;
-                reject(err);
-            }
-            else {
-                resolve(response);
-            }
+            }));
         });
     }
 }
 exports.HttpClient = HttpClient;
-
+const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCase()] = obj[k]), c), {});
+//# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 848:
+/***/ 513:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.checkBypass = exports.getProxyUrl = void 0;
 function getProxyUrl(reqUrl) {
-    let usingSsl = reqUrl.protocol === 'https:';
-    let proxyUrl;
+    const usingSsl = reqUrl.protocol === 'https:';
     if (checkBypass(reqUrl)) {
-        return proxyUrl;
+        return undefined;
     }
-    let proxyVar;
-    if (usingSsl) {
-        proxyVar = process.env['https_proxy'] || process.env['HTTPS_PROXY'];
+    const proxyVar = (() => {
+        if (usingSsl) {
+            return process.env['https_proxy'] || process.env['HTTPS_PROXY'];
+        }
+        else {
+            return process.env['http_proxy'] || process.env['HTTP_PROXY'];
+        }
+    })();
+    if (proxyVar) {
+        return new URL(proxyVar);
     }
     else {
-        proxyVar = process.env['http_proxy'] || process.env['HTTP_PROXY'];
+        return undefined;
     }
-    if (proxyVar) {
-        proxyUrl = new URL(proxyVar);
-    }
-    return proxyUrl;
 }
 exports.getProxyUrl = getProxyUrl;
 function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
     }
-    let noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
+    const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
         return false;
     }
@@ -1990,12 +2454,12 @@ function checkBypass(reqUrl) {
         reqPort = 443;
     }
     // Format the request hostname and hostname with port
-    let upperReqHosts = [reqUrl.hostname.toUpperCase()];
+    const upperReqHosts = [reqUrl.hostname.toUpperCase()];
     if (typeof reqPort === 'number') {
         upperReqHosts.push(`${upperReqHosts[0]}:${reqPort}`);
     }
     // Compare request host against noproxy
-    for (let upperNoProxyItem of noProxy
+    for (const upperNoProxyItem of noProxy
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
@@ -2006,7 +2470,7 @@ function checkBypass(reqUrl) {
     return false;
 }
 exports.checkBypass = checkBypass;
-
+//# sourceMappingURL=proxy.js.map
 
 /***/ }),
 
@@ -2546,12 +3010,12 @@ function copyFile(srcFile, destFile, force) {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 49:
+/***/ 150:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
 
+"use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -2584,7 +3048,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getExecOutput = exports.exec = void 0;
 const string_decoder_1 = __nccwpck_require2_(576);
-const tr = __importStar(__nccwpck_require2_(469));
+const tr = __importStar(__nccwpck_require2_(561));
 /**
  * Exec a command.
  * Output will be streamed to the live console.
@@ -2658,9 +3122,10 @@ exports.getExecOutput = getExecOutput;
 
 /***/ }),
 
-/***/ 469:
+/***/ 561:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
 
+"use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -2696,8 +3161,8 @@ const os = __importStar(__nccwpck_require2_(37));
 const events = __importStar(__nccwpck_require2_(361));
 const child = __importStar(__nccwpck_require2_(81));
 const path = __importStar(__nccwpck_require2_(17));
-const io = __importStar(__nccwpck_require2_(864));
-const ioUtil = __importStar(__nccwpck_require2_(887));
+const io = __importStar(__nccwpck_require2_(381));
+const ioUtil = __importStar(__nccwpck_require2_(687));
 const timers_1 = __nccwpck_require2_(512);
 /* eslint-disable @typescript-eslint/unbound-method */
 const IS_WINDOWS = process.platform === 'win32';
@@ -3282,9 +3747,10 @@ class ExecState extends events.EventEmitter {
 
 /***/ }),
 
-/***/ 887:
+/***/ 687:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
 
+"use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -3465,9 +3931,10 @@ exports.getCmdPath = getCmdPath;
 
 /***/ }),
 
-/***/ 864:
+/***/ 381:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
 
+"use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -3503,7 +3970,7 @@ const assert_1 = __nccwpck_require2_(491);
 const childProcess = __importStar(__nccwpck_require2_(81));
 const path = __importStar(__nccwpck_require2_(17));
 const util_1 = __nccwpck_require2_(837);
-const ioUtil = __importStar(__nccwpck_require2_(887));
+const ioUtil = __importStar(__nccwpck_require2_(687));
 const exec = util_1.promisify(childProcess.exec);
 const execFile = util_1.promisify(childProcess.execFile);
 /**
@@ -3812,9 +4279,131 @@ function copyFile(srcFile, destFile, force) {
 
 /***/ }),
 
-/***/ 577:
+/***/ 639:
+/***/ ((module) => {
+
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ 356:
+/***/ (function(__unused_webpack_module, exports) {
+
+
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var _ArgumentBuilder_args;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+class ArgumentBuilder {
+    constructor() {
+        _ArgumentBuilder_args.set(this, []);
+    }
+    Append(arg, param) {
+        if (Array.isArray(arg)) {
+            __classPrivateFieldSet(this, _ArgumentBuilder_args, __classPrivateFieldGet(this, _ArgumentBuilder_args, "f").concat(arg), "f");
+        }
+        else {
+            __classPrivateFieldGet(this, _ArgumentBuilder_args, "f").push(arg);
+            if (param != null) {
+                __classPrivateFieldGet(this, _ArgumentBuilder_args, "f").push(param);
+            }
+        }
+        return this;
+    }
+    Count() {
+        return __classPrivateFieldGet(this, _ArgumentBuilder_args, "f").length;
+    }
+    Build() {
+        return __classPrivateFieldGet(this, _ArgumentBuilder_args, "f");
+    }
+    ToString() {
+        return __classPrivateFieldGet(this, _ArgumentBuilder_args, "f").join(' ');
+    }
+}
+exports["default"] = ArgumentBuilder;
+_ArgumentBuilder_args = new WeakMap();
+
+
+/***/ }),
+
+/***/ 925:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require3_) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ArgumentBuilder = void 0;
+var ArgumentBuilder_1 = __nccwpck_require3_(356);
+Object.defineProperty(exports, "ArgumentBuilder", ({ enumerable: true, get: function () { return __importDefault(ArgumentBuilder_1).default; } }));
+
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __nccwpck_require3_(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		var threw = true;
+/******/ 		try {
+/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require3_);
+/******/ 			threw = false;
+/******/ 		} finally {
+/******/ 			if(threw) delete __webpack_module_cache__[moduleId];
+/******/ 		}
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat */
+/******/ 	
+/******/ 	if (typeof __nccwpck_require3_ !== 'undefined') __nccwpck_require3_.ab = __dirname + "/";
+/******/ 	
+/************************************************************************/
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require3_(925);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
+/******/ })()
+;
+
+/***/ }),
+
+/***/ 25:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
 
+"use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -3840,56 +4429,131 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const exec = __importStar(__nccwpck_require2_(49));
+const exec = __importStar(__nccwpck_require2_(150));
+const path = __importStar(__nccwpck_require2_(17));
+const argument_builder_1 = __nccwpck_require2_(639);
 class Keychain {
+    static GenerateKeychainPath(keychain) {
+        const tmp = !path.dirname(keychain) ? `${process.env.HOME}/Library/Keychains/${keychain}` : keychain;
+        return !path.extname(tmp) ? `${tmp}.keychain-db` : tmp;
+    }
+    static GetDefaultLoginKeychainPath() {
+        return this.GenerateKeychainPath('login.keychain-db');
+    }
+    static async CreateKeychain(keychain, password) {
+        if (!password) {
+            throw new Error('CreaterKeychain: Password required.');
+        }
+        keychain = this.GenerateKeychainPath(keychain);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('create-keychain')
+            .Append('-p', password)
+            .Append(keychain);
+        await exec.exec('security', builder.Build());
+        return keychain;
+    }
     static ImportCertificateFromFile(keychain, certificate, passphrase) {
-        const args = [
-            'import', certificate,
-            '-k', keychain,
-            '-P', passphrase,
-            '-f', 'pkcs12',
-            '-A',
-            '-T', '/usr/bin/codesign',
-            '-T', '/usr/bin/security'
-        ];
-        return exec.exec('security', args);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('import', certificate)
+            .Append('-k', keychain)
+            .Append('-P', passphrase)
+            .Append('-f', 'pkcs12')
+            .Append('-A')
+            .Append('-T', '/usr/bin/codesign')
+            .Append('-T', '/usr/bin/security');
+        return exec.exec('security', builder.Build());
+    }
+    static ChangeKeychainPassword(keychain, oldPassword, newPassword) {
+        const options = {
+            input: Buffer.from(`${oldPassword}\n${newPassword}\n${newPassword}`)
+        };
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('set-keychain-password')
+            .Append(keychain);
+        return exec.exec('security', builder.Build(), options);
     }
     static LockKeychain(keychain) {
-        if (keychain == null) {
-            return exec.exec('security', ['lock-keychain']);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('lock-keychain');
+        if (keychain != null) {
+            builder.Append(keychain);
         }
-        else {
-            return exec.exec('security', ['lock-keychain', keychain]);
-        }
+        return exec.exec('security', builder.Build());
     }
     static LockKeychainAll() {
-        return exec.exec('security', ['lock-keychain', '-a']);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('lock-keychain')
+            .Append('-a');
+        return exec.exec('security', builder.Build());
     }
     static UnlockKeychain(keychain, password) {
         if (password == null) {
             throw new Error('UnlockKeychain: Password required.');
         }
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('unlock-keychain')
+            .Append('-p', password);
         if (keychain != null) {
-            return exec.exec('security', ['unlock-keychain', '-p', password, keychain]);
+            builder.Append(keychain);
         }
-        else {
-            return exec.exec('security', ['unlock-keychain', '-p', password]);
-        }
-    }
-    static CreateKeychain(keychain, password) {
-        if (password === '') {
-            throw new Error('CreaterKeychain: Password required.');
-        }
-        return exec.exec('security', ['create-keychain', '-p', `${password}`, keychain]);
+        return exec.exec('security', builder.Build());
     }
     static SetKeychainTimeout(keychain, seconds) {
-        return exec.exec('security', ['set-keychain-settings', '-lut', seconds.toString(), keychain]);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('set-keychain-settings')
+            .Append('-lut', seconds.toString())
+            .Append(keychain);
+        return exec.exec('security', builder.Build());
     }
     static DeleteKeychain(keychain) {
-        return exec.exec('security', ['delete-keychain', keychain]);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('delete-keychain')
+            .Append(keychain);
+        return exec.exec('security', builder.Build());
+    }
+    static async GetKeychain(name) {
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append(name)
+            .Append('-d', 'user');
+        let output = '';
+        const options = {};
+        options.listeners = {
+            stdout: (data) => {
+                output += data.toString();
+            }
+        };
+        try {
+            await exec.exec('security', builder.Build(), options);
+        }
+        catch (err) {
+            return [];
+        }
+        let keychains = [];
+        if (!!output) {
+            for (const i of output.split('\n')) {
+                const tmp = i.trim().replace(/"(.*)"/, '$1');
+                if (!!tmp) {
+                    keychains.push(tmp);
+                }
+            }
+        }
+        return keychains;
+    }
+    static async GetDefaultKeychain() {
+        return this.GetKeychain('default-keychain');
+    }
+    static async GetLoginKeychain() {
+        return this.GetKeychain('login-keychain');
+    }
+    static async GetListKeychain() {
+        return this.GetKeychain('list-keychains');
     }
     static SetKeychain(name, keychain) {
-        return exec.exec('security', [name, '-d', 'user', '-s', keychain]);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append(name)
+            .Append('-d', 'user')
+            .Append('-s', keychain);
+        return exec.exec('security', builder.Build());
     }
     static SetDefaultKeychain(keychain) {
         return this.SetKeychain('default-keychain', keychain);
@@ -3901,32 +4565,56 @@ class Keychain {
         return this.SetKeychain('login-keychain', keychain);
     }
     static ShowLoginKeychain() {
-        return exec.exec('security', ['login-keychain']);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('login-keychain');
+        return exec.exec('security', builder.Build());
     }
     static ShowListKeychains() {
-        return exec.exec('security', ['list-keychains', '-d', 'user']);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('list-keychains')
+            .Append('-d', 'user');
+        return exec.exec('security', builder.Build());
     }
     static SetListKeychain(keychain) {
-        return exec.exec('security', ['list-keychains', '-d', 'user', '-s', keychain]);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('list-keychains')
+            .Append('-d', 'user')
+            .Append('-s', keychain);
+        return exec.exec('security', builder.Build());
     }
     static SetListKeychains(keychains) {
-        return exec.exec('security', ['list-keychains', '-d', 'user', '-s'].concat(keychains));
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('list-keychains')
+            .Append('-d', 'user')
+            .Append('-s')
+            .Append(keychains);
+        return exec.exec('security', builder.Build());
     }
     static AllowAccessForAppleTools(keychain, password) {
-        const args = [
-            'set-key-partition-list',
-            '-S', 'apple-tool:,apple:',
-            '-s',
-            '-k', password,
-            keychain
-        ];
-        return exec.exec('security', args);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('set-key-partition-list')
+            .Append('-S', 'apple-tool:,apple:')
+            .Append('-s')
+            .Append('-k', password)
+            .Append(keychain);
+        return exec.exec('security', builder.Build());
     }
-    static FindGenericPassword(service) {
-        return exec.exec('security', ['find-generic-password', '-s', `"${service}"`]);
+    static FindGenericPassword(service, keychain) {
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('find-generic-password')
+            .Append('-s', `"${service}"`);
+        if (keychain != null) {
+            builder.Append(keychain);
+        }
+        return exec.exec('security', builder.Build());
     }
     static ShowCodeSigning(keychain) {
-        return exec.exec('security', ['find-identity', '-p', 'codesigning', '-v', keychain]);
+        const builder = new argument_builder_1.ArgumentBuilder()
+            .Append('find-identity')
+            .Append('-p')
+            .Append('codesigning')
+            .Append('-v', keychain);
+        return exec.exec('security', builder.Build());
     }
 }
 exports["default"] = Keychain;
@@ -3934,17 +4622,131 @@ exports["default"] = Keychain;
 
 /***/ }),
 
-/***/ 925:
+/***/ 829:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
 
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _KeychainFile_keychain, _KeychainFile_password;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const path = __importStar(__nccwpck_require2_(17));
+const fs = __importStar(__nccwpck_require2_(292));
+const Keychain_1 = __importDefault(__nccwpck_require2_(25));
+class KeychainFile {
+    constructor(keychain, password) {
+        _KeychainFile_keychain.set(this, '');
+        _KeychainFile_password.set(this, '');
+        __classPrivateFieldSet(this, _KeychainFile_keychain, Keychain_1.default.GenerateKeychainPath(keychain), "f");
+        __classPrivateFieldSet(this, _KeychainFile_password, password !== null && password !== void 0 ? password : '', "f");
+    }
+    static async Open(keychain, password) {
+        await fs.access(keychain);
+        return new KeychainFile(keychain, password);
+    }
+    GetPath() {
+        return __classPrivateFieldGet(this, _KeychainFile_keychain, "f");
+    }
+    GetName() {
+        return path.basename(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"));
+    }
+    SetPassword(password) {
+        __classPrivateFieldSet(this, _KeychainFile_password, password, "f");
+    }
+    async ChangePassword(oldPassword, newPassword) {
+        const result = await Keychain_1.default.ChangeKeychainPassword(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"), oldPassword, newPassword);
+        if (result === 0) {
+            this.SetPassword(newPassword);
+        }
+        return result;
+    }
+    Lock() {
+        return Keychain_1.default.LockKeychain(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"));
+    }
+    Unlock(password) {
+        return Keychain_1.default.UnlockKeychain(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"), password !== null && password !== void 0 ? password : __classPrivateFieldGet(this, _KeychainFile_password, "f"));
+    }
+    SetTimeout(seconds) {
+        return Keychain_1.default.SetKeychainTimeout(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"), seconds);
+    }
+    SetDefault() {
+        return Keychain_1.default.SetDefaultKeychain(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"));
+    }
+    SetLogin() {
+        return Keychain_1.default.SetLoginKeychain(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"));
+    }
+    SetList() {
+        return Keychain_1.default.SetListKeychain(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"));
+    }
+    ImportCertificateFromFile(certificate, passphrase) {
+        return Keychain_1.default.ImportCertificateFromFile(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"), certificate, passphrase);
+    }
+    AllowAccessForAppleTools(password) {
+        return Keychain_1.default.AllowAccessForAppleTools(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"), password !== null && password !== void 0 ? password : __classPrivateFieldGet(this, _KeychainFile_password, "f"));
+    }
+    FindGenericPassword(service) {
+        return Keychain_1.default.FindGenericPassword(service, __classPrivateFieldGet(this, _KeychainFile_keychain, "f"));
+    }
+    ShowCodeSigning() {
+        return Keychain_1.default.ShowCodeSigning(__classPrivateFieldGet(this, _KeychainFile_keychain, "f"));
+    }
+}
+exports["default"] = KeychainFile;
+_KeychainFile_keychain = new WeakMap(), _KeychainFile_password = new WeakMap();
+
+
+/***/ }),
+
+/***/ 149:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
+
+"use strict";
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Keychain = void 0;
-var Keychain_1 = __nccwpck_require2_(577);
+exports.KeychainFile = exports.Keychain = void 0;
+var Keychain_1 = __nccwpck_require2_(25);
 Object.defineProperty(exports, "Keychain", ({ enumerable: true, get: function () { return __importDefault(Keychain_1).default; } }));
+var KeychainFile_1 = __nccwpck_require2_(829);
+Object.defineProperty(exports, "KeychainFile", ({ enumerable: true, get: function () { return __importDefault(KeychainFile_1).default; } }));
 
 
 /***/ }),
@@ -3952,6 +4754,7 @@ Object.defineProperty(exports, "Keychain", ({ enumerable: true, get: function ()
 /***/ 491:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(491);
 
 /***/ }),
@@ -3959,6 +4762,7 @@ module.exports = __nccwpck_require__(491);
 /***/ 81:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(81);
 
 /***/ }),
@@ -3966,6 +4770,7 @@ module.exports = __nccwpck_require__(81);
 /***/ 361:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(361);
 
 /***/ }),
@@ -3973,13 +4778,23 @@ module.exports = __nccwpck_require__(361);
 /***/ 147:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(147);
+
+/***/ }),
+
+/***/ 292:
+/***/ ((module) => {
+
+"use strict";
+module.exports = __nccwpck_require__(292);
 
 /***/ }),
 
 /***/ 37:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(37);
 
 /***/ }),
@@ -3987,6 +4802,7 @@ module.exports = __nccwpck_require__(37);
 /***/ 17:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(17);
 
 /***/ }),
@@ -3994,6 +4810,7 @@ module.exports = __nccwpck_require__(17);
 /***/ 576:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(576);
 
 /***/ }),
@@ -4001,6 +4818,7 @@ module.exports = __nccwpck_require__(576);
 /***/ 512:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(512);
 
 /***/ }),
@@ -4008,6 +4826,7 @@ module.exports = __nccwpck_require__(512);
 /***/ 837:
 /***/ ((module) => {
 
+"use strict";
 module.exports = __nccwpck_require__(837);
 
 /***/ })
@@ -4054,7 +4873,7 @@ module.exports = __nccwpck_require__(837);
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require2_(925);
+/******/ 	var __webpack_exports__ = __nccwpck_require2_(149);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
@@ -4571,7 +5390,7 @@ function SettingKeychain() {
         core.startGroup('Keychain Settings');
         let keychain = core.getInput('keychain');
         if (!keychain) {
-            keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
+            keychain = keychain_1.Keychain.GetDefaultLoginKeychainPath();
             core.info('Use the default login keychain');
         }
         const keychainPassword = core.getInput('keychain-password');
@@ -4669,6 +5488,14 @@ module.exports = require("events");
 
 "use strict";
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ 292:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("fs/promises");
 
 /***/ }),
 

@@ -17,7 +17,7 @@ async function SettingKeychain()
 
   let keychain: string = core.getInput('keychain')
   if (!keychain) {
-    keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
+    keychain = Keychain.GetDefaultLoginKeychainPath()
     core.info('Use the default login keychain')
   }
 

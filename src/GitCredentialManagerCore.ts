@@ -14,7 +14,16 @@ export class GitCredentialManagerCore
     return exec.exec('git', ['config', '--global', 'credential.interactive', 'false'])
   }
 
-  static async Get(): Promise<string>
+  static Get(): Promise<number>
+  {
+    const options: exec.ExecOptions = {
+      input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
+    }
+
+    return this.Execute('get', options)
+  }
+
+  static async GetWithStdout(): Promise<string>
   {
     let output = ''
     const options: exec.ExecOptions = {
@@ -32,15 +41,6 @@ export class GitCredentialManagerCore
     } catch (ex: any) {
       return ''
     }
-  }
-
-  static Get2(): Promise<number>
-  {
-    const options: exec.ExecOptions = {
-      input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
-    }
-
-    return this.Execute('get', options)
   }
 
   /**

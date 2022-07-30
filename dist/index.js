@@ -4392,9 +4392,32 @@ class GitCredentialManagerCore {
             return exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
         });
     }
+    static CreateBuffer(protocol, host) {
+        return Buffer.from(`protocol=${protocol}\nhost=${host}\n\n`);
+    }
     static Get() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let output = '';
+            const options = {
+                input: this.CreateBuffer('https', 'github.com'),
+                listeners: {
+                    stdout(data) {
+                        output += data.toString();
+                    }
+                }
+            };
+            try {
+                yield this.Execute('get', options);
+                return output;
+            }
+            catch (ex) {
+                return '';
+            }
+        });
+    }
+    static Get2() {
         const options = {
-            input: Buffer.from('protocol=https\nhost=github.com\n\n'),
+            input: this.CreateBuffer('https', 'github.com'),
         };
         return this.Execute('get', options);
     }
@@ -4404,14 +4427,12 @@ class GitCredentialManagerCore {
         };
         return this.Execute('store', options);
     }
-    ;
     static Erase() {
         const options = {
-            input: Buffer.from('protocol=https\nhost=github.com\n')
+            input: this.CreateBuffer('https', 'github.com'),
         };
         return this.Execute('erase', options);
     }
-    ;
 }
 exports.GitCredentialManagerCore = GitCredentialManagerCore;
 

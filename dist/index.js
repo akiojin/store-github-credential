@@ -4572,9 +4572,10 @@ function SettingKeychain() {
 function SettingCredential() {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('git credential-manager-core Settings');
-        var get = yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
+        var get = '';
+        //await Credential.Get()
         core.info(get);
-        if (!!get) {
+        if (!get) {
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('github-username'), core.getInput('github-password'));
         }

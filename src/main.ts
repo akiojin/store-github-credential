@@ -39,10 +39,11 @@ async function SettingCredential()
 {
   core.startGroup('git credential-manager-core Settings')
 
-  var get = await Credential.Get()
+  var get = ''
+  //await Credential.Get()
   core.info(get)
 
-  if (!!get) {
+  if (!get) {
     await Credential.Configure()
     await Credential.Store(core.getInput('github-username'), core.getInput('github-password'))
   }

@@ -8,11 +8,14 @@ inputs:
     description: 'A personal access token with access to the GitHub repository.'
     required: true
   keychain:
-    description: 'Path of the keychain to use. If omitted, the default login keychain is used.'
+    description: >
+      Path of the keychain to use. If omitted, the default login keychain is used.
     required: false
     default: ''
   keychain-password:
-    description: 'Password for the keychain if specified in the keychain parameter; default login keychain password if the kerchain parameter is omitted.'
+    description: >
+      Password for the keychain if specified in the keychain parameter;
+      default login keychain password if the kerchain parameter is omitted.
     required: false
     default: ''
 runs:

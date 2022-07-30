@@ -4396,7 +4396,7 @@ class GitCredentialManagerCore {
         return __awaiter(this, void 0, void 0, function* () {
             let output = '';
             const options = {
-                input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
+                input: Buffer.from(`protocol=https\nhost=github.com\n\n\n\n`),
                 listeners: {
                     stdout(data) {
                         output += data.toString();
@@ -4414,7 +4414,7 @@ class GitCredentialManagerCore {
     }
     static Get2() {
         const options = {
-            input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
+            input: Buffer.from(`protocol=https\nhost=github.com\n\n\n\n`),
         };
         return this.Execute('get', options);
     }

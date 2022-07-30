@@ -18,7 +18,7 @@ export class GitCredentialManagerCore
   {
     let output = ''
     const options: exec.ExecOptions = {
-      input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
+      input: Buffer.from(`protocol=https\nhost=github.com\n\n\n\n`),
       listeners: {
         stdout (data: Buffer) {
           output += data.toString()
@@ -37,7 +37,7 @@ export class GitCredentialManagerCore
   static Get2(): Promise<number>
   {
     const options: exec.ExecOptions = {
-      input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
+      input: Buffer.from(`protocol=https\nhost=github.com\n\n\n\n`),
     }
 
     return this.Execute('get', options)

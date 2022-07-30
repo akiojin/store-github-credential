@@ -9,6 +9,7 @@ const IsMacOS = os.platform() === 'darwin'
 const PostProcess = new BooleanStateValue('IS_POST_PROCESS')
 const KeychainCache = new StringStateValue('KEYCHAIN')
 const KeychainPasswordCache = new StringStateValue('KEYCHAIN_PASSWORD')
+const StoreGitCredential = new BooleanStateValue('IS_STORE_GIT_CREDENTIAL')
 
 async function SettingKeychain()
 {
@@ -45,6 +46,7 @@ async function SettingCredential()
 	await Credential.Get()
   } catch (ex: any) {
     await Credential.Store(core.getInput('github-username'), core.getInput('github-password'))
+	StoreGitCredential.Set(true)
   }
 
   core.endGroup()
@@ -58,6 +60,8 @@ async function Run()
   } catch (ex: any) {
     core.setFailed(ex.message)
   }
+
+  PostProcess.Set(true)
 }
 
 async function Cleanup()
@@ -65,7 +69,10 @@ async function Cleanup()
   try {
     await Keychain.SetDefaultKeychain(KeychainCache.Get())
     await Keychain.UnlockKeychain(KeychainCache.Get(), KeychainPasswordCache.Get())
-    await Credential.Erase()
+
+	if (!!StoreGitCredential.Get()) {
+	    await Credential.Erase()
+	}
   } catch (ex: any) {
     core.setFailed(ex.message)
   }
@@ -79,6 +86,4 @@ if (!IsMacOS) {
   } else {
     Run()
   }
-  
-  PostProcess.Set(true)
 }

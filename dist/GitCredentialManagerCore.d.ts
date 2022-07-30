@@ -2,8 +2,8 @@ import { ExecOptions } from '@actions/exec';
 export declare class GitCredentialManagerCore {
     static Execute(command: string, options?: ExecOptions): Promise<number>;
     static Configure(): Promise<number>;
-    static Get(): Promise<string>;
-    static Get2(): Promise<number>;
+    static Get(): Promise<number>;
+    static GetWithStdout(): Promise<string>;
     /**
      * Store git credentials
      *

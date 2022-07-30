@@ -4393,6 +4393,12 @@ class GitCredentialManagerCore {
         });
     }
     static Get() {
+        const options = {
+            input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
+        };
+        return this.Execute('get', options);
+    }
+    static GetWithStdout() {
         return __awaiter(this, void 0, void 0, function* () {
             let output = '';
             const options = {
@@ -4411,12 +4417,6 @@ class GitCredentialManagerCore {
                 return '';
             }
         });
-    }
-    static Get2() {
-        const options = {
-            input: Buffer.from(`protocol=https\nhost=github.com\n\n`),
-        };
-        return this.Execute('get', options);
     }
     /**
      * Store git credentials
@@ -4565,6 +4565,7 @@ const IsMacOS = os.platform() === 'darwin';
 const PostProcess = new StateHelper_1.BooleanStateValue('IS_POST_PROCESS');
 const KeychainCache = new StateHelper_1.StringStateValue('KEYCHAIN');
 const KeychainPasswordCache = new StateHelper_1.StringStateValue('KEYCHAIN_PASSWORD');
+const StoreGitCredential = new StateHelper_1.BooleanStateValue('IS_STORE_GIT_CREDENTIAL');
 function SettingKeychain() {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('Keychain Settings');
@@ -4590,10 +4591,11 @@ function SettingCredential() {
         core.startGroup('git credential-manager-core Settings');
         yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
         try {
-            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get2();
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
         }
         catch (ex) {
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('github-username'), core.getInput('github-password'));
+            StoreGitCredential.Set(true);
         }
         core.endGroup();
     });
@@ -4607,6 +4609,7 @@ function Run() {
         catch (ex) {
             core.setFailed(ex.message);
         }
+        PostProcess.Set(true);
     });
 }
 function Cleanup() {
@@ -4614,7 +4617,9 @@ function Cleanup() {
         try {
             yield keychain_1.Keychain.SetDefaultKeychain(KeychainCache.Get());
             yield keychain_1.Keychain.UnlockKeychain(KeychainCache.Get(), KeychainPasswordCache.Get());
-            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
+            if (!!StoreGitCredential.Get()) {
+                yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
+            }
         }
         catch (ex) {
             core.setFailed(ex.message);
@@ -4631,7 +4636,6 @@ else {
     else {
         Run();
     }
-    PostProcess.Set(true);
 }
 
 

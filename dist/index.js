@@ -4589,10 +4589,10 @@ function SettingCredential() {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('git credential-manager-core Settings');
         yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
-        var get = '';
-        yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get2();
-        //  core.info(get)
-        if (!get) {
+        try {
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get2();
+        }
+        catch (ex) {
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('github-username'), core.getInput('github-password'));
         }
         core.endGroup();

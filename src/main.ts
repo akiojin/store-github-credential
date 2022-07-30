@@ -41,11 +41,9 @@ async function SettingCredential()
 
   await Credential.Configure()
 
-  var get = ''
-  await Credential.Get2()
-//  core.info(get)
-
-  if (!get) {
+  try {
+	await Credential.Get2()
+  } catch (ex: any) {
     await Credential.Store(core.getInput('github-username'), core.getInput('github-password'))
   }
 

@@ -49,6 +49,7 @@ async function Run()
 
     try {
       await Credential.Get()
+      core.notice('No authentication information is set.')
     } catch (ex: any) {
       await SettingKeychain()
       await StoreCredential()

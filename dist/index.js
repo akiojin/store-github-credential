@@ -4598,6 +4598,7 @@ function Run() {
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
             try {
                 yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
+                core.notice('No authentication information is set.');
             }
             catch (ex) {
                 yield SettingKeychain();

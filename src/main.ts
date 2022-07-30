@@ -39,7 +39,8 @@ async function SettingCredential()
 {
   core.startGroup('git credential-manager-core Settings')
 
-  var get = await Credential.Get()
+  var get = ''
+  await Credential.Get2()
 //  core.info(get)
 
   if (!get) {

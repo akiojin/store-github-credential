@@ -4421,12 +4421,24 @@ class GitCredentialManagerCore {
         };
         return this.Execute('get', options);
     }
+    /**
+     * Store git credentials
+     *
+     * @param   username        User name.
+     * @param   password        Password or Personal access token.
+     * @returns Promise<number> exit code
+     */
     static Store(username, password) {
         const options = {
             input: Buffer.from(`protocol=https\nhost=github.com\nusername=${username}\npassword=${password}\n`)
         };
         return this.Execute('store', options);
     }
+    /**
+     * Erase git credentials
+     *
+     * @returns Promise<number> exit code
+     */
     static Erase() {
         const options = {
             input: this.CreateBuffer('https', 'github.com'),
@@ -4579,7 +4591,8 @@ function SettingKeychain() {
 function SettingCredential() {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('git credential-manager-core Settings');
-        var get = yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
+        var get = '';
+        yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get2();
         //  core.info(get)
         if (!get) {
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();

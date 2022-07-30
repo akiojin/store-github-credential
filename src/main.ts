@@ -18,7 +18,7 @@ async function SettingKeychain()
   let keychain: string = core.getInput('keychain')
   if (!keychain) {
     keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`
-	  core.info('Use the default login keychain')
+    core.info('Use the default login keychain')
   }
 
   const keychainPassword: string = core.getInput('keychain-password')
@@ -36,27 +36,23 @@ async function SettingKeychain()
   core.endGroup()
 }
 
-async function SettingCredential()
+async function StoreCredential()
 {
-  core.startGroup('git credential-manager-core Settings')
-
-  await Credential.Configure()
-
-  try {
-	await Credential.Get()
-  } catch (ex: any) {
-    await Credential.Store(core.getInput('github-username'), core.getInput('github-password'))
-	StoreGitCredential.Set(true)
-  }
-
-  core.endGroup()
+  await Credential.Store(core.getInput('github-username'), core.getInput('github-password'))
+  StoreGitCredential.Set(true)
 }
 
 async function Run()
 {
   try {
-    await SettingKeychain()
-    await SettingCredential()
+    await Credential.Configure()
+
+    try {
+      await Credential.Get()
+    } catch (ex: any) {
+      await SettingKeychain()
+      await StoreCredential()
+    }
   } catch (ex: any) {
     core.setFailed(ex.message)
   }
@@ -67,12 +63,11 @@ async function Run()
 async function Cleanup()
 {
   try {
-    await Keychain.SetDefaultKeychain(KeychainCache.Get())
-    await Keychain.UnlockKeychain(KeychainCache.Get(), KeychainPasswordCache.Get())
-
-	if (!!StoreGitCredential.Get()) {
-	    await Credential.Erase()
-	}
+    if (!!StoreGitCredential.Get()) {
+      await Keychain.SetDefaultKeychain(KeychainCache.Get())
+      await Keychain.UnlockKeychain(KeychainCache.Get(), KeychainPasswordCache.Get())
+      await Credential.Erase()
+    }
   } catch (ex: any) {
     core.setFailed(ex.message)
   }

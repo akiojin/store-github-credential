@@ -4586,25 +4586,23 @@ function SettingKeychain() {
         core.endGroup();
     });
 }
-function SettingCredential() {
+function StoreCredential() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.startGroup('git credential-manager-core Settings');
-        yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
-        try {
-            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
-        }
-        catch (ex) {
-            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('github-username'), core.getInput('github-password'));
-            StoreGitCredential.Set(true);
-        }
-        core.endGroup();
+        yield GitCredentialManagerCore_1.GitCredentialManagerCore.Store(core.getInput('github-username'), core.getInput('github-password'));
+        StoreGitCredential.Set(true);
     });
 }
 function Run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield SettingKeychain();
-            yield SettingCredential();
+            yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
+            try {
+                yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
+            }
+            catch (ex) {
+                yield SettingKeychain();
+                yield StoreCredential();
+            }
         }
         catch (ex) {
             core.setFailed(ex.message);
@@ -4615,9 +4613,9 @@ function Run() {
 function Cleanup() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield keychain_1.Keychain.SetDefaultKeychain(KeychainCache.Get());
-            yield keychain_1.Keychain.UnlockKeychain(KeychainCache.Get(), KeychainPasswordCache.Get());
             if (!!StoreGitCredential.Get()) {
+                yield keychain_1.Keychain.SetDefaultKeychain(KeychainCache.Get());
+                yield keychain_1.Keychain.UnlockKeychain(KeychainCache.Get(), KeychainPasswordCache.Get());
                 yield GitCredentialManagerCore_1.GitCredentialManagerCore.Erase();
             }
         }

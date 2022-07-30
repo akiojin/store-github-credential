@@ -4555,6 +4555,7 @@ function SettingKeychain() {
         let keychain = core.getInput('keychain');
         if (!keychain) {
             keychain = `${process.env.HOME}/Library/Keychains/login.keychain-db`;
+            core.info('Use the default login keychain');
         }
         const keychainPassword = core.getInput('keychain-password');
         if (!!keychainPassword) {

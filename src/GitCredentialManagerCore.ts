@@ -5,6 +5,7 @@ export class GitCredentialManagerCore
 {
   static Execute(command: string, options?: ExecOptions): Promise<number>
   {
+    // https://github.com/GitCredentialManager/git-credential-manager/blob/main/docs/credstores.md#macos-keychain
     return exec.exec('git', ['credential-manager-core', command], options)
   }
 

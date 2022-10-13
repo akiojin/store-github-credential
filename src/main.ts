@@ -2,14 +2,14 @@ import * as core from '@actions/core'
 import * as os from 'os'
 import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
 import { Keychain } from '@akiojin/keychain'
-import { BooleanStateValue, StringStateValue } from './StateHelper'
+import { BooleanEnvironment, StringEnvironment } from './Environment'
 
 const IsMacOS = os.platform() === 'darwin'
 
-const PostProcess = new BooleanStateValue('IS_POST_PROCESS')
-const KeychainCache = new StringStateValue('KEYCHAIN')
-const KeychainPasswordCache = new StringStateValue('KEYCHAIN_PASSWORD')
-const StoreGitCredential = new BooleanStateValue('IS_STORE_GIT_CREDENTIAL')
+const PostProcess = new BooleanEnvironment('IS_POST_PROCESS')
+const KeychainCache = new StringEnvironment('KEYCHAIN')
+const KeychainPasswordCache = new StringEnvironment('KEYCHAIN_PASSWORD')
+const StoreGitCredential = new BooleanEnvironment('IS_STORE_GIT_CREDENTIAL')
 
 async function SettingKeychain()
 {

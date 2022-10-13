@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 538:
+/***/ 368:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -28,7 +28,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
 const os = __importStar(__nccwpck_require__(37));
-const utils_1 = __nccwpck_require__(63);
+const utils_1 = __nccwpck_require__(797);
 /**
  * Commands
  *
@@ -100,7 +100,7 @@ function escapeProperty(s) {
 
 /***/ }),
 
-/***/ 74:
+/***/ 810:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -135,13 +135,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
-const command_1 = __nccwpck_require__(538);
-const file_command_1 = __nccwpck_require__(20);
-const utils_1 = __nccwpck_require__(63);
+const command_1 = __nccwpck_require__(368);
+const file_command_1 = __nccwpck_require__(647);
+const utils_1 = __nccwpck_require__(797);
 const os = __importStar(__nccwpck_require__(37));
 const path = __importStar(__nccwpck_require__(17));
-const uuid_1 = __nccwpck_require__(509);
-const oidc_utils_1 = __nccwpck_require__(50);
+const oidc_utils_1 = __nccwpck_require__(228);
 /**
  * The code to exit an action
  */
@@ -170,20 +169,9 @@ function exportVariable(name, val) {
     process.env[name] = convertedVal;
     const filePath = process.env['GITHUB_ENV'] || '';
     if (filePath) {
-        const delimiter = `ghadelimiter_${uuid_1.v4()}`;
-        // These should realistically never happen, but just in case someone finds a way to exploit uuid generation let's not allow keys or values that contain the delimiter.
-        if (name.includes(delimiter)) {
-            throw new Error(`Unexpected input: name should not contain the delimiter "${delimiter}"`);
-        }
-        if (convertedVal.includes(delimiter)) {
-            throw new Error(`Unexpected input: value should not contain the delimiter "${delimiter}"`);
-        }
-        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
-        file_command_1.issueCommand('ENV', commandValue);
+        return file_command_1.issueFileCommand('ENV', file_command_1.prepareKeyValueMessage(name, val));
     }
-    else {
-        command_1.issueCommand('set-env', { name }, convertedVal);
-    }
+    command_1.issueCommand('set-env', { name }, convertedVal);
 }
 exports.exportVariable = exportVariable;
 /**
@@ -201,7 +189,7 @@ exports.setSecret = setSecret;
 function addPath(inputPath) {
     const filePath = process.env['GITHUB_PATH'] || '';
     if (filePath) {
-        file_command_1.issueCommand('PATH', inputPath);
+        file_command_1.issueFileCommand('PATH', inputPath);
     }
     else {
         command_1.issueCommand('add-path', {}, inputPath);
@@ -241,7 +229,10 @@ function getMultilineInput(name, options) {
     const inputs = getInput(name, options)
         .split('\n')
         .filter(x => x !== '');
-    return inputs;
+    if (options && options.trimWhitespace === false) {
+        return inputs;
+    }
+    return inputs.map(input => input.trim());
 }
 exports.getMultilineInput = getMultilineInput;
 /**
@@ -274,8 +265,12 @@ exports.getBooleanInput = getBooleanInput;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setOutput(name, value) {
+    const filePath = process.env['GITHUB_OUTPUT'] || '';
+    if (filePath) {
+        return file_command_1.issueFileCommand('OUTPUT', file_command_1.prepareKeyValueMessage(name, value));
+    }
     process.stdout.write(os.EOL);
-    command_1.issueCommand('set-output', { name }, value);
+    command_1.issueCommand('set-output', { name }, utils_1.toCommandValue(value));
 }
 exports.setOutput = setOutput;
 /**
@@ -404,7 +399,11 @@ exports.group = group;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function saveState(name, value) {
-    command_1.issueCommand('save-state', { name }, value);
+    const filePath = process.env['GITHUB_STATE'] || '';
+    if (filePath) {
+        return file_command_1.issueFileCommand('STATE', file_command_1.prepareKeyValueMessage(name, value));
+    }
+    command_1.issueCommand('save-state', { name }, utils_1.toCommandValue(value));
 }
 exports.saveState = saveState;
 /**
@@ -426,17 +425,17 @@ exports.getIDToken = getIDToken;
 /**
  * Summary exports
  */
-var summary_1 = __nccwpck_require__(272);
+var summary_1 = __nccwpck_require__(776);
 Object.defineProperty(exports, "summary", ({ enumerable: true, get: function () { return summary_1.summary; } }));
 /**
  * @deprecated use core.summary
  */
-var summary_2 = __nccwpck_require__(272);
+var summary_2 = __nccwpck_require__(776);
 Object.defineProperty(exports, "markdownSummary", ({ enumerable: true, get: function () { return summary_2.markdownSummary; } }));
 /**
  * Path exports
  */
-var path_utils_1 = __nccwpck_require__(93);
+var path_utils_1 = __nccwpck_require__(834);
 Object.defineProperty(exports, "toPosixPath", ({ enumerable: true, get: function () { return path_utils_1.toPosixPath; } }));
 Object.defineProperty(exports, "toWin32Path", ({ enumerable: true, get: function () { return path_utils_1.toWin32Path; } }));
 Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: function () { return path_utils_1.toPlatformPath; } }));
@@ -444,7 +443,7 @@ Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: funct
 
 /***/ }),
 
-/***/ 20:
+/***/ 647:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -470,13 +469,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.issueCommand = void 0;
+exports.prepareKeyValueMessage = exports.issueFileCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__nccwpck_require__(147));
 const os = __importStar(__nccwpck_require__(37));
-const utils_1 = __nccwpck_require__(63);
-function issueCommand(command, message) {
+const uuid_1 = __nccwpck_require__(55);
+const utils_1 = __nccwpck_require__(797);
+function issueFileCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
         throw new Error(`Unable to find environment variable for file command ${command}`);
@@ -488,12 +488,27 @@ function issueCommand(command, message) {
         encoding: 'utf8'
     });
 }
-exports.issueCommand = issueCommand;
+exports.issueFileCommand = issueFileCommand;
+function prepareKeyValueMessage(key, value) {
+    const delimiter = `ghadelimiter_${uuid_1.v4()}`;
+    const convertedValue = utils_1.toCommandValue(value);
+    // These should realistically never happen, but just in case someone finds a
+    // way to exploit uuid generation let's not allow keys or values that contain
+    // the delimiter.
+    if (key.includes(delimiter)) {
+        throw new Error(`Unexpected input: name should not contain the delimiter "${delimiter}"`);
+    }
+    if (convertedValue.includes(delimiter)) {
+        throw new Error(`Unexpected input: value should not contain the delimiter "${delimiter}"`);
+    }
+    return `${key}<<${delimiter}${os.EOL}${convertedValue}${os.EOL}${delimiter}`;
+}
+exports.prepareKeyValueMessage = prepareKeyValueMessage;
 //# sourceMappingURL=file-command.js.map
 
 /***/ }),
 
-/***/ 50:
+/***/ 228:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -509,9 +524,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OidcClient = void 0;
-const http_client_1 = __nccwpck_require__(781);
-const auth_1 = __nccwpck_require__(136);
-const core_1 = __nccwpck_require__(74);
+const http_client_1 = __nccwpck_require__(734);
+const auth_1 = __nccwpck_require__(278);
+const core_1 = __nccwpck_require__(810);
 class OidcClient {
     static createHttpClient(allowRetry = true, maxRetry = 10) {
         const requestOptions = {
@@ -577,7 +592,7 @@ exports.OidcClient = OidcClient;
 
 /***/ }),
 
-/***/ 93:
+/***/ 834:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -642,7 +657,7 @@ exports.toPlatformPath = toPlatformPath;
 
 /***/ }),
 
-/***/ 272:
+/***/ 776:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -932,7 +947,7 @@ exports.summary = _summary;
 
 /***/ }),
 
-/***/ 63:
+/***/ 797:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -979,7 +994,7 @@ exports.toCommandProperties = toCommandProperties;
 
 /***/ }),
 
-/***/ 479:
+/***/ 222:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1015,7 +1030,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getExecOutput = exports.exec = void 0;
 const string_decoder_1 = __nccwpck_require__(576);
-const tr = __importStar(__nccwpck_require__(664));
+const tr = __importStar(__nccwpck_require__(708));
 /**
  * Exec a command.
  * Output will be streamed to the live console.
@@ -1089,7 +1104,7 @@ exports.getExecOutput = getExecOutput;
 
 /***/ }),
 
-/***/ 664:
+/***/ 708:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1128,8 +1143,8 @@ const os = __importStar(__nccwpck_require__(37));
 const events = __importStar(__nccwpck_require__(361));
 const child = __importStar(__nccwpck_require__(81));
 const path = __importStar(__nccwpck_require__(17));
-const io = __importStar(__nccwpck_require__(262));
-const ioUtil = __importStar(__nccwpck_require__(383));
+const io = __importStar(__nccwpck_require__(246));
+const ioUtil = __importStar(__nccwpck_require__(165));
 const timers_1 = __nccwpck_require__(512);
 /* eslint-disable @typescript-eslint/unbound-method */
 const IS_WINDOWS = process.platform === 'win32';
@@ -1714,7 +1729,7 @@ class ExecState extends events.EventEmitter {
 
 /***/ }),
 
-/***/ 136:
+/***/ 278:
 /***/ (function(__unused_webpack_module, exports) {
 
 "use strict";
@@ -1802,7 +1817,7 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 
 /***/ }),
 
-/***/ 781:
+/***/ 734:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1840,8 +1855,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HttpClient = exports.isHttps = exports.HttpClientResponse = exports.HttpClientError = exports.getProxyUrl = exports.MediaTypes = exports.Headers = exports.HttpCodes = void 0;
 const http = __importStar(__nccwpck_require__(685));
 const https = __importStar(__nccwpck_require__(687));
-const pm = __importStar(__nccwpck_require__(434));
-const tunnel = __importStar(__nccwpck_require__(390));
+const pm = __importStar(__nccwpck_require__(682));
+const tunnel = __importStar(__nccwpck_require__(786));
 var HttpCodes;
 (function (HttpCodes) {
     HttpCodes[HttpCodes["OK"] = 200] = "OK";
@@ -2414,7 +2429,7 @@ const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCa
 
 /***/ }),
 
-/***/ 434:
+/***/ 682:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -2482,7 +2497,7 @@ exports.checkBypass = checkBypass;
 
 /***/ }),
 
-/***/ 383:
+/***/ 165:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2666,7 +2681,7 @@ exports.getCmdPath = getCmdPath;
 
 /***/ }),
 
-/***/ 262:
+/***/ 246:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2705,7 +2720,7 @@ const assert_1 = __nccwpck_require__(491);
 const childProcess = __importStar(__nccwpck_require__(81));
 const path = __importStar(__nccwpck_require__(17));
 const util_1 = __nccwpck_require__(837);
-const ioUtil = __importStar(__nccwpck_require__(383));
+const ioUtil = __importStar(__nccwpck_require__(165));
 const exec = util_1.promisify(childProcess.exec);
 const execFile = util_1.promisify(childProcess.execFile);
 /**
@@ -3014,7 +3029,7 @@ function copyFile(srcFile, destFile, force) {
 
 /***/ }),
 
-/***/ 846:
+/***/ 526:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 /******/ (() => { // webpackBootstrap
@@ -4889,15 +4904,15 @@ module.exports = __nccwpck_require__(837);
 
 /***/ }),
 
-/***/ 390:
+/***/ 786:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-module.exports = __nccwpck_require__(522);
+module.exports = __nccwpck_require__(683);
 
 
 /***/ }),
 
-/***/ 522:
+/***/ 683:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5169,7 +5184,7 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 509:
+/***/ 55:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5233,29 +5248,29 @@ Object.defineProperty(exports, "parse", ({
   }
 }));
 
-var _v = _interopRequireDefault(__nccwpck_require__(233));
+var _v = _interopRequireDefault(__nccwpck_require__(434));
 
-var _v2 = _interopRequireDefault(__nccwpck_require__(661));
+var _v2 = _interopRequireDefault(__nccwpck_require__(136));
 
-var _v3 = _interopRequireDefault(__nccwpck_require__(561));
+var _v3 = _interopRequireDefault(__nccwpck_require__(127));
 
-var _v4 = _interopRequireDefault(__nccwpck_require__(3));
+var _v4 = _interopRequireDefault(__nccwpck_require__(225));
 
-var _nil = _interopRequireDefault(__nccwpck_require__(129));
+var _nil = _interopRequireDefault(__nccwpck_require__(175));
 
-var _version = _interopRequireDefault(__nccwpck_require__(36));
+var _version = _interopRequireDefault(__nccwpck_require__(909));
 
-var _validate = _interopRequireDefault(__nccwpck_require__(61));
+var _validate = _interopRequireDefault(__nccwpck_require__(713));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(343));
+var _stringify = _interopRequireDefault(__nccwpck_require__(146));
 
-var _parse = _interopRequireDefault(__nccwpck_require__(121));
+var _parse = _interopRequireDefault(__nccwpck_require__(775));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
 
-/***/ 5:
+/***/ 280:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5285,7 +5300,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 129:
+/***/ 175:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -5300,7 +5315,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 121:
+/***/ 775:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5311,7 +5326,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _validate = _interopRequireDefault(__nccwpck_require__(61));
+var _validate = _interopRequireDefault(__nccwpck_require__(713));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5352,7 +5367,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 409:
+/***/ 403:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -5367,7 +5382,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 53:
+/***/ 54:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5398,7 +5413,7 @@ function rng() {
 
 /***/ }),
 
-/***/ 571:
+/***/ 531:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5428,7 +5443,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 343:
+/***/ 146:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5439,7 +5454,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _validate = _interopRequireDefault(__nccwpck_require__(61));
+var _validate = _interopRequireDefault(__nccwpck_require__(713));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5474,7 +5489,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 233:
+/***/ 434:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5485,9 +5500,9 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _rng = _interopRequireDefault(__nccwpck_require__(53));
+var _rng = _interopRequireDefault(__nccwpck_require__(54));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(343));
+var _stringify = _interopRequireDefault(__nccwpck_require__(146));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5588,7 +5603,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 661:
+/***/ 136:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5599,9 +5614,9 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _v = _interopRequireDefault(__nccwpck_require__(887));
+var _v = _interopRequireDefault(__nccwpck_require__(530));
 
-var _md = _interopRequireDefault(__nccwpck_require__(5));
+var _md = _interopRequireDefault(__nccwpck_require__(280));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5611,7 +5626,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 887:
+/***/ 530:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5623,9 +5638,9 @@ Object.defineProperty(exports, "__esModule", ({
 exports["default"] = _default;
 exports.URL = exports.DNS = void 0;
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(343));
+var _stringify = _interopRequireDefault(__nccwpck_require__(146));
 
-var _parse = _interopRequireDefault(__nccwpck_require__(121));
+var _parse = _interopRequireDefault(__nccwpck_require__(775));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5696,7 +5711,7 @@ function _default(name, version, hashfunc) {
 
 /***/ }),
 
-/***/ 561:
+/***/ 127:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5707,9 +5722,9 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _rng = _interopRequireDefault(__nccwpck_require__(53));
+var _rng = _interopRequireDefault(__nccwpck_require__(54));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(343));
+var _stringify = _interopRequireDefault(__nccwpck_require__(146));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5740,7 +5755,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 3:
+/***/ 225:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5751,9 +5766,9 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _v = _interopRequireDefault(__nccwpck_require__(887));
+var _v = _interopRequireDefault(__nccwpck_require__(530));
 
-var _sha = _interopRequireDefault(__nccwpck_require__(571));
+var _sha = _interopRequireDefault(__nccwpck_require__(531));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5763,7 +5778,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 61:
+/***/ 713:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5774,7 +5789,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _regex = _interopRequireDefault(__nccwpck_require__(409));
+var _regex = _interopRequireDefault(__nccwpck_require__(403));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5787,7 +5802,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 36:
+/***/ 909:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5798,7 +5813,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _validate = _interopRequireDefault(__nccwpck_require__(61));
+var _validate = _interopRequireDefault(__nccwpck_require__(713));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5815,7 +5830,100 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 587:
+/***/ 244:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _Environement_key;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.NumberEnvironment = exports.BooleanEnvironment = exports.StringEnvironment = void 0;
+const core = __importStar(__nccwpck_require__(810));
+class Environement {
+    constructor(key) {
+        _Environement_key.set(this, '');
+        __classPrivateFieldSet(this, _Environement_key, key, "f");
+    }
+    GetKey() {
+        return __classPrivateFieldGet(this, _Environement_key, "f");
+    }
+}
+_Environement_key = new WeakMap();
+class StringEnvironment extends Environement {
+    constructor(key) {
+        super(key);
+    }
+    Set(value) {
+        core.saveState(this.GetKey(), value);
+    }
+    Get() {
+        return core.getState(this.GetKey());
+    }
+}
+exports.StringEnvironment = StringEnvironment;
+class BooleanEnvironment extends Environement {
+    constructor(key) {
+        super(key);
+    }
+    Set(value) {
+        core.saveState(this.GetKey(), value.toString());
+    }
+    Get() {
+        return !!core.getState(this.GetKey());
+    }
+}
+exports.BooleanEnvironment = BooleanEnvironment;
+class NumberEnvironment extends Environement {
+    constructor(key) {
+        super(key);
+    }
+    Set(value) {
+        core.saveState(this.GetKey(), value.toString());
+    }
+    Get() {
+        return +core.getState(this.GetKey());
+    }
+}
+exports.NumberEnvironment = NumberEnvironment;
+
+
+/***/ }),
+
+/***/ 924:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -5854,7 +5962,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitCredentialManagerCore = void 0;
-const exec = __importStar(__nccwpck_require__(479));
+const exec = __importStar(__nccwpck_require__(222));
 class GitCredentialManagerCore {
     static Execute(command, options) {
         // https://github.com/GitCredentialManager/git-credential-manager/blob/main/docs/credstores.md#macos-keychain
@@ -5922,77 +6030,7 @@ exports.GitCredentialManagerCore = GitCredentialManagerCore;
 
 /***/ }),
 
-/***/ 372:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BooleanStateValue = exports.StringStateValue = exports.StateHelper = void 0;
-const coreCommand = __importStar(__nccwpck_require__(538));
-class StateHelper {
-    static Set(key, value) {
-        coreCommand.issueCommand('save-state', { name: key }, value);
-    }
-    static Get(key) {
-        return process.env[`STATE_${key}`] || '';
-    }
-}
-exports.StateHelper = StateHelper;
-class StringStateValue {
-    constructor(key) {
-        this.key = '';
-        this.key = key;
-    }
-    Set(value) {
-        StateHelper.Set(this.key, value);
-    }
-    Get() {
-        return StateHelper.Get(this.key);
-    }
-}
-exports.StringStateValue = StringStateValue;
-class BooleanStateValue {
-    constructor(key) {
-        this.key = '';
-        this.key = key;
-    }
-    Set(value) {
-        StateHelper.Set(this.key, value.toString());
-    }
-    Get() {
-        return !!StateHelper.Get(this.key);
-    }
-}
-exports.BooleanStateValue = BooleanStateValue;
-
-
-/***/ }),
-
-/***/ 416:
+/***/ 917:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -6030,16 +6068,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(74));
+const core = __importStar(__nccwpck_require__(810));
 const os = __importStar(__nccwpck_require__(37));
-const GitCredentialManagerCore_1 = __nccwpck_require__(587);
-const keychain_1 = __nccwpck_require__(846);
-const StateHelper_1 = __nccwpck_require__(372);
+const GitCredentialManagerCore_1 = __nccwpck_require__(924);
+const keychain_1 = __nccwpck_require__(526);
+const Environment_1 = __nccwpck_require__(244);
 const IsMacOS = os.platform() === 'darwin';
-const PostProcess = new StateHelper_1.BooleanStateValue('IS_POST_PROCESS');
-const KeychainCache = new StateHelper_1.StringStateValue('KEYCHAIN');
-const KeychainPasswordCache = new StateHelper_1.StringStateValue('KEYCHAIN_PASSWORD');
-const StoreGitCredential = new StateHelper_1.BooleanStateValue('IS_STORE_GIT_CREDENTIAL');
+const PostProcess = new Environment_1.BooleanEnvironment('IS_POST_PROCESS');
+const KeychainCache = new Environment_1.StringEnvironment('KEYCHAIN');
+const KeychainPasswordCache = new Environment_1.StringEnvironment('KEYCHAIN_PASSWORD');
+const StoreGitCredential = new Environment_1.BooleanEnvironment('IS_STORE_GIT_CREDENTIAL');
 function SettingKeychain() {
     return __awaiter(this, void 0, void 0, function* () {
         core.startGroup('Keychain Settings');
@@ -6276,7 +6314,7 @@ module.exports = require("util");
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(416);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(917);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()

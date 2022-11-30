@@ -1,56 +1,40 @@
 name: Build
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   Build:
     runs-on: macos-latest
     timeout-minutes: 5
-
     steps:
       - uses: actions/checkout@v3
-
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-
       - run: npm install
-
-      - name: ncc build
-        run: |
-          npx @vercel/ncc build src/main.ts
+      - run: npx @vercel/ncc build src/main.ts
 
   Test:
     runs-on: macos-latest
     needs: Build
     timeout-minutes: 5
-
     steps:
-      - uses: actions/checkout@v2
-
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-
-      - name: Install git-credential-manager-core
+      - name: Install GCM
         run: |
           brew tap microsoft/git
           brew install --cask git-credential-manager-core
-
       - run: npm install
-
       - name: Default Loging keychain
         uses: ./
         with:
           github-username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
           github-password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}
-
-      - uses: akiojin/setup-temporary-keychain-github-action@v2
+      - uses: akiojin/setup-temporary-keychain-github-action@v2.0.7
         id: setup-temporary-keychain
-
       - name: Create temporary keychain
         uses: ./
         with:

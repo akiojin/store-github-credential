@@ -33,7 +33,7 @@ jobs:
         with:
           github-username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
           github-password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}
-      - uses: akiojin/setup-temporary-keychain-github-action@v2.0.7
+      - uses: akiojin/setup-temporary-keychain-github-action@v2.3.2
         id: setup-temporary-keychain
       - name: Create temporary keychain
         uses: ./

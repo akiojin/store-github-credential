@@ -1,6 +1,6 @@
 {
   "name": "store-git-credential-github-action",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "description": "This action saves the GitHub credentials to the specified keychain.",
   "main": "dist/index.js",
   "repository": {

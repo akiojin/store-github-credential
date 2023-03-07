@@ -6086,14 +6086,16 @@ function SettingKeychain() {
             keychain = keychain_1.Keychain.GetDefaultLoginKeychainPath();
             core.info('Use the default login keychain');
         }
+        else {
+            yield keychain_1.Keychain.SetDefaultKeychain(keychain);
+            yield keychain_1.Keychain.SetListKeychain(keychain);
+        }
         const keychainPassword = core.getInput('keychain-password');
         if (!!keychainPassword) {
             KeychainPasswordCache.Set(keychainPassword);
             core.setSecret(keychainPassword);
             yield keychain_1.Keychain.UnlockKeychain(keychain, keychainPassword);
         }
-        yield keychain_1.Keychain.SetDefaultKeychain(keychain);
-        yield keychain_1.Keychain.SetListKeychain(keychain);
         KeychainCache.Set(keychain);
         core.endGroup();
     });
@@ -6110,9 +6112,10 @@ function Run() {
             yield GitCredentialManagerCore_1.GitCredentialManagerCore.Configure();
             try {
                 yield GitCredentialManagerCore_1.GitCredentialManagerCore.Get();
-                core.notice('No authentication information is set.');
+                core.notice('Authentication information is already set.');
             }
             catch (ex) {
+                core.notice('No authentication information is set.');
                 yield SettingKeychain();
                 yield StoreCredential();
             }

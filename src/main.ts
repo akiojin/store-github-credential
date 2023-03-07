@@ -19,6 +19,9 @@ async function SettingKeychain()
   if (!keychain) {
     keychain = Keychain.GetDefaultLoginKeychainPath()
     core.info('Use the default login keychain')
+  } else {
+    await Keychain.SetDefaultKeychain(keychain)
+    await Keychain.SetListKeychain(keychain)
   }
 
   const keychainPassword: string = core.getInput('keychain-password')
@@ -27,9 +30,6 @@ async function SettingKeychain()
     core.setSecret(keychainPassword)
     await Keychain.UnlockKeychain(keychain, keychainPassword)
   }
-
-  await Keychain.SetDefaultKeychain(keychain)
-  await Keychain.SetListKeychain(keychain)
 
   KeychainCache.Set(keychain)
 
@@ -49,8 +49,9 @@ async function Run()
 
     try {
       await Credential.Get()
-      core.notice('No authentication information is set.')
+      core.notice('Authentication information is already set.')
     } catch (ex: any) {
+      core.notice('No authentication information is set.')
       await SettingKeychain()
       await StoreCredential()
     }

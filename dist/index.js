@@ -6247,12 +6247,12 @@ async function SettingKeychain() {
     core.endGroup();
 }
 async function StoreCredential() {
-    await git_credential_manager_helper_1.GitCredentialManager.Setup();
     await git_credential_manager_helper_1.GitCredentialManager.Store(core.getInput('github-username'), core.getInput('github-password'));
     StoreGitCredential.Set(true);
 }
 async function Run() {
     try {
+        await git_credential_manager_helper_1.GitCredentialManager.Setup();
         await git_credential_manager_helper_1.GitCredentialManager.Configure();
         try {
             await git_credential_manager_helper_1.GitCredentialManager.Get();

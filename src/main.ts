@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as os from 'os'
-import { GitCredentialManagerCore as Credential } from './GitCredentialManagerCore'
+import { GitCredentialManager } from '@akiojin/git-credential-manager-helper'
 import { Keychain } from '@akiojin/keychain'
 import { BooleanEnvironment, StringEnvironment } from './Environment'
 
@@ -38,17 +38,18 @@ async function SettingKeychain()
 
 async function StoreCredential()
 {
-  await Credential.Store(core.getInput('github-username'), core.getInput('github-password'))
+  await GitCredentialManager.Store(core.getInput('github-username'), core.getInput('github-password'))
   StoreGitCredential.Set(true)
 }
 
 async function Run()
 {
   try {
-    await Credential.Configure()
+    await GitCredentialManager.Configure()
+    await GitCredentialManager.Setup()
 
     try {
-      await Credential.Get()
+      await GitCredentialManager.Get()
       core.notice('Authentication information is already set.')
     } catch (ex: any) {
       core.notice('No authentication information is set.')
@@ -68,7 +69,7 @@ async function Cleanup()
     if (!!StoreGitCredential.Get()) {
       await Keychain.SetDefaultKeychain(KeychainCache.Get())
       await Keychain.UnlockKeychain(KeychainCache.Get(), KeychainPasswordCache.Get())
-      await Credential.Erase()
+      await GitCredentialManager.Erase()
     }
   } catch (ex: any) {
     core.setFailed(ex.message)

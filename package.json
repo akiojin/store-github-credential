@@ -28,6 +28,7 @@
   "devDependencies": {
     "@actions/core": "1.10.0",
     "@actions/exec": "1.1.1",
+    "@akiojin/git-credential-manager-helper": "0.1.0",
     "@akiojin/keychain": "1.0.0",
     "@commitlint/cli": "17.5.1",
     "@commitlint/config-conventional": "17.4.4",

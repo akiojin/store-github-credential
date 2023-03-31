@@ -45,8 +45,8 @@ async function StoreCredential()
 async function Run()
 {
   try {
-    await GitCredentialManager.Configure()
     await GitCredentialManager.Setup()
+    await GitCredentialManager.Configure()
 
     try {
       await GitCredentialManager.Get()

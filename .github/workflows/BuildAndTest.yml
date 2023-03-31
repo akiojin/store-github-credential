@@ -24,10 +24,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install GCM
-        run: |
-          brew tap microsoft/git
-          brew install --cask git-credential-manager-core
       - run: npm install
       - name: Default Loging keychain
         uses: ./

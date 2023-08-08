@@ -6262,8 +6262,10 @@ async function StoreCredential() {
 }
 async function Run() {
     try {
+        core.startGroup('Git credential manager settings');
         await git_credential_manager_helper_1.GitCredentialManager.Setup();
         await git_credential_manager_helper_1.GitCredentialManager.Configure();
+        core.endGroup();
         try {
             await git_credential_manager_helper_1.GitCredentialManager.Get();
             core.notice('Authentication information is already set.');

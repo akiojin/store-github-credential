@@ -45,8 +45,10 @@ async function StoreCredential()
 async function Run()
 {
   try {
+    core.startGroup('Git credential manager settings')
     await GitCredentialManager.Setup()
     await GitCredentialManager.Configure()
+    core.endGroup()
 
     try {
       await GitCredentialManager.Get()

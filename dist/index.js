@@ -3063,17 +3063,27 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitCredentialManager = void 0;
 const exec = __importStar(__nccwpck_require2_(514));
 class GitCredentialManager {
+    /**
+     * Setup git credential manager.
+     * Install git-credential-manager-core with Homebrew.
+     *
+     * Hobrew is required.
+     *
+     * @returns Promise<void>
+     */
     static async Setup() {
         await exec.exec('brew', ['tap', 'microsoft/git']);
+        // https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/rename.md#macos-package
         await exec.exec('brew', ['install', '--cask', 'git-credential-manager-core']);
     }
     static async Configure() {
         await this.Execute('configure');
-        return exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
+        await exec.exec('git', ['config', '--global', 'credential.interactive', 'false']);
+        await exec.exec('git', ['config', '--global', 'credential.credentialStore', 'keychain']);
     }
     static Execute(command, options) {
         // https://github.com/GitCredentialManager/git-credential-manager/blob/main/docs/credstores.md#macos-keychain
-        return exec.exec('git', ['credential-manager-core', command], options);
+        return exec.exec('git', ['credential-manager', command], options);
     }
     /**
      * Get git credentials
@@ -6252,8 +6262,10 @@ async function StoreCredential() {
 }
 async function Run() {
     try {
+        core.startGroup('Git credential manager settings');
         await git_credential_manager_helper_1.GitCredentialManager.Setup();
         await git_credential_manager_helper_1.GitCredentialManager.Configure();
+        core.endGroup();
         try {
             await git_credential_manager_helper_1.GitCredentialManager.Get();
             core.notice('Authentication information is already set.');

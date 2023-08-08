@@ -1,5 +1,5 @@
-name: 'Store GitHub credential'
-description: 'This action stores the GitHub credentials in the specified keychain.'
+name: 'Store Git credentials'
+description: 'This action stores the Git credentials in the specified keychain.'
 inputs:
   github-username:
     description: 'GitHub username'

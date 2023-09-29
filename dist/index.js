@@ -3074,7 +3074,7 @@ class GitCredentialManager {
     static async Setup() {
         await exec.exec('brew', ['tap', 'microsoft/git']);
         // https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/rename.md#macos-package
-        await exec.exec('brew', ['install', '--cask', 'git-credential-manager-core']);
+        await exec.exec('brew', ['install', '--cask', 'git-credential-manager']);
     }
     static async Configure() {
         await this.Execute('configure');

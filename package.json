@@ -1,6 +1,6 @@
 {
   "name": "store-git-credential-github-action",
-  "version": "1.7.3",
+  "version": "1.7.5",
   "description": "This action saves the GitHub credentials to the specified keychain.",
   "main": "dist/index.js",
   "scripts": {
@@ -23,21 +23,18 @@
   },
   "homepage": "https://github.com/akiojin/store-git-credential-github-action#readme",
   "dependencies": {
-    "tmp": "0.2.1"
+    "tmp": "0.2.3"
   },
   "devDependencies": {
-    "@actions/core": "1.10.0",
+    "@actions/core": "1.11.1",
     "@actions/exec": "1.1.1",
     "@akiojin/git-credential-manager-helper": "1.0.4",
     "@akiojin/keychain": "1.0.0",
-    "@commitlint/cli": "18.2.0",
-    "@commitlint/config-conventional": "18.1.0",
-    "@types/node": "20.8.10",
-    "@types/tmp": "0.2.5",
-    "@vercel/ncc": "0.36.1",
-    "husky": "8.0.3",
-    "rimraf": "5.0.1",
-    "typescript": "5.2.2"
+    "@types/node": "22.10.5",
+    "@types/tmp": "0.2.6",
+    "@vercel/ncc": "0.38.3",
+    "rimraf": "6.0.1",
+    "typescript": "5.7.2"
   },
   "private": true
 }

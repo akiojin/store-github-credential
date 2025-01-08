@@ -1,32 +1,20 @@
-name: Build
+name: Test
 
-on: push
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
 
 jobs:
-  Build:
-    runs-on: macos-latest
-    timeout-minutes: 5
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - run: npm run build
-
   Test:
     runs-on: macos-latest
-    needs: Build
     timeout-minutes: 5
 
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - run: npm install
+      - uses: actions/checkout@v4
 
       - name: Default Login keychain
         uses: ./
@@ -34,7 +22,7 @@ jobs:
           github-username: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_USERNAME }}
           github-password: ${{ secrets.GIT_CREDENTIAL_REPOSITORY_PAT }}
 
-      - uses: akiojin/setup-temporary-keychain-github-action@v2.3.2
+      - uses: akiojin/setup-temporary-keychain-github-action@v2
         id: setup-temporary-keychain
         
       - name: Create temporary keychain

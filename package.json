@@ -28,7 +28,7 @@
   "devDependencies": {
     "@actions/core": "1.11.1",
     "@actions/exec": "1.1.1",
-    "@akiojin/git-credential-manager-helper": "1.0.4",
+    "@akiojin/git-credential-manager-helper": "1.0.9",
     "@akiojin/keychain": "1.0.0",
     "@types/node": "22.10.5",
     "@types/tmp": "0.2.6",
